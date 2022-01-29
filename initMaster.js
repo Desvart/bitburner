@@ -2,7 +2,7 @@
 export async function main(ns) {
 	ns.tail();
     ns.clearLog();
-	ns.disableLog("ALL");
+	//ns.disableLog("ALL");
 
 	ns.print("STEP 0 - Release Jarvis");
 	ns.print("\t - NOT YET IMPLEMENTED");
