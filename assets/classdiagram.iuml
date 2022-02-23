@@ -5,8 +5,8 @@
 
 package 0-GitHub #pink{
   class Github {
-    +<color:#red>pull(?str[]) : bool
-    +<color:#red>push(?str[], str) : bool
+    +<color:#red>pull(?str[])
+    +<color:#red>push(?str[], str)
   }
 }
 
