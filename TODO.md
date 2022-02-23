@@ -22,6 +22,7 @@
 
 ## Internal notes
 const symbols = ["", "k", "m", "b", "t", "q", "Q", "s", "S", "o", "n", "e33", "e36", "e39"];
+
 Queue : 1 Hydra -- 2 Sherlock
 
 ## Class diagram
