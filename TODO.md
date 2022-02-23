@@ -60,3 +60,6 @@ Deploy malware as soon as a server has been upgraded
 * crime automation
 * market automation
 * Auto-learning ?
+
+## Class diagram
+![Class Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Desvart/bitburner/main/assets/classdiagram.iuml)
