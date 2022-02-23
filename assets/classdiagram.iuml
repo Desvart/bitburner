@@ -1,0 +1,285 @@
+@startuml
+'https://plantuml-editor.kkeisuke.dev/
+
+'interface NetworkLastUpdate <<Q, skyblue>> #aliceblue;line:deepskyblue {}
+
+package 0-GitHub #pink{
+  class Github {
+    +<color:#red>pull(?str[]) : bool
+    +<color:#red>push(?str[], str) : bool
+  }
+}
+
+package 1-Hacknet-BN9 #technology{
+  hide empty member
+
+  interface nextUpgrade <<Q, skyblue>> #aliceblue;line:deepskyblue {
+    +timestampOfNextUpgrade : int
+  }
+  'entity hacknet <<F, lawngreen>> #technology;line:green {}
+
+  class HacknetDaemon {
+    -cycleTime    : int
+    -harvestRatio   : float
+    -farm           : HacknetFarm
+    '-availableFunds : int
+    '-turnover       : int
+    
+    #deploy()
+    #activate()
+    +operate()
+    +identifyCheapestComponentToUpgrade() : [int, Component, int]
+    '-identifyMostProfitableUpgrade() : [int, str]
+  }
+
+  class HacknetFarm {
+    +MAX_NODE_COUNT : int
+    +nodeCount : int
+    +newNodeCost    : int
+    +nodeList : HacknetNode[]
+    +production : float
+    +totalProduction : float
+    '-investment : float
+    '-funds : float
+    
+    '+saveSnapshot() : bool
+    +buyNewNode() : bool
+    
+  }
+
+  'class HacknetNode <HacknetEntity> {
+  class HacknetNode {
+    #Component : {int, int, int, int}
+    -MAX_LEVEL : int
+    -MAX_RAM : int
+    -MAX_CORES : int
+    +id : int
+    '+investment
+    +level : int
+    +ram : int
+    +cores : int
+    +levelUpgradeCost : int
+    +ramUpgradeCost : int
+    +coreUpgradeCost : int
+    +production : float
+    +totalProduction : int
+
+    +getUpgradeCost(Component) : int
+    +upgrade(Component, int) : void
+    -upgradeLevel(int) : void
+    -upgradeRam(int) : void
+    -upgradeCore(int) : void
+  }  
+
+  'class HacknetServer <HacknetEntity> {} 
+  'abstract class HacknetEntity {}
+}
+
+package 2-Sherlock #technology{
+
+  class WatsonDaemon {
+    -rewardDisplay : bool
+    -contractsList : [str, str]
+
+    +wakeup()
+    -prepareContracts([str, str]) : Contract[]
+    -submitSolution(Contract) : str
+    -reportResult(Contract)
+  }
+
+  class Contract {
+    +name
+    +location
+    +type
+    +data
+    +remainingTentatives
+    +solution
+    +reward
+  }
+
+  class Sherlock {
+
+    +solve() : Contract
+    -solveAlgorithmicStockTrader()
+    -solveArrayJumingGame()
+    -solveFindAllValidMathExpressions()
+    -solveFindLargestPrimeFactor()
+    -solveGenerateIPAddresses()
+    -solveMergeOverlappingIntervals()
+    -solveMinimumPathSumInATriangle()
+    -solveSanitizeParenthesesInExpression()
+    -solveSpiralizeMatrix()
+    -solveSubarrayWithMaximumSum()
+    -solveTotalWayToSum()
+    -solveUniquePathsInAGridI()
+    -solveUniquePathsInAGridII()
+  }
+}
+
+package 3-Network #technology{
+
+  class Spider {
+    +network : Network
+    +availableContracts : [str, str]
+    -snapshotFile : str
+
+    +patrol()
+    +updateAdminStatus()
+    -updateAvailableContracts()
+    -loadNetwork()
+    -backupNetwork()
+  }
+
+  class Network {
+    +nodesList : Node[]
+    +nodesNameList : str[]
+    +nodesCount : int
+    +isFullyOwned : bool
+
+    +getNodes(str[]) : Node[]
+    +getNode(str) : Node
+    -getNodeNames() : str[]
+    -getNodeStaticData() : Node[]
+    -updateFullyOwnedStatus()
+    -checkIfPotentialTarget() : bool
+  }
+
+  class Node {
+    +hostname : str
+    +hasAdminRights : bool
+    +requiredHackingSkill : int
+    +numOpenPortsRequired : int
+    +securityMin : int
+    +moneyMax : int
+    +ramMax : int
+    +purchasedByPlayer : bool
+    +growthFactor : int
+    +isPotentialTarget : bool
+  }
+
+  entity network <<F, lawngreen>> #technology;line:green{}
+}
+
+package 4-Jarvis #cornsilk{
+  hide empty member
+  'entity jarvisKibana <<F, lawngreen>> #technology;line:green{}
+
+  class JarvisDaemon {
+    +hacknetDaemon : HacknetDaemon
+    +spider : Spider
+    +network : Network
+    -cycleTime : int
+    
+    +warmingUp()
+    +wakeup()
+    -hacknetInspection()
+    -releaseSpider()
+    -wakeupWatson()
+    -zombifyAvailableServers()
+  }
+
+  class SkeletonKey {
+    +keyCount : int
+    -KEYS : str[]
+
+    +nuke(target) : bool
+    -openPorts(str) : int
+    -requestRootAccess(str) : bool
+  }
+
+  class CONFIG{}
+}
+
+package 6-Hydra #pink{
+
+  class HydraDaemon {}
+  class ShivaDaemon {}
+  () hack
+  () weaken
+  () grow
+}
+
+package 7-WolfStreet-BN8 #pink{
+  
+  'entity wolfStreetKibana  <<F, lawngreen>> #technology;line:green {}
+  entity businessRelationship <<F, lawngreen>> #technology;line:green {}
+  
+  class TradingFloor {}
+  class Trader {}
+  class Market {}
+  class Stock {}
+}
+
+'package Underworld-BN2 {}
+'package Corporatocracy-BN3 {}
+
+package Singularity-BN4 #pink{ 
+  '=> singularity functions
+  class CareerCoach {}
+  class Job {}
+}
+
+'package AI-BN5 {} => getBitNodeMultipliers() + formulas
+'package Bladeburners-BN6/7 {}
+'Package HacknetServers-BM9 {}
+'Package Sleeves-BN10{}
+
+
+
+'GIT'
+Github -[hidden]d---- JarvisDaemon
+
+'JARVIS'
+JarvisDaemon -u- CONFIG
+JarvisDaemon -u- SkeletonKey
+
+JarvisDaemon      -l-     HacknetDaemon : > activate
+nextUpgrade       -      JarvisDaemon   : < listen to
+JarvisDaemon      -d-    Spider         : > run
+JarvisDaemon      -r-    WatsonDaemon   : > activate
+JarvisDaemon      --     HydraDaemon    : > activate
+JarvisDaemon      -u--   TradingFloor 
+JarvisDaemon      -u--   CareerCoach 
+
+'HACKNET'
+'HacknetDaemon .left|> hacknet : > save
+HacknetDaemon     -- HacknetFarm
+HacknetDaemon     .u.|> nextUpgrade : > publish
+HacknetFarm   "1" *-- "n" HacknetNode
+'HacknetFarm      *-- HacknetServer
+'HacknetNode      <|-- HacknetEntity
+'HacknetServer    <|-- HacknetEntity
+
+'CONTRACTS'
+WatsonDaemon -u- Contract
+WatsonDaemon -u- Sherlock
+Sherlock - Contract
+
+'SPIDER'
+Spider -d- Network
+Spider .r.|> network
+Network "1" *-r- "n" Node
+
+'HYDRA'
+HydraDaemon "1" -r- "n" ShivaDaemon
+HydraDaemon ..|> hack
+HydraDaemon ..|> grow
+HydraDaemon ..|> weaken
+ShivaDaemon -- hack 
+ShivaDaemon -- grow
+ShivaDaemon -- weaken
+
+'TRADING'
+TradingFloor .l|> businessRelationship
+Trader       .d.|> businessRelationship
+
+TradingFloor -u- Trader
+TradingFloor -u- Market
+
+Trader -r- Stock
+Market -l- Stock
+
+'JOB'
+CareerCoach -u- Job
+
+@enduml
