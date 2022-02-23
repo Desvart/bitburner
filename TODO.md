@@ -1,6 +1,3 @@
-Queue : 1 Hydra -- 2 Sherlock
-
-
 ## Hydra-Shiva
 
 * Adapt hydra to match multiple available pServ.
@@ -22,6 +19,10 @@ Queue : 1 Hydra -- 2 Sherlock
 # Market automation
 
 * Dump price variation on typical stock to analyse price fluctuations
+
+## Internal notes
+const symbols = ["", "k", "m", "b", "t", "q", "Q", "s", "S", "o", "n", "e33", "e36", "e39"];
+Queue : 1 Hydra -- 2 Sherlock
 
 ## Class diagram
 ![Class Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Desvart/bitburner/main/assets/classdiagram.iuml)
