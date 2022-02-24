@@ -14,7 +14,7 @@ export async function main(ns) {
                 paths[newSv] = `${path},${newSv}`;
                 if (newSv == target)
                     pathToTarget = paths[newSv].substr(1).split(",");
-
+                    
             }
         }
     }

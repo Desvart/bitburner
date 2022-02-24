@@ -34,24 +34,24 @@ export async function main(ns) {
         let name = server.name;
         let hackColor = ns.hasRootAccess(name) ? "lime" : "red";
         let nameColor = facServers[name] ? facServers[name] : "white";
-
+        
         let hoverText = ["Req Level: ", ns.getServerRequiredHackingLevel(name),
             "&#10;Req Ports: ", ns.getServerNumPortsRequired(name),
             "&#10;Memory: ", ns.getServerRam(name)[0], "GB",
             "&#10;Security: ", ns.getServerSecurityLevel(name),
             "/", ns.getServerMinSecurityLevel(name),
-            "&#10;Money: ", Math.round(ns.getServerMoneyAvailable(name)).toLocaleString(), " (",
+            "&#10;Money: ", Math.round(ns.getServerMoneyAvailable(name)).toLocaleString(), " (", 
             Math.round(100 * ns.getServerMoneyAvailable(name)/ns.getServerMaxMoney(name)), "%)"
-        ].join("");
-
+            ].join("");
+        
         let ctText = "";
         ns.ls(name, ".cct").forEach(ctName => {
             ctText += ["<a title='", ctName,
                 //Comment out the next line to reduce footprint by 5 GB
                 "&#10;", ns.codingcontract.getContractType(ctName, name),
-                "'>©</a>"].join("");
+                "'>©</a>"].join(""); 
         });
-
+               
         output += ["<br>", "---".repeat(server.depth),
             `<font color=${hackColor}>■ </font>`,
             `<a class='scan-analyze-link' title='${hoverText}''
@@ -59,7 +59,7 @@ export async function main(ns) {
             onClick="(function()
             {
                 const terminalInput = document.getElementById('terminal-input');
-                terminalInput.value='home; run helpers/connect.js ${name}';
+                terminalInput.value='home; run tools/connect.js ${name}';
                 const handler = Object.keys(terminalInput)[1];
                 terminalInput[handler].onChange({target:terminalInput});
                 terminalInput[handler].onKeyDown({keyCode:13,preventDefault:()=>null});
@@ -67,7 +67,7 @@ export async function main(ns) {
         
             style='color:${nameColor}'>${name}</a> `,
             `<font color='fuchisa'>${ctText}</font>`,
-        ].join("");
+            ].join("");
     });
 
     const doc = eval('document');
