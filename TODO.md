@@ -11,6 +11,19 @@
 * Add hydra activities and upgradable pserv logic
 * Design the daemon to upgrade servers one by one and not the full batch at once.
 * pServ-shivaX auto build
+
+## Sherlock
+
+* Fix bug: Array Jumping Game : [5,2,1,1,5,5]   OR    [4,2,1,1,8]
+
+## Unit testing
+
+* Setup a unit testing framework on JS
+** Jest + https://www.npmjs.com/package/jest-cucumber
+** https://www.freecodecamp.org/news/how-to-start-unit-testing-javascript/ 
+
+* https://cypress.io/ ??
+* NightwatchJS ??
     
 ## Map network in a log window
 

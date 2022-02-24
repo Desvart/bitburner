@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "bitburner-sync": "^1.0.1"
+  },
+  "devDependencies": {
+    "standard": "^16.0.4"
+  }
+}
