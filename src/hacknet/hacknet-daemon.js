@@ -1,7 +1,9 @@
-import {Log, initDaemon, formatMoney} 	from '/helper.js';
-import {HacknetConfig, JarvisConfig} 	from '/src/config/config.js';
-import {HacknetFarm} 					from '/hacknet-farm.js';
-import {HacknetNode} 					from '/hacknet-node.js';
+// noinspection SpellCheckingInspection
+
+import {Log, initDaemon, formatMoney} from '../helpers/helper.js';
+import {HacknetConfig, JarvisConfig} 	from '../config/config.js';
+import {HacknetFarm} 									from 'hacknet-farm.js';
+import {HacknetNode} 									from 'hacknet-node.js';
 
 export async function main(ns) {
 	initDaemon(ns, 'hacknet-daemon.js', HacknetConfig.displayTail);
@@ -12,32 +14,32 @@ export async function main(ns) {
 
 
 export class HacknetDaemon {
-	#ns;
-	#cycleTime;
-	#harvestRatio;
+	_ns;
+	_cycleTime;
+	_harvestRatio;
 	location
 	queueId;
 	//#availableFunds
-	get #farm() 		{ return new HacknetFarm(this.#ns); 		 				}
-	//get #newNodeCost() 	{ return Math.ceil(this.#ns.hacknet.getPurchaseNodeCost()); }
+	get #farm() 		{ return new HacknetFarm(this._ns); 		 				}
+	//get #newNodeCost() 	{ return Math.ceil(this._ns.hacknet.getPurchaseNodeCost()); }
 	//get #turnover() 	{ return this.#farm.production - this.#farm.investment;  	}
 	
 	constructor(ns) {
-		this.#ns 			= ns;
-		this.#cycleTime  	= HacknetConfig.cycleTime;
-		this.#harvestRatio 	= HacknetConfig.harvestRatio;
-		this.location		= HacknetConfig.location;
-		this.queueId		= HacknetConfig.queueId;
+		this._ns 					 = ns;
+		this._cycleTime  	 = HacknetConfig.cycleTime;
+		this._harvestRatio = HacknetConfig.harvestRatio;
+		this.location			 = HacknetConfig.location;
+		this.queueId			 = HacknetConfig.queueId;
 	}
 
 
 	static async deploy(ns, location) {
 		if (location !== 'home') {
-			await ns.scp('helper.js', 			location);
-			await ns.scp('hacknet-daemon.js', 	location);
+			await ns.scp('helper.js', 				location);
+			await ns.scp('hacknet-daemon.js', location);
 			await ns.scp('hacknet-farm.js', 	location);
 			await ns.scp('hacknet-node.js', 	location);
-			await ns.scp('config.js', 			location);
+			await ns.scp('config.js', 				location);
 		}
 	}
 
@@ -52,13 +54,13 @@ export class HacknetDaemon {
 
 		// check which component should be upgraded (least expensive)
 		let [nodeId, componentName, cost] = this.#identifyCheapestComponentToUpgrade();
-		Log.info(this.#ns, `HACKNET_DAEMON - Upgrade target: Node ${nodeId} - ${componentName} - Cost: ${formatMoney(this.#ns, cost)}`);
+		Log.info(this._ns, `HACKNET_DAEMON - Upgrade target: Node ${nodeId} - ${componentName} - Cost: ${formatMoney(this._ns, cost)}`);
 
 		// check available funds
-		while (this.#ns.getPlayer().money <= cost) {
-			let availableFund = formatMoney(this.#ns, this.#ns.getPlayer().money);
-			Log.warn(this.#ns, `HACKNET_DAEMON - Not enough money! Cost: ${formatMoney(this.#ns, cost)}, available: ${availableFund}`);
-			await this.#ns.sleep(this.#cycleTime * 10);
+		while (this._ns.getPlayer().money <= cost) {
+			let availableFund = formatMoney(this._ns, this._ns.getPlayer().money);
+			Log.warn(this._ns, `HACKNET_DAEMON - Not enough money! Cost: ${formatMoney(this._ns, cost)}, available: ${availableFund}`);
+			await this._ns.sleep(this._cycleTime * 10);
 		}
 
 		// upgrade
@@ -73,22 +75,22 @@ export class HacknetDaemon {
 
 		// compute time before next upgrade
 		let timeToRoI 				= costNext / this.#farm.production; //s
-		let timeBeforeNextUpgrade 	= Math.ceil(timeToRoI / this.#harvestRatio) * 1000; //ms
+		let timeBeforeNextUpgrade 	= Math.ceil(timeToRoI / this._harvestRatio) * 1000; //ms
 
 		if (componentNameNext === HacknetNode.Component.NODE) {
-			Log.info(this.#ns, `HACKNET_DAEMON - Next upgrade: New node ${nodeIdNext} in ${timeBeforeNextUpgrade} s.`);
+			Log.info(this._ns, `HACKNET_DAEMON - Next upgrade: New node ${nodeIdNext} in ${timeBeforeNextUpgrade} s.`);
 		} else {
 			let upgradeNext = this.#farm.nodeList[nodeIdNext][componentNameNext] + 1;
-			Log.info(this.#ns, `HACKNET_DAEMON - Next upgrade: Node ${nodeIdNext} - ${componentNameNext} -> ${upgradeNext} in ${timeBeforeNextUpgrade / 1000} s.`);
+			Log.info(this._ns, `HACKNET_DAEMON - Next upgrade: Node ${nodeIdNext} - ${componentNameNext} -> ${upgradeNext} in ${timeBeforeNextUpgrade / 1000} s.`);
 		}
 
 		// if less than Jarvis loop, wait, else send Jarvis the wake-up timestamp
 		if (timeBeforeNextUpgrade < JarvisConfig.cycleTime) {
-			await this.#ns.sleep(timeBeforeNextUpgrade);
+			await this._ns.sleep(timeBeforeNextUpgrade);
 			await this.operate();
 		} else {
-			await this.#ns.writePort(this.queueId, Date.now() + timeBeforeNextUpgrade);
-			Log.info(this.#ns, `HACKNET_DAEMON - Quit Hacknet Daemon. Jarvis should relaunch Hacknet Daemon in ${timeBeforeNextUpgrade / 1000} s.`);
+			await this._ns.writePort(this.queueId, Date.now() + timeBeforeNextUpgrade);
+			Log.info(this._ns, `HACKNET_DAEMON - Quit Hacknet Daemon. Jarvis should relaunch Hacknet Daemon in ${timeBeforeNextUpgrade / 1000} s.`);
 		}
 	}
 

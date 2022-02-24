@@ -1,25 +1,25 @@
-import {Log} from '/helper.js';
+import {Log} from '../helpers/helper.js';
 
 export class HacknetNode {
-    #ns;
+    _ns;
     static Component = Object.freeze({NODE: 'node', LEVEL: 'level', RAM: 'ram', CORE: 'cores'});
-    #MAX_LEVEL  = 200;
-    #MAX_RAM    = 64;
-    #MAX_CORES  = 16;
+    _MAX_LEVEL  = 200;
+    _MAX_RAM    = 64;
+    _MAX_CORES  = 16;
     id;
     //investment = null; //not used yet
-    get level()            { return this.#ns.hacknet.getNodeStats(this.id).level;      }
-    get ram()              { return this.#ns.hacknet.getNodeStats(this.id).ram;        }
-    get cores()            { return this.#ns.hacknet.getNodeStats(this.id).cores;      }
-    get levelUpgradeCost() { return this.#ns.hacknet.getLevelUpgradeCost(this.id, 1);  }
-    get ramUpgradeCost()   { return this.#ns.hacknet.getRamUpgradeCost(this.id, 1);    }
-    get coreUpgradeCost()  { return this.#ns.hacknet.getCoreUpgradeCost(this.id, 1);   }
-    get production()       { return this.#ns.hacknet.getNodeStats(this.id).production; }
-    get totalProduction()  { return Math.floor(this.#ns.hacknet.getNodeStats(this.id).totalProduction); }
+    get level()            { return this._ns.hacknet.getNodeStats(this.id).level;      }
+    get ram()              { return this._ns.hacknet.getNodeStats(this.id).ram;        }
+    get cores()            { return this._ns.hacknet.getNodeStats(this.id).cores;      }
+    get levelUpgradeCost() { return this._ns.hacknet.getLevelUpgradeCost(this.id, 1);  }
+    get ramUpgradeCost()   { return this._ns.hacknet.getRamUpgradeCost(this.id, 1);    }
+    get coreUpgradeCost()  { return this._ns.hacknet.getCoreUpgradeCost(this.id, 1);   }
+    get production()       { return this._ns.hacknet.getNodeStats(this.id).production; }
+    get totalProduction()  { return Math.floor(this._ns.hacknet.getNodeStats(this.id).totalProduction); }
     
     constructor (ns, nodeId) {
         //console.debug(`Hook - ${ns.getScriptName()} - Hacknet Node`);
-        this.#ns        = ns; 
+        this._ns        = ns;
         this.id         = nodeId;        
     }
 
@@ -64,20 +64,20 @@ export class HacknetNode {
 
 
     #upgradeLevel(qty = 1) {
-        if(this.#ns.hacknet.upgradeLevel(this.id, qty)) {
-			Log.info(this.#ns, `HACKNET_NODE - Node ${this.id} - Level upgraded to ${this.level}.`);
+        if(this._ns.hacknet.upgradeLevel(this.id, qty)) {
+			Log.info(this._ns, `HACKNET_NODE - Node ${this.id} - Level upgraded to ${this.level}.`);
         }
     }
 
     #upgradeRam(qty = 1) {
-        if(this.#ns.hacknet.upgradeRam(this.id, qty)) {
-            Log.info(this.#ns, `HACKNET_NODE - Node ${this.id} - RAM upgraded to ${this.ram}.`);
+        if(this._ns.hacknet.upgradeRam(this.id, qty)) {
+            Log.info(this._ns, `HACKNET_NODE - Node ${this.id} - RAM upgraded to ${this.ram}.`);
         }
     }
 
     #upgradeCore(qty = 1) {
-        if(this.#ns.hacknet.upgradeCore(this.id, qty)) {
-            Log.info(this.#ns, `HACKNET_NODE - Node ${this.id} - Cores upgraded to ${this.cores}.`);
+        if(this._ns.hacknet.upgradeCore(this.id, qty)) {
+            Log.info(this._ns, `HACKNET_NODE - Node ${this.id} - Cores upgraded to ${this.cores}.`);
         }
     }
 }

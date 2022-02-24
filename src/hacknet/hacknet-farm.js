@@ -1,27 +1,27 @@
-import {Log} from '/helper.js';
-import {HacknetNode} from '/hacknet-node.js';
+import {Log} 				 from '../helpers/helper.js';
+import {HacknetNode} from 'hacknet-node.js';
 
 export class HacknetFarm {
-	#ns
-	get MAX_NODE_COUNT()  { return this.#ns.hacknet.maxNumNodes(); }
-	get nodeCount()  	  { return this.#ns.hacknet.numNodes(); }
-	get newNodeCost() 	  { return this.#ns.hacknet.getPurchaseNodeCost(); }
-	get nodeList() 	 	  { return this.#getNodeList(); 		}
-	get production()	  { return this.#getProduction(); 		}
+	_ns;
+	get MAX_NODE_COUNT()  { return this._ns.hacknet.maxNumNodes(); }
+	get nodeCount()  	  	{ return this._ns.hacknet.numNodes(); }
+	get newNodeCost() 	  { return this._ns.hacknet.getPurchaseNodeCost(); }
+	get nodeList() 	 	  	{ return this.#getNodeList(); 		}
+	get production()	  	{ return this.#getProduction(); 		}
 	get totalProduction() { return this.#getTotalProduction(); 	}
 	//get investment() 	  { return this.#getInvestment(); 		}
 
 
 	constructor(ns) {
 		//console.debug(`Hook - ${ns.getScriptName()} - Hacknet Farm`);
-		this.#ns = ns;
+		this._ns = ns;
 	}
 
 
 	#getNodeList() {
 		let nodeList = [];
 		for (let i = 0; i < this.nodeCount; i++) {
-			let node = new HacknetNode(this.#ns, i);
+			let node = new HacknetNode(this._ns, i);
 			nodeList.push(node);
 		}
 		return nodeList;
@@ -41,7 +41,7 @@ export class HacknetFarm {
 	}
 
 	buyNewNode() {
-		let nodeId = this.#ns.hacknet.purchaseNode();
-		Log.success(this.#ns, `HACKNET_FARM - New node ${nodeId} bought.`);
+		let nodeId = this._ns.hacknet.purchaseNode();
+		Log.success(this._ns, `HACKNET_FARM - New node ${nodeId} bought.`);
 	}
 }
