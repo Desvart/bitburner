@@ -1,5 +1,5 @@
 import {Log, initDaemon}	                    from '/helper.js';
-import {JarvisConfig, WatsonConfig, NsConst} 	from '/config/config.js';
+import {JarvisConfig, WatsonConfig, NsConst} 	from '/src/config/config.js';
 import {HacknetDaemon}                          from '/hacknet-daemon.js';
 import {Spider}                                 from '/spider.js';
 import {SkeletonKey}                            from '/skeleton-key.js';

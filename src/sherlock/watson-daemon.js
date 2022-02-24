@@ -1,5 +1,5 @@
 import {Log, initDaemon, nowStr}    from '/helper.js';
-import {WatsonConfig}               from '/config/config.js';
+import {WatsonConfig}               from '/src/config/config.js';
 import {Contract}                   from './contract.js';
 import {Sherlock}                   from './sherlock.js';
 

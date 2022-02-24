@@ -1,6 +1,6 @@
 import {Log}	        from '/helper.js';
 import {Network}        from '/network.js';
-import {SpiderConfig} 	from '/config/config.js';
+import {SpiderConfig} 	from '/src/config/config.js';
 
 export class Spider {
     network;

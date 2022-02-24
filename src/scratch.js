@@ -1,5 +1,5 @@
 import { Log, nowStr } from '/helper.js'
-import { HacknetConfig, JarvisConfig } from '/config/config.js'
+import { HacknetConfig, JarvisConfig } from '/src/config/config.js'
 import { HacknetDaemon } from '/hacknet-daemon.js'
 
 export async function main (ns) {

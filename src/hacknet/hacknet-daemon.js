@@ -1,5 +1,5 @@
 import {Log, initDaemon, formatMoney} 	from '/helper.js';
-import {HacknetConfig, JarvisConfig} 	from '/config/config.js';
+import {HacknetConfig, JarvisConfig} 	from '/src/config/config.js';
 import {HacknetFarm} 					from '/hacknet-farm.js';
 import {HacknetNode} 					from '/hacknet-node.js';
 
