@@ -1,6 +1,6 @@
-import {Log, initDaemon}    from 'helper.js';
+import {Log, initDaemon}    from '../helpers/helper.js';
 import {ShivaConfig}        from '../config/config';
-import {NetworkNode}        from 'network-node.js';
+//const ns = import('../../assets/ns-mockup.js').then(obj => ns)
 
 export async function main(ns) {
     
@@ -23,7 +23,7 @@ class ShivaLeecher {
 	// CONFIG
 	malwareFiles        = ShivaConfig.malwareFiles;
 	pauseBetweenSteps   = ShivaConfig.pauseBetweenSteps
-    hackRatio           = ShivaConfig.hackRatio
+    hackRatio         = ShivaConfig.hackRatio
 	
 	// INPUTS
     target;

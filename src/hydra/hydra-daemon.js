@@ -1,6 +1,7 @@
-import {Log, initDaemon}            from 'helper.js';
+import {Log, initDaemon}            from '../helpers/helper.js';
 import {HydraConfig, ShivaConfig}   from '../config/config';
-import {Network}                    from 'network.js';
+import {Network}                    from '../spider/network.js';
+const ns = import('../../assets/ns-mockup.js').then(obj => ns)
 
 export async function main(ns) {
     

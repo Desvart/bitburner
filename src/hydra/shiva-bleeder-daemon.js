@@ -1,6 +1,7 @@
-import {Log, initDaemon}    from 'helper.js';
+import {Log, initDaemon}    from '../helpers/helper.js';
 import {ShivaConfig}        from '../config/config';
-import {NetworkNode}        from 'network-node.js';
+import {NetworkNode}        from '../spider/network-node.js';
+const ns = import('../../assets/ns-mockup.js').then(obj => obj.ns);
 
 export async function main(ns) {
     
