@@ -7,6 +7,10 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.17.0",
     "@types/node": "^17.0.21",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^27.5.1",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^27.5.1",
     "standard": "^16.0.4"
   },
   "type": "module",
@@ -17,7 +21,8 @@
     "sourceType": "module"
   },
   "scripts": {
-    "sync": "bitburner-sync --watch"
+    "sync": "bitburner-sync --watch",
+    "test": "jest"
   },
   "config": {
     "bitburnerAuthToken": "f3tCN3d9CK4JovNgZbO7u5vCewuhvKQeD3pO4J8zTQ0IxeUJpWMJKNqGPvI55zz7",
