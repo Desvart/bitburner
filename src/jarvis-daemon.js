@@ -1,8 +1,8 @@
-import {Log, initDaemon}	                    from '/helper.js';
-import {JarvisConfig, WatsonConfig, NsConst} 	from '/src/config/config.js';
-import {HacknetDaemon}                          from '/hacknet-daemon.js';
-import {Spider}                                 from '/spider.js';
-import {SkeletonKey}                            from '/skeleton-key.js';
+import {Log, initDaemon}	                   from './helpers/helper.js';
+import {JarvisConfig, WatsonConfig, NsConst} from './config/config.js';
+import {HacknetDaemon}                       from './hacknet/hacknet-daemon.js';
+import {Spider}                              from './spider/spider.js';
+import {SkeletonKey}                         from './jarvis/skeleton-key.js';
 
 export async function main(ns) {
     initDaemon(ns, 'jarvis-daemon.js', JarvisConfig.displayTail);
