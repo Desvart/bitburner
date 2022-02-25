@@ -45,12 +45,14 @@ export class WatsonConfig {
 
 export class HydraConfig {
 
+    static modulePath       = '/hydra/';
     static displayTail      = true;
 
 }
 
 export class ShivaConfig {
 
+    static modulePath       = '/hydra/';
     static malwareFiles         = ['/hydra/hack.js', '/hydra/weaken.js',
         '/hydra/grow.js', '/hydra/shiva-leecher-daemon.js',
         '/hydra/shiva-bleeder-daemon.js', '/helpers/helper.js',

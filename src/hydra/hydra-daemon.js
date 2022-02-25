@@ -35,6 +35,7 @@ class Hydra {
         this.network           = network;
         this.farmsList         = ['home'];
         this.malwareFiles      = ShivaConfig.malwareFiles;
+        this.modulePath        = HydraConfig.modulePath;
         this.targetsList       = [];
     }
 
@@ -60,7 +61,7 @@ class Hydra {
 
     invokeShivas() {
         for (let [targetName, farm] of this.targetsList) {
-            this.ns.exec('shiva-leecher-daemon.js', farm, 1, JSON.stringify(targetName), farm);
+            this.ns.exec(this.modulePath + 'shiva-leecher-daemon.js', farm, 1, JSON.stringify(targetName), farm);
             Log.info(this.ns, `Shiva-daemon activated on ${farm} and targeting ${targetName}.`);
         }
     }

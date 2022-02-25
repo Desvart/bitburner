@@ -29,6 +29,7 @@ class ShivaLeecher {
         this._ns    = ns;
         this.target = target;
         this.farm   = farm;
+        this.modulePath = ShivaConfig.modulePath;
     }
 
     async leechTarget() {
@@ -37,7 +38,7 @@ class ShivaLeecher {
         while (true) {
 
             await this._ns.sleep(4 * this.pauseBetweenSteps);
-            this._ns.exec('/hydra/shiva-bleeder-daemon.js', this.farm, 1, JSON.stringify(this.target), this.farm, i);
+            this._ns.exec(this.modulePath + 'shiva-bleeder-daemon.js', this.farm, 1, JSON.stringify(this.target), this.farm, i);
 
             if (i < 1000 )
                 i++;
