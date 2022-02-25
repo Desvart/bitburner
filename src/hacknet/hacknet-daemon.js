@@ -4,7 +4,7 @@ import {HacknetFarm} 									from '/hacknet/hacknet-farm.js';
 import {HacknetNode} 									from '/hacknet/hacknet-node.js';
 
 export async function main(ns) {
-	initDaemon(ns, 'hacknet-daemon.js', HacknetConfig.displayTail);
+	initDaemon(ns, '/hacknet/hacknet-daemon.js', HacknetConfig.displayTail);
 	
 	let hacknetDaemon = new HacknetDaemon(ns);
 	await hacknetDaemon.operate();
@@ -17,15 +17,13 @@ export class HacknetDaemon {
 	_harvestRatio;
 	location
 	queueId;
-	//#availableFunds
-	get #farm() 		{ return new HacknetFarm(this._ns); 		 				}
-	//get #newNodeCost() 	{ return Math.ceil(this._ns.hacknet.getPurchaseNodeCost()); }
-	//get #turnover() 	{ return this.#farm.production - this.#farm.investment;  	}
+	get #farm() { return new HacknetFarm(this._ns); }
 	
 	constructor(ns) {
 		this._ns 					 = ns;
 		this._cycleTime  	 = HacknetConfig.cycleTime;
 		this._harvestRatio = HacknetConfig.harvestRatio;
+		this._modulePath	 = HacknetConfig.modulePath;
 		this.location			 = HacknetConfig.location;
 		this.queueId			 = HacknetConfig.queueId;
 	}
@@ -33,17 +31,17 @@ export class HacknetDaemon {
 
 	static async deploy(ns, location) {
 		if (location !== 'home') {
-			await ns.scp('helper.js', 				location);
-			await ns.scp('hacknet-daemon.js', location);
-			await ns.scp('hacknet-farm.js', 	location);
-			await ns.scp('hacknet-node.js', 	location);
-			await ns.scp('config.js', 				location);
+			await ns.scp('/helpers/helper.js', 				location);
+			await ns.scp(HacknetConfig.modulePath + 'hacknet-daemon.js', location);
+			await ns.scp(HacknetConfig.modulePath + 'hacknet-farm.js', 	location);
+			await ns.scp(HacknetConfig.modulePath + 'hacknet-node.js', 	location);
+			await ns.scp('/config/config.js', 					location);
 		}
 	}
 
 	static activate(ns, location) {
 		ns.nuke(location);
-		ns.exec('hacknet-daemon.js', location, 1);
+		ns.exec(HacknetConfig.modulePath + 'hacknet-daemon.js', location, 1);
 	}
 
 
