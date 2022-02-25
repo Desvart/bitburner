@@ -1,9 +1,7 @@
-// noinspection SpellCheckingInspection
-
-import {Log, initDaemon, formatMoney} from '../helpers/helper.js';
-import {HacknetConfig, JarvisConfig} 	from '../config/config.js';
-import {HacknetFarm} 									from 'hacknet-farm.js';
-import {HacknetNode} 									from 'hacknet-node.js';
+import {Log, initDaemon, formatMoney} from '/helpers/helper.js';
+import {HacknetConfig, JarvisConfig} 	from '/config/config.js';
+import {HacknetFarm} 									from '/hacknet/hacknet-farm.js';
+import {HacknetNode} 									from '/hacknet/hacknet-node.js';
 
 export async function main(ns) {
 	initDaemon(ns, 'hacknet-daemon.js', HacknetConfig.displayTail);

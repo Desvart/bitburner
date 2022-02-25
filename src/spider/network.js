@@ -1,6 +1,6 @@
-import {Log} from '../helpers/helper.js';
-import {NetworkNode} from './network-node.js';
-import {NetworkConfig} from  '../config/config.js';
+import {Log} from '/helpers/helper.js';
+import {NetworkNode} from '/spider/network-node.js';
+import {NetworkConfig} from  '/config/config.js';
 
 export class Network {
 

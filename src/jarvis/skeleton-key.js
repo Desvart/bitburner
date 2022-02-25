@@ -1,4 +1,4 @@
-import { Log } from '../helpers/helper.js'
+import { Log } from '/helpers/helper.js'
 
 export class SkeletonKey {
 	_KEYS = ['BruteSSH.exe', 'FTPCrack.exe', 'relaySMTP.exe', 'HTTPWorm.exe', 'SQLInject.exe'];

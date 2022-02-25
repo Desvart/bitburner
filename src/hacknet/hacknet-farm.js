@@ -1,5 +1,5 @@
-import {Log} 				 from '../helpers/helper.js';
-import {HacknetNode} from 'hacknet-node.js';
+import {Log} 				 from '/helpers/helper.js';
+import {HacknetNode} from '/hacknet/hacknet-node.js';
 
 export class HacknetFarm {
 	_ns;

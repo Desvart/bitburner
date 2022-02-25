@@ -1,4 +1,4 @@
-import {Log} from '../helpers/helper.js';
+import {Log} from '/helpers/helper.js';
 
 export class HacknetNode {
     _ns;
