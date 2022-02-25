@@ -1,6 +1,6 @@
 export class NetworkNode {
     
-    hostname;
+  hostname;
 	requiredHackingSkill;
 	numOpenPortsRequired;
 	securityMin;
@@ -9,13 +9,13 @@ export class NetworkNode {
 	purchasedByPlayer;
 	growthFactor;
 	isPotentialTarget;
-	get hasAdminRights() { return this.ns.hasRootAccess(this.hostname); }
-	get availableMoney() { return this.ns.getServerMoneyAvailable(this.hostname); }
-	get actualSecurity() { return this.ns.getServerSecurityLevel(this.hostname); }
-	ns;
+	get hasAdminRights() { return this._ns.hasRootAccess(this.hostname); }
+	get availableMoney() { return this._ns.getServerMoneyAvailable(this.hostname); }
+	get actualSecurity() { return this._ns.getServerSecurityLevel(this.hostname); }
+	_ns;
 
 	constructor (ns, nodeX) {
-		this.ns 					= ns;
+		this._ns 					= ns;
 		this.loadStaticData(nodeX);
 	}
 
@@ -35,19 +35,19 @@ export class NetworkNode {
 	}
 
 	loadStaticDataFromNetwork(nodeName) {
-		const node = this.ns.getServer(nodeName);
+		const node = this._ns.getServer(nodeName);
 		this.mapStaticDataFromImportedNode(node);
 	}
 
 	mapStaticDataFromImportedNode(node) {
-		this.hostname 				= node.hostname;
-		this.requiredHackingSkill 	= node.requiredHackingSkill;
+		this.hostname 						= node.hostname;
+		this.requiredHackingSkill = node.requiredHackingSkill;
 		this.numOpenPortsRequired	= node.numOpenPortsRequired;
-		this.securityMin 			= node.minDifficulty 			|| node.securityMin;
-		this.moneyMax 				= node.moneyMax;
-		this.ramMax 				= node.maxRam 					|| node.ramMax;
+		this.securityMin 					= node.minDifficulty 			|| node.securityMin;
+		this.moneyMax 						= node.moneyMax;
+		this.ramMax 							= node.maxRam 						|| node.ramMax;
 		this.purchasedByPlayer 		= node.purchasedByPlayer;
-		this.growthFactor 			= node.serverGrowth 			|| node.growthFactor;
+		this.growthFactor 				= node.serverGrowth 			|| node.growthFactor;
 	}
     
 }

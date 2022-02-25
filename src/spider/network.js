@@ -1,6 +1,6 @@
-import {Log} from '/helper.js';
-import {NetworkNode} from '/network-node.js';
-import {NetworkConfig} from  './config.js';
+import {Log} from '../helpers/helper.js';
+import {NetworkNode} from './network-node.js';
+import {NetworkConfig} from  '../config/config.js';
 
 export class Network {
 
@@ -8,11 +8,11 @@ export class Network {
 	nodesCount;
 	nodesList;
 	get isFullyOwned() { return this.#updateFullyOwnedStatus(); }
-	#blackList = NetworkConfig.blackList;
-	#ns;
+	_blackList = NetworkConfig.blackList;
+	_ns;
     
     constructor(ns) {
-        this.#ns = ns;
+        this._ns = ns;
         this.nodesNameList  = this.#getNodeNames();
 		this.nodesCount 	= this.nodesNameList.length;
 		this.nodesList 	 	= this.#getNodeStaticData();
@@ -35,7 +35,7 @@ export class Network {
 		while (nodesToScan.length > 0 && infiniteLoopProtection-- > 0) {
 
 			let nodeName             = nodesToScan.pop();
-			const connectedNodeNames = this.#ns.scan(nodeName)
+			const connectedNodeNames = this._ns.scan(nodeName)
 
 			for (const connectedNodeName of connectedNodeNames) {
 				if (discoveredNodes.includes(connectedNodeName) === false) {
@@ -54,7 +54,7 @@ export class Network {
 
 		for (let nodeName of this.nodesNameList) {
 
-			const node = this.#ns.getServer(nodeName);
+			const node = this._ns.getServer(nodeName);
 			/*const staticNode = new NetworkNode(this.#ns,
 											   node.hostname, 
 									           node.hasAdminRights, 
@@ -66,7 +66,7 @@ export class Network {
 									           node.purchasedByPlayer,
 									           node.serverGrowth);
 											   */
-			const staticNode = new NetworkNode(this.#ns, node);
+			const staticNode = new NetworkNode(this._ns, node);
 			staticNode.isPotentialTarget = this.#checkIfPotentialTarget(staticNode);
 			nodeList.push(staticNode);
 		}
@@ -108,7 +108,7 @@ export class Network {
 	#checkIfPotentialTarget(node) {
 		let potentialTarget = true;
 
-		for (let blackNode of this.#blackList)
+		for (let blackNode of this._blackList)
 			if (node.hostname === blackNode)
 				potentialTarget = false;
 		
