@@ -1,4 +1,4 @@
-import {Log} from '/src/helpers/helper.js';
+import {Log} from '../helpers/helper.js';
 
 
 export async function main(ns) {
@@ -384,9 +384,9 @@ export class Sherlock {
         for (let i = 1; i < triangle.length; i++) {
             nextArray = [];
             for (let j = 0; j < triangle[i].length; j++) {
-                if (j == 0)
+                if (j === 0)
                     nextArray.push(previousArray[j] + triangle[i][j]);
-                else if (j == triangle[i].length - 1)
+                else if (j === triangle[i].length - 1)
                     nextArray.push(previousArray[j - 1] + triangle[i][j]);
                 else
                     nextArray.push(Math.min(previousArray[j], previousArray[j - 1]) + triangle[i][j]);
@@ -663,7 +663,7 @@ export class Sherlock {
     }
 
     #factorialDivision(n, d) {
-        if (n == 0 || n == 1 || n == d)
+        if (n === 0 || n === 1 || n === d)
             return 1;
         return this.#factorialDivision(n - 1, d) * n;
     }
@@ -677,7 +677,7 @@ export class Sherlock {
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].length; j++) {
 
-                if (data[i][j] == 1 && (!ignoreFirst || (i != 0 || j != 0)) && (!ignoreLast || (i != data.length - 1 || j != data[i].length - 1))) {
+                if (data[i][j] === 1 && (!ignoreFirst || (i !== 0 || j !== 0)) && (!ignoreLast || (i !== data.length - 1 || j !== data[i].length - 1))) {
                     const newArray = [];
                     for (let k = i; k < data.length; k++)
                         newArray.push(data[k].slice(j, data[i].length));

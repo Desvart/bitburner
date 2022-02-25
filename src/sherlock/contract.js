@@ -1,6 +1,6 @@
 export class Contract
 {
-    #ns;
+    _ns;
     name;
     location;
     type;
@@ -10,7 +10,7 @@ export class Contract
     reward;
 
     constructor(ns, name, location) {
-        this.#ns        = ns;
+        this._ns        = ns;
         this.name       = name;
         this.location   = location;
         this.type       = ns.codingcontract.getContractType(name, location);
