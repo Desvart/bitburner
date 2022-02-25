@@ -31,7 +31,7 @@ export class Sherlock {
             case "Algorithmic Stock Trader II":         contract.solution = this.solveAlgorithmicStockTrader([Math.ceil(contract.data.length / 2), contract.data]); break;
             case "Algorithmic Stock Trader III":        contract.solution = this.solveAlgorithmicStockTrader([2, contract.data]); break;
             case "Algorithmic Stock Trader IV":         contract.solution = this.solveAlgorithmicStockTrader(contract.data); break;
-            case "Array Jumping Game":                  contract.solution = this.solveArrayJumingGame(contract.data); break;
+            case "Array Jumping Game":                  contract.solution = this.solveArrayJumpingGame(contract.data); break;
             case "Find All Valid Math Expressions":     contract.solution = this.solveFindAllValidMathExpressions(contract.data); break;
             case "Find Largest Prime Factor":           contract.solution = this.solveFindLargestPrimeFactor(contract.data); break;
             case "Generate IP Addresses":               contract.solution = this.solveGenerateIPAddresses(contract.data); break;
@@ -95,7 +95,7 @@ export class Sherlock {
     }
 
 
-    solveArrayJumingGame(inputArray) {
+    solveArrayJumpingGame(inputArray) {
 
         for (let i = inputArray.length - 1; i >= 0; i--) {
 
