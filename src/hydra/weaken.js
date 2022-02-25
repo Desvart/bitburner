@@ -1,5 +1,4 @@
-import { Log } from '../helpers/helper.js'
-const ns = import('../../assets/ns-mockup.js').then(obj => ns);
+import { Log } from '/helpers/helper.js'
 
 export async function main (ns) {
   const timestamp1 = Date.now()

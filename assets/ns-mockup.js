@@ -17,11 +17,22 @@ export class ns {
 
     toast(string) {}
     scan(nodeName) {}
-    getServer(nodeName) {}
+    getServer = {
+        cpuCores: ''
+    }
     hasRootAccess(hostname) {}
     getServerMoneyAvailable(hostname) {}
     getServerSecurityLevel(hostname) {}
 
+    weakenAnalyze(){}
+    hackAnalyzeThreads
+    hackAnalyzeSecurity
+    hackAnalyze
+    growthAnalyze
+    growthAnalyzeSecurity
+    getHackTime
+    getWeakenTime
+    getGrowTime
     async hack(target, { threads: threadsCount, stock: marketImpact }) {}
     async grow(target, { threads: threadsCount, stock: marketImpact }) {}
     async weaken(target, { threads: threadsCount, stock: marketImpact }) {}

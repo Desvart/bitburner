@@ -51,7 +51,10 @@ export class HydraConfig {
 
 export class ShivaConfig {
 
-    static malwareFiles         = ['hack.js', 'weaken.js', 'grow.js', 'shiva-leecher-daemon.js', 'shiva-bleeder-daemon.js', 'helper.js', 'config.js', 'network-node.js'];
+    static malwareFiles         = ['/hydra/hack.js', '/hydra/weaken.js',
+        '/hydra/grow.js', '/hydra/shiva-leecher-daemon.js',
+        '/hydra/shiva-bleeder-daemon.js', '/helpers/helper.js',
+        '/config/config.js', '/spider/network-node.js'];
     static pauseBetweenSteps    = 200; // ms
     static hackRatio            = 50/100;
     static displayTail          = false;

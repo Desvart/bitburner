@@ -1,22 +1,16 @@
-import {Log, initDaemon}            from '../helpers/helper.js';
-import {HydraConfig, ShivaConfig}   from '../config/config';
-import {Network}                    from '../spider/network.js';
-const ns = import('../../assets/ns-mockup.js').then(obj => ns)
+import {Log, initDaemon}            from '/helpers/helper.js';
+import {HydraConfig, ShivaConfig}   from '/config/config';
+import {Network}                    from '/spider/network.js';
 
 export async function main(ns) {
     
     initDaemon(ns, 'hydra-daemon.js', HydraConfig.displayTail);
-
-    try {
-        const shivaProcessId = ns.ps('home').filter(p => p.filename === 'hydra-daemon.js')[0].pid;
-//        ns.kill(shivaProcessId);
-    } catch{}
     //const network               = ns.args[1];
-    const network                     = new Network(ns);
-
+    const network                 = new Network(ns);
     //const potentialTargetsList  = ns.args[0];
-    const potentialTargetsList        = [network.getNode('n00dles'), network.getNode('foodnstuff')];
-    //const potentialTargetsList        = [network.getNode('harakiri-sushi')];
+    const potentialTargetsList    = [network.getNode('n00dles'), network.getNode('foodnstuff')];
+    //const potentialTargetsList  = [network.getNode('harakiri-sushi')];
+
     const hydra = new Hydra(ns, potentialTargetsList, network);
     await hydra.deployMalwares();
     hydra.identifyTargetsAndFarms();

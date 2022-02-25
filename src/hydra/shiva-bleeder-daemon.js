@@ -1,11 +1,10 @@
-import {Log, initDaemon}    from '../helpers/helper.js';
-import {ShivaConfig}        from '../config/config';
-import {NetworkNode}        from '../spider/network-node.js';
-const ns = import('../../assets/ns-mockup.js').then(obj => obj.ns);
+import {Log, initDaemon}    from '/helpers/helper.js';
+import {ShivaConfig}        from '/config/config';
+import {NetworkNode}        from '/spider/network-node.js';
 
 export async function main(ns) {
     
-    initDaemon(ns, 'shiva-bleeder-daemon.js', ShivaConfig.displayTail);
+    initDaemon(ns, '/hydra/shiva-bleeder-daemon.js', ShivaConfig.displayTail);
 
     const target  = ns.args[0];
     const farm    = ns.args[1];
@@ -13,7 +12,6 @@ export async function main(ns) {
 
     
     const shiva  = new ShivaBleeder(ns, JSON.parse(target), farm);
-//    shiva.getStaticParameters();
     await shiva.bleedTarget(leechId);
 }
 
