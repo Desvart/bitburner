@@ -1,8 +1,19 @@
 {
   "dependencies": {
-    "bitburner-sync": "^1.0.1"
+    "babel": "^6.23.0",
+    "bitburner-sync": "^1.0.1",
+    "fs": "^0.0.1-security"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
+    "@types/node": "^17.0.21",
     "standard": "^16.0.4"
+  },
+  "type": "module",
+  "parser": "@babel/eslint-parser",
+  "eslintConfig": {},
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module"
   }
 }
