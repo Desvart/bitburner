@@ -17,7 +17,7 @@ export class HacknetDaemon {
 	_harvestRatio;
 	location
 	queueId;
-	get #farm() { return new HacknetFarm(this._ns); }
+	get _farm() { return new HacknetFarm(this._ns); }
 	
 	constructor(ns) {
 		this._ns 					 = ns;
@@ -61,22 +61,22 @@ export class HacknetDaemon {
 
 		// upgrade
 		if (componentName === HacknetNode.Component.NODE) {
-			this.#farm.buyNewNode();
+			this._farm.buyNewNode();
 		} else {
-			this.#farm.nodeList[nodeId].upgrade(componentName);
+			this._farm.nodeList[nodeId].upgrade(componentName);
 		}
 
 		// check which next element should be upgraded (least expensive)
 		let [nodeIdNext, componentNameNext, costNext] = this.#identifyCheapestComponentToUpgrade();
 
 		// compute time before next upgrade
-		let timeToRoI 				= costNext / this.#farm.production; //s
+		let timeToRoI 				= costNext / this._farm.production; //s
 		let timeBeforeNextUpgrade 	= Math.ceil(timeToRoI / this._harvestRatio) * 1000; //ms
 
 		if (componentNameNext === HacknetNode.Component.NODE) {
 			Log.info(this._ns, `HACKNET_DAEMON - Next upgrade: New node ${nodeIdNext} in ${timeBeforeNextUpgrade} s.`);
 		} else {
-			let upgradeNext = this.#farm.nodeList[nodeIdNext][componentNameNext] + 1;
+			let upgradeNext = this._farm.nodeList[nodeIdNext][componentNameNext] + 1;
 			Log.info(this._ns, `HACKNET_DAEMON - Next upgrade: Node ${nodeIdNext} - ${componentNameNext} -> ${upgradeNext} in ${timeBeforeNextUpgrade / 1000} s.`);
 		}
 
@@ -96,10 +96,10 @@ export class HacknetDaemon {
 		let cheapestComponentToUpgrade = [];
 		let upgradeCost = Infinity;
 		
-		if (this.#farm.nodeCount !== 0) {
-			let nodeWithCheapestLevelUpgrade = this.#farm.nodeList.reduce((prev, curr) => prev.levelUpgradeCost < curr.levelUpgradeCost ? prev : curr);
-			let nodeWithCheapestRamUpgrade 	 = this.#farm.nodeList.reduce((prev, curr) => prev.ramUpgradeCost   < curr.ramUpgradeCost   ? prev : curr);
-			let nodeWithCheapestCoreUpgrade  = this.#farm.nodeList.reduce((prev, curr) => prev.coreUpgradeCost  < curr.coreUpgradeCost  ? prev : curr);
+		if (this._farm.nodeCount !== 0) {
+			let nodeWithCheapestLevelUpgrade = this._farm.nodeList.reduce((prev, curr) => prev.levelUpgradeCost < curr.levelUpgradeCost ? prev : curr);
+			let nodeWithCheapestRamUpgrade 	 = this._farm.nodeList.reduce((prev, curr) => prev.ramUpgradeCost   < curr.ramUpgradeCost   ? prev : curr);
+			let nodeWithCheapestCoreUpgrade  = this._farm.nodeList.reduce((prev, curr) => prev.coreUpgradeCost  < curr.coreUpgradeCost  ? prev : curr);
 			
 			
 			if (nodeWithCheapestLevelUpgrade.levelUpgradeCost < nodeWithCheapestRamUpgrade.ramUpgradeCost && 
@@ -119,8 +119,8 @@ export class HacknetDaemon {
 			}
 		}
 
-		if (this.#farm.newNodeCost < upgradeCost) {
-			cheapestComponentToUpgrade = [this.#farm.nodeCount, HacknetNode.Component.NODE, Math.ceil(this.#farm.newNodeCost)];
+		if (this._farm.newNodeCost < upgradeCost) {
+			cheapestComponentToUpgrade = [this._farm.nodeCount, HacknetNode.Component.NODE, Math.ceil(this._farm.newNodeCost)];
 		}
 
 		return cheapestComponentToUpgrade;

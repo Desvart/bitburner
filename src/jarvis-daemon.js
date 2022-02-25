@@ -1,5 +1,5 @@
 import {Log, initDaemon}	                   from '/helpers/helper.js';
-import {JarvisConfig, WatsonConfig, NsConst} from '/config/config.js';
+import {JarvisConfig, HacknetConfig, WatsonConfig, NsConst} from '/config/config.js';
 import {HacknetDaemon}                       from '/hacknet/hacknet-daemon.js';
 import {Spider}                              from '/spider/spider.js';
 import {SkeletonKey}                         from '/jarvis/skeleton-key.js';
@@ -32,11 +32,11 @@ class Jarvis {
     async warmingUp() { 
         Log.info(this.#ns, 'JARVIS_DAEMON - Start global initialization...');
         
-        this.#ns.kill(WatsonConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location);
+        this.#ns.kill(HacknetConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location);
         this.#ns.clearPort(this.hacknetDaemon.queueId);
-        
+
         await HacknetDaemon.deploy(this.#ns, this.hacknetDaemon.location);
-	    HacknetDaemon.activate(this.#ns, this.hacknetDaemon.location);
+	      HacknetDaemon.activate(this.#ns, this.hacknetDaemon.location);
         Log.success(this.#ns, 'JARVIS_DAEMON - Hacknet Daemon package successfully redeployed.');
 
         Log.info(this.#ns, 'JARVIS_DAEMON - ... global initialization finished.\n');
@@ -68,8 +68,8 @@ class Jarvis {
             let hacknetRemainingWaitTime = Math.max(hacknetReactivationTime - Date.now(), 0);
             if (hacknetRemainingWaitTime < 0.5 * this.#cycleTime) { // Cut the last cycle time by 50%.
 
-                if (this.#ns.scriptRunning(WatsonConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location) === false) {
-                    this.#ns.exec(WatsonConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location, 1);
+                if (this.#ns.scriptRunning(HacknetConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location) === false) {
+                    this.#ns.exec(HacknetConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location, 1);
                     this.#ns.readPort(this.hacknetDaemon.queueId);
                     Log.info(this.#ns, 'JARVIS_DAEMON - Hacknet Daemon reactivated with success.');
 
