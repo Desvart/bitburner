@@ -1,7 +1,7 @@
-import {Log, initDaemon, nowStr}    from '../helpers/helper.js';
-import {WatsonConfig}               from '../config/config.js';
-import {Contract}                   from './contract.js';
-import {Sherlock}                   from './sherlock.js';
+import {Log, initDaemon, nowStr}    from '/helpers/helper.js';
+import {WatsonConfig}               from '/config/config.js';
+import {Contract}                   from '/sherlock/contract.js';
+import {Sherlock}                   from '/sherlock/sherlock.js';
 
 export async function main(ns) {
     initDaemon(ns, 'watson.js', WatsonConfig.displayTail);

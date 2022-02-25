@@ -36,7 +36,7 @@ export class NetworkConfig {
 export class WatsonConfig {
 
     static location         = 'home';
-    static modulePath       = '/watson/';
+    static modulePath       = '/sherlock/';
     static rewardDisplay    = true;
     static queueId          = 2;
     static displayTail      = false;

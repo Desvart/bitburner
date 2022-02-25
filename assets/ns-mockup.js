@@ -8,6 +8,7 @@ export class ns {
     ps() {}
     scp(files, target) {}
     exec(file, target, threadCount, args) {}
+    ls() {}
 
     write(string) {}
 

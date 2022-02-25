@@ -32,7 +32,7 @@ class Jarvis {
     async warmingUp() { 
         Log.info(this.#ns, 'JARVIS_DAEMON - Start global initialization...');
         
-        this.#ns.kill('hacknet-daemon.js', this.hacknetDaemon.location);
+        this.#ns.kill(WatsonConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location);
         this.#ns.clearPort(this.hacknetDaemon.queueId);
         
         await HacknetDaemon.deploy(this.#ns, this.hacknetDaemon.location);
@@ -68,8 +68,8 @@ class Jarvis {
             let hacknetRemainingWaitTime = Math.max(hacknetReactivationTime - Date.now(), 0);
             if (hacknetRemainingWaitTime < 0.5 * this.#cycleTime) { // Cut the last cycle time by 50%.
 
-                if (this.#ns.scriptRunning('hacknet-daemon.js', this.hacknetDaemon.location) === false) {
-                    this.#ns.exec('hacknet-daemon.js', this.hacknetDaemon.location, 1);
+                if (this.#ns.scriptRunning(WatsonConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location) === false) {
+                    this.#ns.exec(WatsonConfig.modulePath + 'hacknet-daemon.js', this.hacknetDaemon.location, 1);
                     this.#ns.readPort(this.hacknetDaemon.queueId);
                     Log.info(this.#ns, 'JARVIS_DAEMON - Hacknet Daemon reactivated with success.');
 
@@ -95,7 +95,7 @@ class Jarvis {
 
     #wakeupWatson(contractsList) {
         if (contractsList.length > 0) {
-            this.#ns.exec('watson-daemon.js', WatsonConfig.location, 1, JSON.stringify(contractsList));
+            this.#ns.exec(WatsonConfig.modulePath + 'watson-daemon.js', WatsonConfig.location, 1, JSON.stringify(contractsList));
             Log.info(this.#ns, `JARVIS_DAEMON - Watson has been woken (${contractsList.length} contracts available).`);
         } else {
             Log.info(this.#ns, 'JARVIS_DAEMON - No need to wake Watson up (no available contracts).');

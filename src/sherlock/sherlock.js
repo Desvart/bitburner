@@ -1,4 +1,4 @@
-import {Log} from '../helpers/helper.js';
+import {Log} from '/helpers/helper.js';
 
 
 export async function main(ns) {
