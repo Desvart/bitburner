@@ -12,53 +12,37 @@ package 1-Hacknet-BN9 #technology{
   'entity hacknet <<F, lawngreen>> #technology;line:green {}
 
   class HacknetDaemon {
-    -cycleTime : int
-    -harvestRatio : float
-    -farm : HacknetFarm
-    
     #deploy()
     #activate()
     +operate()
-    +identifyCheapestComponentToUpgrade() : [int, Component, int]
   }
 
   class HacknetFarm {
-    +MAX_NODE_COUNT : int
-    +nodeCount : int
-    +newNodeCost : int
+    +MAX_NODE_COUNT
+    +nodeCount
+    +newNodeCost
     +nodeList : HacknetNode[]
-    +production : float
-    +totalProduction : float
+    +productionRate
+    +totalProduction
 
-    +buyNewNode() : bool
+    +buyNewNode()
   }
 
-  'class HacknetNode <HacknetEntity> {
   class HacknetNode {
     #Component : {int, int, int, int}
-    -MAX_LEVEL : int
-    -MAX_RAM : int
-    -MAX_CORES : int
-    +id : int
-    '+investment
-    +level : int
-    +ram : int
-    +cores : int
-    +levelUpgradeCost : int
-    +ramUpgradeCost : int
-    +coreUpgradeCost : int
-    +production : float
-    +totalProduction : int
+    +id
+    +level
+    +ram
+    +cores
+    +levelUpgradeCost
+    +ramUpgradeCost
+    +coreUpgradeCost
+    +productionRate
+    +totalProduction
 
-    +getUpgradeCost(Component) : int
-    +upgrade(Component, int) : void
-    -upgradeLevel(int) : void
-    -upgradeRam(int) : void
-    -upgradeCore(int) : void
-  }  
-
-  'class HacknetServer <HacknetEntity> {} 
-  'abstract class HacknetEntity {}
+    +getUpgradeCost(Component)
+    +upgrade(Component, quantity)
+  }
 }
 
 package 2-Sherlock #technology{
@@ -252,7 +236,7 @@ JarvisDaemon      --     IcaDaemon    : > activate
 'HACKNET'
 HacknetDaemon     -- HacknetFarm
 HacknetDaemon     .u.|> nextUpgrade : > publish
-HacknetFarm   "1" *-r- "n" HacknetNode
+HacknetFarm   "1" *-d- "n" HacknetNode
 
 'CONTRACTS'
 WatsonDaemon -u- Contract
