@@ -29,10 +29,10 @@ export function nowStr() {
 export class Log {
     
     static info(ns, msg) {
-        const timestamp = nowStr();
-        ns.print(`${timestamp} INFO - ${msg}`);
-        const style = 'color: #42B5FF; font-size: 12px; padding: 5px;';
-        console.info(`${timestamp} %c${msg}`, style);
+            const timestamp = nowStr();
+            ns.print(`${timestamp} INFO - ${msg}`);
+            const style = 'color: #42B5FF; font-size: 12px; padding: 5px;';
+            console.info(`${timestamp} %c${msg}`, style);
     }
     
     static success(ns, msg, duration = 5000) {
@@ -43,10 +43,12 @@ export class Log {
         ns.toast(`${msg}`, 'success', duration);
     }
     
-    static debug(ns, msg) {
-        const timestamp = nowStr();
-        const style = 'color: #FFFFFF; font-size: 12px; padding: 5px;';
-        console.debug(`${timestamp} %c${msg}`, style);
+    static debug(ns, msg, toggle = true) {
+        if (toggle === true) {
+            const timestamp = nowStr();
+            const style = 'color: #FFFFFF; font-size: 12px; padding: 5px;';
+            console.debug(`${timestamp} %c${msg}`, style);
+        }
     }
     
     static warn(ns, msg) {
