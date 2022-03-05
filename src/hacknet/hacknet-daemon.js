@@ -122,98 +122,58 @@ export class HacknetDaemon {
         
     }
     
-    async;
-    
-    #waitToHaveEnoughMoney(cost); {
-    const;
-    wealth = this.#ns.getPlayer().money;
-    
-    while(wealth
-
-<=
-    cost;
-) {
-    
-    const;
-    wealthFormated = formatMoney(this.#ns, wealth);
-    const;
-    costFormated = formatMoney(this.#ns, cost);
-    const;
-    msg = `HACKNET_DAEMON - Not enough money! Cost: ${costFormated}, available: ${wealthFormated}`;
-    Log;
-.
-    
-    warn(
-    
-    this;
-.
-    #ns;
-,
-    msg;
-)
-    ;
-    
-    await;
-    this;
-.
-    #ns;
-.
-    
-    sleep(HACKNET_CONFIG
-
-.
-    CYCLE_TIME;
-    
-    * 10
-
-)
-    ;
-}
-}
-
-#upgradeHacknetFarm(nodeId, componentName);
-{
-    if (componentName === HacknetNode.Component.NODE) {
-        this.#farm.buyNewNode();
-    } else {
-        this.#farm.nodeList[nodeId].upgrade(componentName);
-    }
-}
-
-#getEtaBeforeNextUpgrade();
-{
-    const [nodeIdNext, componentNameNext, costNext] = this.#identifyCheapestComponentToUpgrade();
-    const timeToRoI = costNext / this.#farm.productionRate; //s
-    let etaBeforeNextUpgrade = Math.ceil(timeToRoI / HACKNET_CONFIG.HARVEST_RATIO) * 1000; //ms
-    
-    if (componentNameNext === HacknetNode.Component.NODE) {
-        Log.info(this.#ns,
-            `HACKNET_DAEMON - Next upgrade: New node ${nodeIdNext} in ${etaBeforeNextUpgrade} s.`);
+    async #waitToHaveEnoughMoney(cost) {
+        const wealth = this.#ns.getPlayer().money;
         
-    } else {
-        const upgradeNext = this.#farm.nodeList[nodeIdNext][componentNameNext] + 1;
-        const msg = `HACKNET_DAEMON - Next upgrade: Node ${nodeIdNext} - ${componentNameNext} -> ${upgradeNext} in
-                ${etaBeforeNextUpgrade / 1000} s.`;
-        Log.info(this.#ns, msg);
+        while (wealth <= cost) {
+            
+            const wealthFormated = formatMoney(this.#ns, wealth);
+            const costFormated = formatMoney(this.#ns, cost);
+            const msg = `HACKNET_DAEMON - Not enough money! Cost: ${costFormated}, available: ${wealthFormated}`;
+            Log.warn(this.#ns, msg);
+            
+            await this.#ns.sleep(HACKNET_CONFIG.CYCLE_TIME * 10);
+        }
     }
     
-    return etaBeforeNextUpgrade;
-}
-
-async;
-#waitUntilNextUpgradeOrSendWakeUpCallToJarvis(etaBeforeNextUpgrade);
-{
-    // if less than Jarvis cycle time, wait, else send Jarvis a wake-up call
+    #upgradeHacknetFarm(nodeId, componentName) {
+        if (componentName === HacknetNode.Component.NODE) {
+            this.#farm.buyNewNode();
+        } else {
+            this.#farm.nodeList[nodeId].upgrade(componentName);
+        }
+    }
     
-    if (etaBeforeNextUpgrade < JARVIS_CONFIG.CYCLE_TIME) {
-        await this.#ns.sleep(etaBeforeNextUpgrade);
-        await this.operate();
+    #getEtaBeforeNextUpgrade() {
+        const [nodeIdNext, componentNameNext, costNext] = this.#identifyCheapestComponentToUpgrade();
+        const timeToRoI = costNext / this.#farm.productionRate; //s
+        let etaBeforeNextUpgrade = Math.ceil(timeToRoI / HACKNET_CONFIG.HARVEST_RATIO) * 1000; //ms
         
-    } else {
-        await this.#ns.writePort(HACKNET_CONFIG.QUEUE_ID, Date.now() + etaBeforeNextUpgrade);
-        const msg = `HACKNET_DAEMON - Quit Hacknet Daemon. Jarvis should relaunch Hacknet Daemon in
+        if (componentNameNext === HacknetNode.Component.NODE) {
+            Log.info(this.#ns, `HACKNET_DAEMON - Next upgrade: New node $ {nodeIdNext} in ${etaBeforeNextUpgrade} s.`);
+            
+        } else {
+            const upgradeNext = this.#farm.nodeList[nodeIdNext][componentNameNext] + 1;
+            const msg = `HACKNET_DAEMON - Next upgrade: Node ${nodeIdNext} - ${componentNameNext} -> ${upgradeNext} in
                 ${etaBeforeNextUpgrade / 1000} s.`;
-        Log.info(this.#ns, msg);
+            Log.info(this.#ns, msg);
+        }
+        
+        return etaBeforeNextUpgrade;
     }
-}
+    
+    async #waitUntilNextUpgradeOrSendWakeUpCallToJarvis(etaBeforeNextUpgrade) {
+        // if less than Jarvis cycle time, wait, else send Jarvis a wake-up call
+        
+        if (etaBeforeNextUpgrade < JARVIS_CONFIG.CYCLE_TIME) {
+            await this.#ns.sleep(etaBeforeNextUpgrade);
+            await this.operate();
+            
+        } else {
+            await this.#ns.writePort(HACKNET_CONFIG.QUEUE_ID, Date.now() + etaBeforeNextUpgrade);
+            const msg = `HACKNET_DAEMON - Quit Hacknet Daemon. Jarvis should relaunch Hacknet Daemon in
+                ${etaBeforeNextUpgrade / 1000} s.`;
+            Log.info(this.#ns, msg);
+        }
+    }
 }
