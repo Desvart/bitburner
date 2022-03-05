@@ -3,13 +3,6 @@
 
 'interface NetworkLastUpdate <<Q, skyblue>> #aliceblue;line:deepskyblue {}
 
-package 0-GitHub #pink{
-  class Github {
-    +<color:#red>pull(?str[])
-    +<color:#red>push(?str[], str)
-  }
-}
-
 package 1-Hacknet-BN9 #technology{
   hide empty member
 
@@ -19,32 +12,25 @@ package 1-Hacknet-BN9 #technology{
   'entity hacknet <<F, lawngreen>> #technology;line:green {}
 
   class HacknetDaemon {
-    -cycleTime    : int
-    -harvestRatio   : float
-    -farm           : HacknetFarm
-    '-availableFunds : int
-    '-turnover       : int
+    -cycleTime : int
+    -harvestRatio : float
+    -farm : HacknetFarm
     
     #deploy()
     #activate()
     +operate()
     +identifyCheapestComponentToUpgrade() : [int, Component, int]
-    '-identifyMostProfitableUpgrade() : [int, str]
   }
 
   class HacknetFarm {
     +MAX_NODE_COUNT : int
     +nodeCount : int
-    +newNodeCost    : int
+    +newNodeCost : int
     +nodeList : HacknetNode[]
     +production : float
     +totalProduction : float
-    '-investment : float
-    '-funds : float
-    
-    '+saveSnapshot() : bool
+
     +buyNewNode() : bool
-    
   }
 
   'class HacknetNode <HacknetEntity> {
@@ -118,18 +104,6 @@ package 2-Sherlock #technology{
 
 package 3-Network #technology{
 
-  class Spider {
-    +network : Network
-    +availableContracts : [str, str]
-    -snapshotFile : str
-
-    +patrol()
-    +updateAdminStatus()
-    -updateAvailableContracts()
-    -loadNetwork()
-    -backupNetwork()
-  }
-
   class Network {
     +nodesList : Node[]
     +nodesNameList : str[]
@@ -156,8 +130,6 @@ package 3-Network #technology{
     +growthFactor : int
     +isPotentialTarget : bool
   }
-
-  entity network <<F, lawngreen>> #technology;line:green{}
 }
 
 package 4-Jarvis #cornsilk{
@@ -166,14 +138,13 @@ package 4-Jarvis #cornsilk{
 
   class JarvisDaemon {
     +hacknetDaemon : HacknetDaemon
-    +spider : Spider
+
     +network : Network
     -cycleTime : int
     
     +warmingUp()
     +wakeup()
     -hacknetInspection()
-    -releaseSpider()
     -wakeupWatson()
     -zombifyAvailableServers()
   }
@@ -192,32 +163,72 @@ package 4-Jarvis #cornsilk{
 
 package 6-Hydra #pink{
 
+  class IcaDaemon {}
+
+  class Agent47 {}
+
   class HydraDaemon {}
+
   class ShivaDaemon {}
-  () hack
-  () weaken
-  () grow
+
+  class Hack <Malware> {
+    +duration
+    +unitMoneyDecrease
+    +unitSecurityIncrease
+    +successRate
+
+    +threadsQtyToDecreaseMoneyOf()
+  }
+
+  class Weaken <Malware> {
+    +duration
+    +unitMoneyImpact
+    +unitSecurityDecrease
+
+    +threadsQtyToDecreaseSecurityOf()
+  }
+
+  class Grow <Malware> {
+    +duration
+    +unitMoneyIncrease
+    +unitSecurityIncrease
+
+    +threadsQtyToIncreaseMoneyOf()
+  }
+
+  abstract Malware {
+    +filePath
+    +targetName
+    +runnerName
+    +marketImpact
+    +coresQty
+    +ramRequirement
+
+    +deploy()
+    +execute()
+  }
+
 }
 
-package 7-WolfStreet-BN8 #pink{
+'package 7-WolfStreet-BN8 #pink{
   
   'entity wolfStreetKibana  <<F, lawngreen>> #technology;line:green {}
-  entity businessRelationship <<F, lawngreen>> #technology;line:green {}
+ ' entity businessRelationship <<F, lawngreen>> #technology;line:green {}
   
-  class TradingFloor {}
-  class Trader {}
-  class Market {}
-  class Stock {}
-}
+  'class TradingFloor {}
+  'class Trader {}
+  'class Market {}
+  'class Stock {}
+'}
 
 'package Underworld-BN2 {}
 'package Corporatocracy-BN3 {}
 
-package Singularity-BN4 #pink{ 
+'package Singularity-BN4 #pink{
   '=> singularity functions
-  class CareerCoach {}
-  class Job {}
-}
+  'class CareerCoach {}
+  'class Job {}
+'}
 
 'package AI-BN5 {} => getBitNodeMultipliers() + formulas
 'package Bladeburners-BN6/7 {}
@@ -225,61 +236,55 @@ package Singularity-BN4 #pink{
 'Package Sleeves-BN10{}
 
 
-
-'GIT'
-Github -[hidden]d---- JarvisDaemon
-
 'JARVIS'
 JarvisDaemon -u- CONFIG
 JarvisDaemon -u- SkeletonKey
 
 JarvisDaemon      -l-     HacknetDaemon : > activate
 nextUpgrade       -      JarvisDaemon   : < listen to
-JarvisDaemon      -d-    Spider         : > run
-JarvisDaemon      -r-    WatsonDaemon   : > activate
+JarvisDaemon      -r-    Network         : > run
+JarvisDaemon      -u-    WatsonDaemon   : > activate
 JarvisDaemon      --     HydraDaemon    : > activate
-JarvisDaemon      -u--   TradingFloor 
-JarvisDaemon      -u--   CareerCoach 
+JarvisDaemon      --     IcaDaemon    : > activate
+'JarvisDaemon      -u--   TradingFloor
+'JarvisDaemon      -u--   CareerCoach
 
 'HACKNET'
-'HacknetDaemon .left|> hacknet : > save
 HacknetDaemon     -- HacknetFarm
 HacknetDaemon     .u.|> nextUpgrade : > publish
-HacknetFarm   "1" *-- "n" HacknetNode
-'HacknetFarm      *-- HacknetServer
-'HacknetNode      <|-- HacknetEntity
-'HacknetServer    <|-- HacknetEntity
+HacknetFarm   "1" *-r- "n" HacknetNode
 
 'CONTRACTS'
 WatsonDaemon -u- Contract
-WatsonDaemon -u- Sherlock
-Sherlock - Contract
+WatsonDaemon -r- Sherlock
+Sherlock -l- Contract
 
-'SPIDER'
-Spider -d- Network
-Spider .r.|> network
+'NETWORK'
 Network "1" *-r- "n" Node
 
 'HYDRA'
-HydraDaemon "1" -r- "n" ShivaDaemon
-HydraDaemon ..|> hack
-HydraDaemon ..|> grow
-HydraDaemon ..|> weaken
-ShivaDaemon -- hack 
-ShivaDaemon -- grow
-ShivaDaemon -- weaken
+IcaDaemon -- Agent47
+HydraDaemon "1" -- "n" ShivaDaemon
+ShivaDaemon -d- Hack
+ShivaDaemon -d- Grow
+ShivaDaemon -d- Weaken
+Agent47 -d- Grow
+Agent47 -d- Weaken
+Hack -d- Malware
+Grow -d- Malware
+Weaken -d- Malware
 
 'TRADING'
-TradingFloor .l|> businessRelationship
-Trader       .d.|> businessRelationship
+'TradingFloor .l|> businessRelationship
+'Trader       .d.|> businessRelationship
 
-TradingFloor -u- Trader
-TradingFloor -u- Market
+'TradingFloor -u- Trader
+'TradingFloor -u- Market
 
-Trader -r- Stock
-Market -l- Stock
+'Trader -r- Stock
+'Market -l- Stock
 
 'JOB'
-CareerCoach -u- Job
+'CareerCoach -u- Job
 
 @enduml

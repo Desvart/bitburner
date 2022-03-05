@@ -26,17 +26,26 @@ export class ns {
     getServerSecurityLevel(hostname) {}
 
     weakenAnalyze(){}
-    hackAnalyzeThreads
-    hackAnalyzeSecurity
-    hackAnalyze
-    growthAnalyze
-    growthAnalyzeSecurity
-    getHackTime
-    getWeakenTime
-    getGrowTime
+    hackAnalyzeThreads(){}
+    hackAnalyzeSecurity(){}
+    hackAnalyzeChance(){}
+    hackAnalyze(){}
+    growthAnalyze(){}
+    growthAnalyzeSecurity(){}
+    getHackTime(){}
+    getWeakenTime(){}
+    getGrowTime(){}
     async hack(target, { threads: threadsCount, stock: marketImpact }) {}
     async grow(target, { threads: threadsCount, stock: marketImpact }) {}
     async weaken(target, { threads: threadsCount, stock: marketImpact }) {}
+    
+    getScriptRam() {}
+    
+    formulas = {
+        hacking: {
+            growPercent() {}
+        }
+    }
 
     getPurchasedServerCost() {}
     brutessh(target) {}
@@ -47,6 +56,7 @@ export class ns {
     fileExists(fileName, target) {}
     clearPort(portId) {}
     readPort(portId) {}
+    async writePort(portId, data) {}
     scriptRunning(fileName, hostname) {}
     getPlayer = {
         hacking: ''

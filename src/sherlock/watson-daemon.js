@@ -1,83 +1,101 @@
-import {Log, initDaemon, nowStr}    from '/helpers/helper.js';
-import {WatsonConfig}               from '/config/config.js';
-import {Contract}                   from '/sherlock/contract.js';
-import {Sherlock}                   from '/sherlock/sherlock.js';
+import {Log, initDaemon, nowStr} from '/helpers/helper.js';
+import {WATSON_CONFIG} from '/config/config.js';
+import {Contract} from '/sherlock/contract.js';
+import {Sherlock} from '/sherlock/sherlock.js';
+
 
 export async function main(ns) {
-    initDaemon(ns, 'watson.js', WatsonConfig.displayTail);
-
+    initDaemon(ns, 'watson.js', WATSON_CONFIG.DISPLAY_TAIL);
+    
     const rawContractsList = JSON.parse(ns.args[0]);
-    let watsonDaemon = new WatsonDaemon(ns, rawContractsList);
+    const watsonDaemon = new WatsonDaemon(ns, rawContractsList);
     await watsonDaemon.wakeup();
 }
 
 
 class WatsonDaemon {
-
-    _ns;
-    _rewardDisplay;
-    _contractsList;
-
+    
+    #ns;
+    #CONFIG = WATSON_CONFIG;
+    #contractsList;
+    
+    
     constructor(ns, rawContractsList) {
-        this._ns            = ns;
-        this._rewardDisplay = WatsonConfig.rewardDisplay;
-        this._contractsList = this._prepareContracts(rawContractsList);
+        this.#ns = ns;
+        this.#contractsList = this.#prepareContracts(rawContractsList);
     }
-
-
+    
+    
+    static call(ns, contractsList) {
+        
+        ns.exec(WATSON_CONFIG.DAEMON_FILE, WATSON_CONFIG.LOCATION, 1, JSON.stringify(contractsList));
+        
+    }
+    
+    
     async wakeup() {
-
-        const sherlock = new Sherlock(this._ns);
-
-        for (let contract of this._contractsList) {
+        
+        const sherlock = new Sherlock(this.#ns);
+        
+        for (let contract of this.#contractsList) {
             
-            if (this._ns.ls(contract.location, '.cct').includes(contract.name) === true) {
+            if (this.#ns.ls(contract.location, '.cct').includes(contract.name) === true) {
                 contract = sherlock.solve(contract);
+                
             } else {
-                Log.warn(this._ns, `WATSON_DAEMON - Contract ${contract.name} doesn't exist anymore on ${contract.location}.`);
+                const msg = `WATSON_DAEMON - Contract ${contract.name} doesn't exist anymore on ${contract.location}.`;
+                Log.warn(this.#ns, msg);
                 continue;
             }
-
-            if (contract.solution !== "Not implemented yet") {
-                contract = this._submitSolution(contract);
-                await this._reportResult(contract);              
+            
+            if (contract.solution !== 'Not implemented yet') {
+                contract = this.#submitSolution(contract);
+                await this.#reportResult(contract);
+                
             } else {
-                Log.warn(this._ns, `WATSON_DAEMON - Solver for contract type "${contract.type}" not yet implemented.\nContract ${contract.name} on ${contract.location}) skipped.`);
+                const msg1 = `WATSON_DAEMON - Solver for contract type "${contract.type}" not yet implemented.\n`;
+                const msg2 = `Contract ${contract.name} on ${contract.location}) skipped.`;
+                Log.warn(this.#ns, msg1 + msg2);
             }
         }
     }
-
-
-    _prepareContracts(rawContractsList) {
-
+    
+    
+    #prepareContracts(rawContractsList) {
+        
         let contractsList = [];
-
         for (const [name, location] of rawContractsList) {
-            contractsList.push(new Contract(this._ns, name, location));
+            contractsList.push(new Contract(this.#ns, name, location));
         }
-
+        
         return contractsList;
     }
-
-
-    _submitSolution(contract) {
-        const rewardConfig = { returnReward: this._rewardDisplay };
-        contract.reward = this._ns.codingcontract.attempt(contract.solution, contract.name, contract.location, rewardConfig)
+    
+    
+    #submitSolution(contract) {
+        const rewardConfig = {returnReward: this.#CONFIG.REWARD_DISPLAY};
+        contract.reward = this.#ns.codingcontract.attempt(contract.solution, contract.name, contract.location, rewardConfig);
         return contract;
     }
+    
+    
+    async #reportResult(contract) {
+        if (contract.reward !== '' || contract.reward === true) {
+            const msg1 = `WATSON_DAEMON - Contract ${contract.name} (${contract.type}) on ${contract.location} solved.`;
+            const msg2 = `Reward: ${contract.reward}`;
+            Log.success(this.#ns, msg1 + msg2, null);
 
-
-    async _reportResult(contract) {
-        if (contract.reward !== "" || contract.reward === true) {
-            Log.success(this._ns, `WATSON_DAEMON - Contract ${contract.name} (${contract.type}) on ${contract.location} solved. Reward: ${contract.reward}`, null);
-            //this.#ns.toast(`INFO - WATSON_DAEMON - Contract solved (${contract.type}). Reward: ${contract.reward}`, "success", null);
-        }
-        else {
-            const errorLog = `${nowStr()}\nContract: ${contract.name}\nLocation: ${contract.location}\nType: ${contract.type}\nData: ${JSON.stringify(contract.data)}\n\n`;
-            await this._ns.write('sherlockfails.log.txt', errorLog, 'a');
-            this._ns.toast(`ERROR - WATSON_DAEMON - Contract resolution failed! - ${contract.name} @ ${contract.location}`, "error", null);
-            Log.error(this._ns, `WATSON_DAEMON - Contract ${contract.name} on ${contract.location} resolution has failed! Sherlock fired!`);
+        } else {
+            const errorLog1 = `${nowStr()}\nContract: ${contract.name}\nLocation: ${contract.location}\n`;
+            const errorLog2 = `Type: ${contract.type}\nData: ${JSON.stringify(contract.data)}\n\n`;
+            await this.#ns.write(this.#CONFIG.LOGFILE, errorLog1 + errorLog2, 'a');
+            
+            const msg = `ERROR - WATSON_DAEMON - Contract resolution failed! - ${contract.name} @ ${contract.location}`;
+            this.#ns.toast(msg, 'error', null);
+            
+            const msg2 = `WATSON_DAEMON - Contract ${contract.name} on ${contract.location} resolution has failed!`;
+            Log.error(this.#ns, msg2 + ' Sherlock fired!');
         }
     }
-
+    
 }

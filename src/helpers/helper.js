@@ -2,26 +2,24 @@
 // format numbers
 
 export function formatMoney(ns, num) {
-    return ns.nFormat(num, "0.00 a$");
+    return ns.nFormat(num, '0.00 a$');
 }
 
 export function formatNumbers(ns, num) {
-    return ns.nFormat(num, "0.00 a");
+    return ns.nFormat(num, '0.00 a');
 }
 
 export function formatTime(ns, num) {
-    return ns.tFormat(num, "00:00:00");
+    return ns.tFormat(num, '00:00:00');
 }
 
-
-
 export function timeConverter(timestamp) {
-	let date = new Date(timestamp);
+    let date = new Date(timestamp);
     let h = date.getHours().toString().padStart(2, '0');
     let m = date.getMinutes().toString().padStart(2, '0');
     let s = date.getSeconds().toString().padStart(2, '0');
     let ms = date.getMilliseconds().toString().padStart(3, '0');
-	return `${h}:${m}:${s}.${ms}`;
+    return `${h}:${m}:${s}.${ms}`;
 }
 
 export function nowStr() {
@@ -29,36 +27,38 @@ export function nowStr() {
 }
 
 
-// debug - info - warning - error - log 
-
 export class Log {
-
+    
     static info(ns, msg) {
         let timestamp = nowStr();
         ns.print(`${timestamp} INFO - ${msg}`);
         let style = 'color: #42B5FF; font-size: 12px; padding: 5px;';
-        console.info(`${timestamp} %c${msg}`,style);
+        console.info(`${timestamp} %c${msg}`, style);
     }
+    
     
     static success(ns, msg, duration = 5000) {
         let timestamp = nowStr();
         ns.print(`${timestamp} SUCCESS - ${msg}`);
         let style = 'color: #00FF08; font-size: 12px; padding: 5px;';
-        console.info(`${timestamp} %c${msg}`,style);
-        ns.toast(`${msg}`, "success", duration);
+        console.info(`${timestamp} %c${msg}`, style);
+        ns.toast(`${msg}`, 'success', duration);
     }
+    
     
     static debug(ns, msg) {
         let timestamp = nowStr();
         let style = 'color: #FFFFFF; font-size: 12px; padding: 5px;';
-        console.debug(`${timestamp} %c${msg}`,style);
+        console.debug(`${timestamp} %c${msg}`, style);
     }
-
+    
+    
     static warn(ns, msg) {
         let timestamp = nowStr();
         ns.print(`${timestamp} WARNING - ${msg}`);
         console.warn(`${timestamp} ${msg}`);
     }
+    
     
     static error(ns, msg) {
         let timestamp = nowStr();
@@ -69,11 +69,11 @@ export class Log {
 }
 
 
-export function initDaemon(ns, scriptName, toogle) {
-    //console.debug(`Hook - ${ns.getScriptName()} - ${scriptName}`);
-	if(toogle === true) {
-		ns.tail();
-		ns.disableLog("ALL");
-		ns.clearLog();
-	}
+export function initDaemon(ns, toggle) {
+    
+    if (toggle === true) {
+        ns.tail();
+        ns.disableLog('ALL');
+        ns.clearLog();
+    }
 }

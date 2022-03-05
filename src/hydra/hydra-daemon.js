@@ -1,6 +1,6 @@
 import {Log, initDaemon}            from '/helpers/helper.js';
 import {HydraConfig, ShivaConfig}   from '/config/config';
-import {Network}                    from '/spider/network.js';
+import {Network}                    from '/network/network.js';
 
 export async function main(ns) {
     
@@ -8,8 +8,8 @@ export async function main(ns) {
     //const network               = ns.args[1];
     const network                 = new Network(ns);
     //const potentialTargetsList  = ns.args[0];
-    const potentialTargetsList    = [network.getNode('n00dles'), network.getNode('foodnstuff')];
-    //const potentialTargetsList  = [network.getNode('harakiri-sushi')];
+    //const potentialTargetsList    = [network.getNode('n00dles'), network.getNode('foodnstuff')];
+    const potentialTargetsList  = [network.getNode('foodnstuff')];
 
     const hydra = new Hydra(ns, potentialTargetsList, network);
     await hydra.deployMalwares();
@@ -20,19 +20,20 @@ export async function main(ns) {
 
 
 
-class Hydra {
+export class Hydra {
 
     potentialTargetsList;
     targetsList;
     network;
     farmsList;
     malwareFiles;
-    ns;
+    alreadyHackedServerList;
+    _ns;
 
     constructor(ns, potentialTargetsList, network) {
-        this.ns                = ns;
+        this._ns                = ns;
         this.potentialTargetsList  = potentialTargetsList;
-        this.network           = network;
+        this.network           = new Network(ns);
         this.farmsList         = ['home'];
         this.malwareFiles      = ShivaConfig.malwareFiles;
         this.modulePath        = HydraConfig.modulePath;
@@ -43,8 +44,8 @@ class Hydra {
     async deployMalwares() {
         for (let farm of this.farmsList) {
             if (farm !== 'home') {
-                await this.ns.scp(this.malwareFiles, farm);
-                Log.info(this.ns, `Hydra malwares deployed on ${farm}`);
+                await this._ns.scp(this.malwareFiles, farm);
+                Log.info(this._ns, `Hydra malwares deployed on ${farm}`);
             }
         }
     }
@@ -60,13 +61,40 @@ class Hydra {
 
 
     invokeShivas() {
-        for (let [targetName, farm] of this.targetsList) {
-            this.ns.exec(this.modulePath + 'shiva-leecher-daemon.js', farm, 1, JSON.stringify(targetName), farm);
-            Log.info(this.ns, `Shiva-daemon activated on ${farm} and targeting ${targetName}.`);
+        for (let [targetName, farmName] of this.targetsList) {
+            this._ns.exec(this.modulePath + 'shiva-leecher-daemon.js', farmName, 1, targetName, farmName);
+            Log.info(this._ns, `Shiva-daemon activated on ${farmName} and targeting ${targetName}.`);
         }
     }
 
 
-
+    identifyMostProfitableTarget() {
+        const network = new Network(this._ns);
+        let potentialTargets = network.nodesList.filter(n => n.isPotentialTarget === true &&
+                                                             n.hasAdminRights    === true &&
+                                                             n.hackChance        === 1 &&
+                                                             this.alreadyHackedServerList.includes(n.hostname) === false);
+        potentialTargets.sort((prev, curr) => {return (Math.sign(prev.securityMin - curr.securityMin) + Math.sign(- prev.moneyMax + curr.moneyMax)/10)});
+        return potentialTargets[0].hostname;
+    }
+    
+    computeMinRamToHack(targetName) {
+        const leecherRam = this._ns.getScriptRam('/hydra/shiva-leecher-daemon.js', 'home');
+        const bleederRam = this._ns.getScriptRam('/hydra/shiva-bleeder-daemon.js', 'home');
+        const weakenRam  = this._ns.getScriptRam('/hydra/weaken.js',  'home');
+        const hackRam    = this._ns.getScriptRam('/hydra/hack.js',    'home');
+        const growRam    = this._ns.getScriptRam('/hydra/grow.js',    'home');
+        
+        const weakenDuration = this._ns.getWeakenTime(targetName);
+        
+        const delta = ShivaConfig.pauseBetweenSteps;
+        const maxSimultaneousBlockCount = Math.ceil((weakenDuration + 2 * delta) / (4 * delta));
+        
+        const ramNeededForASingleBlock = bleederRam + (2 * weakenRam) + hackRam + growRam;
+        const totalRamNeeded = leecherRam + maxSimultaneousBlockCount * ramNeededForASingleBlock;
+        
+        return totalRamNeeded;
+        
+    }
 
 }
