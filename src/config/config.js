@@ -1,7 +1,9 @@
 // const symbols = ["", "k", "m", "b", "t", "q", "Q", "s", "S", "o", "n", "e33", "e36", "e39"];
 
-export class NS_CONST {
+export class GLOBAL_CONFIG {
     static EMPTY_QUEUE = 'NULL PORT DATA';
+    static HELPER_FILE = '/helpers/helper.js';
+    static CONFIG_FILE = '/config/config.js';
 }
 
 export class JARVIS_CONFIG {
@@ -15,9 +17,9 @@ export class HACKNET_CONFIG {
     static CYCLE_TIME = 1000; //ms
     static HARVEST_RATIO = 50 / 100;
     static QUEUE_ID = 1;
-    static MODULE_PATH = '/hacknet/';
-    static FILE = 'hacknet-daemon.js';
-    static DAEMON = '/hacknet/hacknet-daemon.js';
+    static DAEMON_FILE = '/hacknet/hacknet-daemon.js';
+    static FARM_FILE = '/hacknet/hacknet-farm.js';
+    static NODE_FILE = '/hacknet/hacknet-node.js';
     static DISPLAY_TAIL = false;
 }
 
