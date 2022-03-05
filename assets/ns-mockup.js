@@ -40,7 +40,7 @@ export class ns {
     async weaken(target, { threads: threadsCount, stock: marketImpact }) {}
     
     hacknet = {
-        getNodeStats() {},
+        getNodeStats () {},
         getLevelUpgradeCost() {},
         getRamUpgradeCost() {},
         getCoreUpgradeCost() {},

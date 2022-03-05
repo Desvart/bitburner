@@ -20,6 +20,15 @@ export class HacknetFarm {
         this.MAX_NODE_COUNT = this.#ns.hacknet.maxNumNodes();
     }
     
+    buyNewNode() {
+        if (this.nodeCount < this.MAX_NODE_COUNT) {
+            const nodeId = this.#ns.hacknet.purchaseNode();
+            Log.success(this.#ns, `HACKNET_FARM - New node ${nodeId} bought.`);
+        } else {
+            Log.info(this.#ns, `HACKNET_FARM - Max number of nodes (${this.MAX_NODE_COUNT}) already bought.`);
+        }
+    }
+    
     #getNodeList() {
         let nodeList = [];
         for (let i = 0; i < this.nodeCount; i++) {
@@ -37,12 +46,4 @@ export class HacknetFarm {
         return this.nodeList.reduce((prev, curr) => prev.totalProduction + curr.totalProduction);
     }
     
-    buyNewNode() {
-        if (this.nodeCount < this.MAX_NODE_COUNT) {
-            const nodeId = this.#ns.hacknet.purchaseNode();
-            Log.success(this.#ns, `HACKNET_FARM - New node ${nodeId} bought.`);
-        } else {
-            Log.info(this.#ns, `HACKNET_FARM - Max number of nodes (${this.MAX_NODE_COUNT}) already bought.`);
-        }
-    }
 }
