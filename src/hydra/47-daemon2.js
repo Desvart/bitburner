@@ -2,6 +2,13 @@ import {MalwareConfig, ShivaConfig, NsConst} from '/config/config.js';
 import {NetworkNode} from '/network/server.js';
 import {Log} from '/helpers/helper.js';
 
+/*
+      for (let i = 1; i <= 20; i++) {
+        ns.print(`${i} - ${Math.pow(2, i)} GB of RAM = ${ns.getPurchasedServerCost(Math.pow(2, i)) / 1e6} M\$`);
+      }
+    */
+
+// ns.purchaseServer('pserv-Shiva3', Math.pow(2, 15));
 
 export async function main(ns) {
     
