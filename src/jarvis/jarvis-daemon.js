@@ -40,8 +40,8 @@ class Jarvis {
     async wakeup() {
         while (true) {
             this.#hacknetInspection();
-            /*this.#wakeupWatson();
-            this.#zombifyAvailableServers();
+            this.#wakeupWatson();
+            /*this.#zombifyAvailableServers();
             this.#warmUpServers();*/
             await this.#ns.sleep(config.CYCLE_TIME);
         }
@@ -67,7 +67,7 @@ class Jarvis {
     #wakeupWatson() {
         const contractsList = this.#getAvailableContracts();
         if (contractsList.length > 0) {
-            new Watson(this.#ns).call(contractsList);
+            new WatsonDaemon(this.#ns).call(contractsList);
             Log.info(this.#ns, `JARVIS_DAEMON - Watson has been woken (${contractsList.length} contracts available).`);
         } else {
             Log.info(this.#ns, 'JARVIS_DAEMON - No need to wake Watson up (no available contracts).');
