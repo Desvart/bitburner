@@ -72,8 +72,7 @@ export class WatsonDaemon {
             
             const msg = `ERROR - WATSON_DAEMON - Contract resolution failed! - ${contract.name} (${contract.type})
                 @${contract.location}`;
-            this.#ns.toast(msg, 'error', null);
-            Log.error(this.#ns, msg);
+            Log.warn(this.#ns, msg);
         }
     }
     

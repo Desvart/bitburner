@@ -5,6 +5,12 @@ export async function main(ns) {
     ns.disableLog('ALL');
     ns.clearLog();
     
+    //FIXME - Sanitize Parentheses in Expression - ()((())()))(()
+    // FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
+    //FIXME - Array Jumping Game - [5,2,1,1,5,5]
+    //FIXME - Array Jumping Game - [4,2,1,1,8]
+    
+    
     const data = '((a)()((';
     
     const sh = new Sherlock(ns);

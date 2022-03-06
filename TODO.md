@@ -18,8 +18,7 @@
 
 ## Sherlock
 
-* Fix bug: Array Jumping Game : [5,2,1,1,5,5]   OR    [4,2,1,1,8]
-* Fix bug: Sanitize Parentheses in Expression  Data: "()((())()))(()"
+
 
 ## Unit testing
 
