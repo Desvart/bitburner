@@ -18,19 +18,20 @@ export class HacknetDaemon {
         this.#farm = new HacknetFarm(ns);
     }
     
-    static async deploy(ns, location) {
-        if (location !== 'home') {
-            await ns.scp(GLOBAL_CONFIG.CONFIG_FILE, location);
-            await ns.scp(HACKNET_CONFIG.DAEMON_FILE, location);
-            await ns.scp(HACKNET_CONFIG.FARM_FILE, location);
-            await ns.scp(HACKNET_CONFIG.NODE_FILE, location);
-            await ns.scp(GLOBAL_CONFIG.HELPER_FILE, location);
+    async deploy() {
+        if (HACKNET_CONFIG.LOCATION !== 'home') {
+            await this.#ns.scp(GLOBAL_CONFIG.CONFIG_FILE, HACKNET_CONFIG.LOCATION);
+            await this.#ns.scp(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION);
+            await this.#ns.scp(HACKNET_CONFIG.FARM_FILE, HACKNET_CONFIG.LOCATION);
+            await this.#ns.scp(HACKNET_CONFIG.NODE_FILE, HACKNET_CONFIG.LOCATION);
+            await this.#ns.scp(GLOBAL_CONFIG.HELPER_FILE, HACKNET_CONFIG.LOCATION);
         }
+        return new Promise((resolve, reject) => resolve(this));
     }
     
-    static activate(ns, location) {
-        ns.nuke(location);
-        ns.exec(HACKNET_CONFIG.DAEMON_FILE, location, 1);
+    activate() {
+        this.#ns.nuke(HACKNET_CONFIG.LOCATION);
+        this.#ns.exec(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION, 1);
     }
     
     async operate() {
@@ -170,7 +171,7 @@ export class HacknetDaemon {
         if (etaBeforeNextUpgrade < JARVIS_CONFIG.CYCLE_TIME) {
             await this.#ns.sleep(etaBeforeNextUpgrade);
             await this.operate();
-            
+         
         } else {
             await this.#ns.writePort(HACKNET_CONFIG.QUEUE_ID, Date.now() + etaBeforeNextUpgrade);
             const msg = `HACKNET_DAEMON - Quit Hacknet Daemon. Jarvis should relaunch Hacknet Daemon in
