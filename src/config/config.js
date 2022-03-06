@@ -29,25 +29,19 @@ export class NETWORK_CONFIG {
 }
 
 export class WATSON_CONFIG {
-    
     static LOCATION = 'home';
     static DAEMON_FILE = '/sherlock/watson-daemon.js';
-    static LOGFILE = '/sherlock/fails.log.txt';
+    static LOGFILE = '/output/sherlock-fails.log.txt';
     static REWARD_DISPLAY = true;
-    static QUEUE_ID = 2;
     static DISPLAY_TAIL = false;
-    
 }
 
 export class HydraConfig {
-    
     static modulePath = '/hydra/';
     static displayTail = true;
-    
 }
 
 export class ShivaConfig {
-    
     static malwareFiles = [
         '/hydra/hack.js',
         '/hydra/weaken.js',
@@ -60,24 +54,19 @@ export class ShivaConfig {
     static pauseBetweenSteps = 200; // ms
     static hackRatio = 50 / 100;
     static displayTail = false;
-    
 }
 
 export class MALWARE_CONFIG {
-    
     MODULE_PATH = '/hydra/';
     WEAKEN_FILE = '/hydra/weaken.js';
     GROW_FILE = '/hydra/grow.js';
     HACK_FILE = '/hydra/hack.js';
-    
 }
 
 export class Agent47Config {
-    
     static    WEAKEN_RAM_MAX_FACTOR = 0.25;
     static    GROW_FACTOR = 0.05;
     static    LOOP_SECURITY = 1000;
     static    RUNNER_NAME = 'home';
     static    QUEUE_ID = 2;
-    
 }

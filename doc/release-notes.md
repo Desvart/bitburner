@@ -1,3 +1,8 @@
+# Release 2.2.0
+
+### Sherlock module
+* Simplify the existing code
+
 # Release 2.1.0
 
 ### Network module

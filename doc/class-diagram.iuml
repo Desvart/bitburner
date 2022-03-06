@@ -48,13 +48,8 @@ package 1-Hacknet-BN9 #technology{
 package 2-Sherlock #technology{
 
   class WatsonDaemon {
-    -rewardDisplay : bool
-    -contractsList : [str, str]
-
+    +call()
     +wakeup()
-    -prepareContracts([str, str]) : Contract[]
-    -submitSolution(Contract) : str
-    -reportResult(Contract)
   }
 
   class Contract {
@@ -62,27 +57,12 @@ package 2-Sherlock #technology{
     +location
     +type
     +data
-    +remainingTentatives
     +solution
     +reward
   }
 
   class Sherlock {
-
     +solve() : Contract
-    -solveAlgorithmicStockTrader()
-    -solveArrayJumingGame()
-    -solveFindAllValidMathExpressions()
-    -solveFindLargestPrimeFactor()
-    -solveGenerateIPAddresses()
-    -solveMergeOverlappingIntervals()
-    -solveMinimumPathSumInATriangle()
-    -solveSanitizeParenthesesInExpression()
-    -solveSpiralizeMatrix()
-    -solveSubarrayWithMaximumSum()
-    -solveTotalWayToSum()
-    -solveUniquePathsInAGridI()
-    -solveUniquePathsInAGridII()
   }
 }
 

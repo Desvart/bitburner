@@ -55,6 +55,7 @@ export class Log {
         const timestamp = nowStr();
         ns.print(`${timestamp} WARNING - ${msg}`);
         console.warn(`${timestamp} ${msg}`);
+        ns.toast(`${msg}`, 'warning', null);
     }
     
     static error(ns, msg) {
