@@ -41,7 +41,8 @@ export class HydraConfig {
     static displayTail = true;
 }
 
-export class ShivaConfig {
+export class SHIVA_CONFIG {
+    static modulePath = '/shiva/';
     static malwareFiles = [
         '/hydra/hack.js',
         '/hydra/weaken.js',

@@ -18,6 +18,11 @@ export class HacknetDaemon {
         this.#farm = new HacknetFarm(ns);
     }
     
+    reset() {
+        this.#ns.clearPort(HACKNET_CONFIG.QUEUE_ID);
+        this.#ns.kill(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION);
+    }
+    
     async deploy() {
         if (HACKNET_CONFIG.LOCATION !== 'home') {
             await this.#ns.scp(GLOBAL_CONFIG.CONFIG_FILE, HACKNET_CONFIG.LOCATION);
@@ -26,7 +31,6 @@ export class HacknetDaemon {
             await this.#ns.scp(HACKNET_CONFIG.NODE_FILE, HACKNET_CONFIG.LOCATION);
             await this.#ns.scp(GLOBAL_CONFIG.HELPER_FILE, HACKNET_CONFIG.LOCATION);
         }
-        return new Promise((resolve, reject) => resolve(this));
     }
     
     activate() {

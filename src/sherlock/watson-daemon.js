@@ -9,7 +9,7 @@ export async function main(ns) {
     await new WatsonDaemon(ns, rawContractsList).wakeup();
 }
 
-class WatsonDaemon {
+export class WatsonDaemon {
     #contractsList;
     #ns;
     

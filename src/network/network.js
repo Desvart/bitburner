@@ -19,13 +19,11 @@ export class Network {
     getNodes(nodeNames) {
         if (nodeNames === null) {
             return this.nodesList;
-            
         } else {
             let nodeList = [];
-            for (let nodeName of nodeNames) {
+            for (const nodeName of nodeNames) {
                 nodeList.push(this.getNode(nodeName));
             }
-            
             return nodeList;
         }
     }
@@ -38,8 +36,7 @@ export class Network {
         let nodeList = [];
         const nodesNameList = this.#getNodeNames();
         for (const nodeName of nodesNameList) {
-            const node = this.#ns.getServer(nodeName);
-            const server = new Server(this.#ns, node);
+            const server = new Server(this.#ns, nodeName);
             nodeList.push(server);
         }
         return nodeList;
