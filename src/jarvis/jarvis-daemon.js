@@ -41,8 +41,8 @@ class Jarvis {
         while (true) {
             this.#hacknetInspection();
             this.#wakeupWatson();
-            /*this.#zombifyAvailableServers();
-            this.#warmUpServers();*/
+            this.#zombifyAvailableServers();
+            /*this.#warmUpServers();*/
             await this.#ns.sleep(config.CYCLE_TIME);
         }
     }
