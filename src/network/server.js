@@ -1,4 +1,4 @@
-import {NETWORK_CONFIG} from '/config/config.js';
+import {NETWORK_CONFIG as config} from '/config/config.js';
 
 export class Server {
     
@@ -11,23 +11,15 @@ export class Server {
     purchasedByPlayer;
     growthFactor;
     isPotentialTarget;
-    #blackList = NETWORK_CONFIG.blackList;
     #ns;
     
     get hasAdminRights() { return this.#ns.hasRootAccess(this.hostname); }
     
-    
     get availableMoney() { return this.#ns.getServerMoneyAvailable(this.hostname); }
-    
     
     get actualSecurity() { return this.#ns.getServerSecurityLevel(this.hostname); }
     
-    
     get hackChance() { return this.#ns.hackAnalyzeChance(this.hostname); }
-    
-    
-    
-    
     
     constructor(ns, nodeX) {
         this.#ns = ns;
@@ -35,45 +27,23 @@ export class Server {
         this.isPotentialTarget = this.checkIfPotentialTarget();
     }
     
-    
-    loadStaticData(nodeX) {
-        switch (typeof nodeX) {
-            
-            case 'string':
-                const nodeName = nodeX;
-                this.loadStaticDataFromNetwork(nodeName);
-                break;
-            
-            case 'object':
-                const nodeObj = nodeX;
-                this.mapStaticDataFromImportedNode(nodeObj);
-                break;
-        }
-    }
-    
-    
-    loadStaticDataFromNetwork(nodeName) {
+    loadStaticData(nodeName) {
         const node = this.#ns.getServer(nodeName);
-        this.mapStaticDataFromImportedNode(node);
-    }
     
-    
-    mapStaticDataFromImportedNode(node) {
         this.hostname = node.hostname;
         this.requiredHackingSkill = node.requiredHackingSkill;
         this.numOpenPortsRequired = node.numOpenPortsRequired;
-        this.securityMin = node.minDifficulty || node.securityMin;
+        this.securityMin = node.minDifficulty;
         this.moneyMax = node.moneyMax;
-        this.ramMax = node.maxRam || node.ramMax;
+        this.ramMax = node.maxRam;
         this.purchasedByPlayer = node.purchasedByPlayer;
-        this.growthFactor = node.serverGrowth || node.growthFactor;
+        this.growthFactor = node.serverGrowth;
     }
-    
     
     checkIfPotentialTarget() {
         let potentialTarget = true;
         
-        for (let blackNode of this.#blackList)
+        for (let blackNode of config.BLACK_LIST)
             if (this.hostname === blackNode)
                 potentialTarget = false;
         

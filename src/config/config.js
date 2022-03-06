@@ -12,7 +12,6 @@ export class JARVIS_CONFIG {
 }
 
 export class HACKNET_CONFIG {
-    
     static LOCATION = 'foodnstuff';
     static CYCLE_TIME = 1000; //ms
     static HARVEST_RATIO = 50 / 100;
@@ -24,10 +23,8 @@ export class HACKNET_CONFIG {
 }
 
 export class NETWORK_CONFIG {
-    
-    static modulePath = '/network/';
-    static snapshotFile = 'network-snapshot.json.txt';
-    static blackList = [
+    static LOOP_SECURITY = 9999;
+    static BLACK_LIST = [
         'home', 'darkweb', 'CSEC', 'The-Cave', 'run4theh111z', 'I.I.I.I', 'avmnite-02h', '.', 'w0r1d_d43m0n'];
 }
 
