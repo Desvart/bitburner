@@ -12,8 +12,8 @@ package 1-Hacknet-BN9 #technology{
   'entity hacknet <<F, lawngreen>> #technology;line:green {}
 
   class HacknetDaemon {
-    #deploy()
-    #activate()
+    +deploy() : Promise
+    +activate()
     +operate()
   }
 
