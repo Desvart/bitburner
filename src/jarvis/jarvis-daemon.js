@@ -52,22 +52,13 @@ class Jarvis {
         if (hacknetReactivationTime !== GLOBAL_CONFIG.EMPTY_QUEUE) {
             const hacknetRemainingWaitTime = Math.max(hacknetReactivationTime - Date.now(), 0);
             if (hacknetRemainingWaitTime < 0.5 * config.CYCLE_TIME) { // Cut the last cycle time by 50%.
-                if (this.#ns.scriptRunning(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION) === false) {
-                    this.#ns.exec(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION, 1);
-                    this.#ns.readPort(HACKNET_CONFIG.QUEUE_ID);
-                    Log.info(this.#ns, 'JARVIS_DAEMON - Hacknet Daemon reactivated with success.');
-                    
-                } else {
-                    const msg = 'JARVIS_DAEMON - Hacknet Daemon couldn\'t be reactivated: the process is still alive.';
-                    Log.error(this.#ns, msg);
-                }
-                
+                this.hacknetDaemon.activate();
+                this.#ns.readPort(HACKNET_CONFIG.QUEUE_ID);
             } else {
                 const remaingTimeInSec = hacknetRemainingWaitTime / 1000;
                 const msg = `JARVIS_DAEMON - Hacknet Daemon still needs to sleep (ETA: ${remaingTimeInSec} s).\n`;
                 Log.info(this.#ns, msg);
             }
-            
         } else {
             Log.info(this.#ns, 'JARVIS_DAEMON - Hacknet already working on his own; nothing to do.');
         }

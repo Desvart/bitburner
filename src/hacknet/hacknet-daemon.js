@@ -34,12 +34,17 @@ export class HacknetDaemon {
     }
     
     activate() {
-        this.#ns.nuke(HACKNET_CONFIG.LOCATION);
-        this.#ns.exec(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION, 1);
+        if (this.#ns.scriptRunning(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION) === false) {
+            this.#ns.nuke(HACKNET_CONFIG.LOCATION);
+            this.#ns.exec(HACKNET_CONFIG.DAEMON_FILE, HACKNET_CONFIG.LOCATION, 1);
+            Log.info(this.#ns, 'JARVIS_DAEMON - Hacknet Daemon reactivated with success.');
+        } else {
+            const msg = 'JARVIS_DAEMON - Hacknet Daemon couldn\'t be reactivated: the process is still alive.';
+            Log.error(this.#ns, msg);
+        }
     }
     
     async operate() {
-        
         const [nodeId, componentName, cost] = this.#identifyCheapestComponentToUpgrade();
         await this.#waitToHaveEnoughMoney(cost);
         this.#upgradeHacknetFarm(nodeId, componentName);
