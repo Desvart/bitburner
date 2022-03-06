@@ -39,8 +39,8 @@ class Jarvis {
     
     async wakeup() {
         while (true) {
-            /*this.#hacknetInspection();
-            this.#wakeupWatson();
+            this.#hacknetInspection();
+            /*this.#wakeupWatson();
             this.#zombifyAvailableServers();
             this.#warmUpServers();*/
             await this.#ns.sleep(config.CYCLE_TIME);
