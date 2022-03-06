@@ -5,7 +5,7 @@ import {Log, initDaemon, formatMoney} from '/helpers/helper.js';
 
 export async function main(ns) {
     initDaemon(ns, HACKNET_CONFIG.DISPLAY_TAIL);
-    const hacknetDaemon = new HACKNET_CONFIG(ns);
+    const hacknetDaemon = new HacknetDaemon(ns);
     await hacknetDaemon.operate();
 }
 
@@ -84,7 +84,9 @@ export class HacknetDaemon {
                 Math.ceil(this.#farm.newNodeCost)];
         }
         
-        const costFormated = formatMoney(this.#ns, cost);
+        const nodeId = cheapestComponentToUpgrade[0];
+        const componentName = cheapestComponentToUpgrade[1];
+        const costFormated = formatMoney(this.#ns, upgradeCost);
         const msg = `HACKNET_DAEMON - Upgrade target: Node ${nodeId} - ${componentName} - Cost: ${costFormated}`;
         Log.info(this.#ns, msg);
         
