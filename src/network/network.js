@@ -16,6 +16,24 @@ export class Network {
         this.nodesList = this.#getNodesStaticData();
     }
     
+    getNodes(nodeNames) {
+        if (nodeNames === null) {
+            return this.nodesList;
+            
+        } else {
+            let nodeList = [];
+            for (let nodeName of nodeNames) {
+                nodeList.push(this.getNode(nodeName));
+            }
+            
+            return nodeList;
+        }
+    }
+    
+    getNode(nodeName) {
+        return this.nodesList.filter(n => n.hostname === nodeName)[0];
+    }
+    
     #getNodesStaticData() {
         let nodeList = [];
         const nodesNameList = this.#getNodeNames();
@@ -46,24 +64,6 @@ export class Network {
         }
         
         return discoveredNodes;
-    }
-    
-    getNodes(nodeNames) {
-        if (nodeNames === null) {
-            return this.nodesList;
-            
-        } else {
-            let nodeList = [];
-            for (let nodeName of nodeNames) {
-                nodeList.push(this.getNode(nodeName));
-            }
-            
-            return nodeList;
-        }
-    }
-    
-    getNode(nodeName) {
-        return this.nodesList.filter(n => n.hostname === nodeName)[0];
     }
     
     #updateFullyOwnedStatus() {

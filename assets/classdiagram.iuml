@@ -89,30 +89,26 @@ package 2-Sherlock #technology{
 package 3-Network #technology{
 
   class Network {
-    +nodesList : Node[]
-    +nodesNameList : str[]
-    +nodesCount : int
-    +isFullyOwned : bool
+    +nodesList : Server[]
+    +nodesNameList
+    +nodesCount
+    +isFullyOwned
 
-    +getNodes(str[]) : Node[]
-    +getNode(str) : Node
-    -getNodeNames() : str[]
-    -getNodeStaticData() : Node[]
-    -updateFullyOwnedStatus()
-    -checkIfPotentialTarget() : bool
+    +getNodes() : Server[]
+    +getNode() : Server
   }
 
   class Node {
-    +hostname : str
-    +hasAdminRights : bool
-    +requiredHackingSkill : int
-    +numOpenPortsRequired : int
-    +securityMin : int
-    +moneyMax : int
-    +ramMax : int
-    +purchasedByPlayer : bool
-    +growthFactor : int
-    +isPotentialTarget : bool
+    +hostname
+    +hasAdminRights
+    +requiredHackingSkill
+    +numOpenPortsRequired
+    +securityMin
+    +moneyMax
+    +ramMax
+    +purchasedByPlayer
+    +growthFactor
+    +isPotentialTarget
   }
 }
 

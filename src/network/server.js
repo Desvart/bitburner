@@ -21,13 +21,13 @@ export class Server {
     
     get hackChance() { return this.#ns.hackAnalyzeChance(this.hostname); }
     
-    constructor(ns, nodeX) {
+    constructor(ns, nodeName) {
         this.#ns = ns;
-        this.loadStaticData(nodeX);
-        this.isPotentialTarget = this.checkIfPotentialTarget();
+        this.#loadStaticData(nodeName);
+        this.isPotentialTarget = this.#checkIfPotentialTarget();
     }
     
-    loadStaticData(nodeName) {
+    #loadStaticData(nodeName) {
         const node = this.#ns.getServer(nodeName);
     
         this.hostname = node.hostname;
@@ -40,7 +40,7 @@ export class Server {
         this.growthFactor = node.serverGrowth;
     }
     
-    checkIfPotentialTarget() {
+    #checkIfPotentialTarget() {
         let potentialTarget = true;
         
         for (let blackNode of config.BLACK_LIST)
