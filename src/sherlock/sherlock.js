@@ -6,9 +6,10 @@ export async function main(ns) {
     ns.clearLog();
     
     //FIXME - Sanitize Parentheses in Expression - ()((())()))(()
-    // FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
+    //FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
     //FIXME - Array Jumping Game - [5,2,1,1,5,5]
     //FIXME - Array Jumping Game - [4,2,1,1,8]
+    //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
     
     
     const data = '((a)()((';
