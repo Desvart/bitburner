@@ -38,7 +38,12 @@ export class ns {
     async hack(target, { threads: threadsCount, stock: marketImpact }) {}
     async grow(target, { threads: threadsCount, stock: marketImpact }) {}
     async weaken(target, { threads: threadsCount, stock: marketImpact }) {}
-    
+    deleteServer() {}
+    killall(){}
+    purchaseServer(){}
+    getPurchasedServers(){}
+    getPurchasedServerLimit(){}
+    getPurchasedServerMaxRam(){}
     hacknet = {
         getNodeStats () {},
         getLevelUpgradeCost() {},

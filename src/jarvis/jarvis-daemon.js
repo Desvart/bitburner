@@ -1,5 +1,5 @@
 import {Log, initDaemon} from '/helpers/helper.js';
-import {JARVIS_CONFIG as config, HACKNET_CONFIG, SHIVA_CONFIG} from '/config/config.js';
+import {JARVIS_CONFIG as config, HACKNET_CONFIG, HYDRA_CONFIG} from '/config/config.js';
 import {GLOBAL_CONFIG} from '/config/config.js';
 import {HacknetDaemon} from '/hacknet/hacknet-daemon.js';
 import {SkeletonKey} from '/jarvis/skeleton-key.js';
@@ -109,8 +109,8 @@ class Jarvis {
             this.zombifiedList.includes(node.hostname) === false)[0];
         
         this.#ns.print(target);
-        if (this.#ns.scriptRunning(SHIVA_CONFIG.modulePath + 'shiva-bleeder-daemon.js', 'home') === false) {
-            this.#ns.exec(SHIVA_CONFIG.modulePath + 'shiva-bleeder-daemon.js', 'home', 1, target.hostname, 'home');
+        if (this.#ns.scriptRunning(HYDRA_CONFIG.modulePath + 'shiva-daemon.js', 'home') === false) {
+            this.#ns.exec(HYDRA_CONFIG.modulePath + 'shiva-daemon.js', 'home', 1, target.hostname, 'home');
             this.zombifiedList.push(target.hostname);
         }
     }

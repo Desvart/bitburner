@@ -78,7 +78,7 @@ package 3-Network #technology{
     +getNode() : Server
   }
 
-  class Node {
+  class Server {
     +hostname
     +hasAdminRights
     +requiredHackingSkill
@@ -123,13 +123,11 @@ package 4-Jarvis #cornsilk{
 
 package 6-Hydra #pink{
 
-  class IcaDaemon {}
-
-  class Agent47 {}
-
   class HydraDaemon {}
 
   class ShivaDaemon {}
+
+  class Leecher {}
 
   class Hack <Malware> {
     +duration
@@ -202,10 +200,9 @@ JarvisDaemon -u- SkeletonKey
 
 JarvisDaemon      -l-     HacknetDaemon : > activate
 nextUpgrade       -      JarvisDaemon   : < listen to
-JarvisDaemon      -r-    Network         : > run
-JarvisDaemon      -u-    WatsonDaemon   : > activate
-JarvisDaemon      --     HydraDaemon    : > activate
-JarvisDaemon      --     IcaDaemon    : > activate
+JarvisDaemon      -u-    Network         : > run
+JarvisDaemon      -d-    WatsonDaemon   : > activate
+JarvisDaemon      -r-     HydraDaemon    : > activate
 'JarvisDaemon      -u--   TradingFloor
 'JarvisDaemon      -u--   CareerCoach
 
@@ -215,21 +212,21 @@ HacknetDaemon     .u.|> nextUpgrade : > publish
 HacknetFarm   "1" *-d- "n" HacknetNode
 
 'CONTRACTS'
-WatsonDaemon -u- Contract
+WatsonDaemon -d- Contract
 WatsonDaemon -r- Sherlock
 Sherlock -l- Contract
 
 'NETWORK'
-Network "1" *-r- "n" Node
+Network "1" *-r- "n" Server
+Network -- HydraDaemon
 
 'HYDRA'
-IcaDaemon -- Agent47
-HydraDaemon "1" -- "n" ShivaDaemon
-ShivaDaemon -d- Hack
-ShivaDaemon -d- Grow
-ShivaDaemon -d- Weaken
-Agent47 -d- Grow
-Agent47 -d- Weaken
+
+HydraDaemon - ShivaDaemon
+ShivaDaemon "1" - "n" Leecher
+Leecher -d- Hack
+Leecher -d- Grow
+Leecher -d- Weaken
 Hack -d- Malware
 Grow -d- Malware
 Weaken -d- Malware

@@ -62,7 +62,7 @@ export class Hydra {
 
     invokeShivas() {
         for (let [targetName, farmName] of this.targetsList) {
-            this._ns.exec(this.modulePath + 'shiva-leecher-daemon.js', farmName, 1, targetName, farmName);
+            this._ns.exec(this.modulePath + 'shiva-daemon2.js', farmName, 1, targetName, farmName);
             Log.info(this._ns, `Shiva-daemon activated on ${farmName} and targeting ${targetName}.`);
         }
     }
@@ -79,8 +79,8 @@ export class Hydra {
     }
     
     computeMinRamToHack(targetName) {
-        const leecherRam = this._ns.getScriptRam('/hydra/shiva-leecher-daemon.js', 'home');
-        const bleederRam = this._ns.getScriptRam('/hydra/shiva-bleeder-daemon.js', 'home');
+        const leecherRam = this._ns.getScriptRam('/hydra/shiva-daemon2.js', 'home');
+        const bleederRam = this._ns.getScriptRam('/hydra/shiva-daemon.js', 'home');
         const weakenRam  = this._ns.getScriptRam('/hydra/weaken.js',  'home');
         const hackRam    = this._ns.getScriptRam('/hydra/hack.js',    'home');
         const growRam    = this._ns.getScriptRam('/hydra/grow.js',    'home');
