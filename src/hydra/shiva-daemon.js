@@ -4,7 +4,7 @@ import {NetworkNode} from '/network/server.js';
 
 
 export async function main(ns) {
-    initDaemon(ns, '/hydra/shiva-bleeder-daemon.js', ShivaConfig.displayTail);
+    initDaemon(ns, '/hydra/shiva-daemon.js', ShivaConfig.displayTail);
     
     const targetName = ns.args[0];
     const farmName = ns.args[1];

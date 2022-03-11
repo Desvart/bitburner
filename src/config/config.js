@@ -36,24 +36,25 @@ export class WATSON_CONFIG {
     static DISPLAY_TAIL = false;
 }
 
-export class HydraConfig {
+export class HYDRA_CONFIG {
     static modulePath = '/hydra/';
-    static displayTail = true;
-}
-
-export class SHIVA_CONFIG {
-    static modulePath = '/shiva/';
-    static malwareFiles = [
+    static MALWARE_FILES = [
         '/hydra/hack.js',
         '/hydra/weaken.js',
         '/hydra/grow.js',
-        '/hydra/shiva-leecher-daemon.js',
-        '/hydra/shiva-bleeder-daemon.js',
+        '/hydra/leecher.js',
+        '/hydra/shiva-daemon2.js',
         '/helpers/helper.js',
         '/config/config.js',
         '/network/server.js'];
-    static pauseBetweenSteps = 200; // ms
+    static PAUSE_BETWEEN_BLOCKS = 200; // ms
     static hackRatio = 50 / 100;
+    static SHIVA_DAEMON_FILE = '/hydra/shiva-daemon2.js';
+    static LEECHER_FILE = '/hydra/leecher.js';
+    static HACK_FILE = '/hydra/hack.js';
+    static WEAKEN_FILE = '/hydra/weaken.js';
+    static GROW_FILE = '/hydra/grow.js';
+    static SERVER_ROOT_NAME = 'pServ-';
     static displayTail = false;
 }
 
