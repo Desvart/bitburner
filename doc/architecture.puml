@@ -1,0 +1,69 @@
+@startuml
+skinparam componentStyle rectangle
+
+
+rectangle {
+    hexagon Jarvis #Business
+    component ApplicationAPI #Application
+    component JarvisHydraAdapter #Implementation
+    component JarvisSherlockAdapter #Implementation
+    component JarvisHacknetAdapter #Implementation
+    component JarvisQueueAdapter #Implementation
+    component JarvisNsAdapter #Implementation
+}
+
+rectangle {
+    hexagon Hydra #Business
+    component HydraJarvisAdapter #Implementation
+    component HydraNsAdapter #Implementation
+}
+
+rectangle {
+    hexagon Sherlock #Business
+    component SherlockJarvisAdapter #Implementation
+    component SherlockNsAdapter #Implementation
+}
+
+rectangle {
+    hexagon Hacknet #Business
+    component HacknetJarvisAdapter #Implementation
+    component HacknetQueueAdapter #Implementation
+    component HacknetNsAdapter #Implementation
+}
+
+interface Queue #Technology
+component NS #Technology
+
+
+ApplicationAPI --> Jarvis
+Jarvis --> JarvisHydraAdapter
+Jarvis --> JarvisHacknetAdapter
+Jarvis --> JarvisSherlockAdapter
+Jarvis --> JarvisQueueAdapter
+Jarvis --> JarvisNsAdapter
+
+HydraJarvisAdapter --> Hydra
+Hydra --> HydraNsAdapter
+
+SherlockJarvisAdapter --> Sherlock
+Sherlock --> SherlockNsAdapter
+
+HacknetJarvisAdapter --> Hacknet
+Hacknet -r-> HacknetQueueAdapter
+Hacknet --> HacknetNsAdapter
+
+JarvisHydraAdapter --> HydraJarvisAdapter
+JarvisHacknetAdapter --> HacknetJarvisAdapter
+JarvisSherlockAdapter --> SherlockJarvisAdapter
+
+HacknetQueueAdapter -u-> Queue : publish
+JarvisQueueAdapter -d-> Queue : read
+
+JarvisNsAdapter --> NS
+SherlockNsAdapter --> NS
+HydraNsAdapter --> NS
+HacknetNsAdapter --> NS
+
+
+
+@enduml
