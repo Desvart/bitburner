@@ -20,9 +20,16 @@ class Hydra {
     
     async run(targetName = null) {
         targetName = this.#findNextBestTarget(targetName);
-        const runnerName = this.#setupRunnerInfra(targetName);
-        await this.#deployMalwaresOnRunner(runnerName);
-        this.#activateShiva(runnerName, targetName);
+        Log.debug(this.#ns, `HYDRA_DAEMON - No potential target at the moment ${targetName}.`);
+        if (targetName.length !== 0) {
+            //targetName = 'ecorp';
+            const runnerName = this.#setupRunnerInfra(targetName);
+            //const runnerName = 'home';
+            await this.#deployMalwaresOnRunner(runnerName);
+            this.#activateShiva(runnerName, targetName);
+        } else {
+            Log.warn(this.#ns, `HYDRA_DAEMON - No potential target at the moment.`);
+        }
     }
     
     #findNextBestTarget(targetName) {
@@ -30,7 +37,11 @@ class Hydra {
         const network = new Network(ns);
         if (targetName === null) {
             const availableTargetsList = getListOfAvailableTargets();
-            targetName = identifyMostProfitableTarget(availableTargetsList);
+            if (availableTargetsList.length !== 0) {
+                targetName = identifyMostProfitableTarget(availableTargetsList);
+            } else {
+                targetName = [];
+            }
         }
         return targetName;
         
@@ -113,7 +124,7 @@ class Hydra {
     
     #activateShiva(runnerName, targetName) {
         this.#ns.exec(config.SHIVA_DAEMON_FILE, runnerName, 1, targetName, runnerName);
-        Log.info(this.#ns, `Shiva-daemon activated on ${runnerName} and targeting ${targetName}.`);
+        Log.info(this.#ns, `HYDRA_DAEMON - Shiva-daemon activated on ${runnerName} and targeting ${targetName}.`);
     }
     
     #identifyNewRunner(targetName, existingRunnerName = []) {

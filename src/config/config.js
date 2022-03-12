@@ -48,7 +48,7 @@ export class HYDRA_CONFIG {
         '/config/config.js',
         '/network/server.js'];
     static PAUSE_BETWEEN_BLOCKS = 200; // ms
-    static hackRatio = 50 / 100;
+    static hackRatio = 75 / 100;
     static SHIVA_DAEMON_FILE = '/hydra/shiva-daemon2.js';
     static LEECHER_FILE = '/hydra/leecher.js';
     static HACK_FILE = '/hydra/hack.js';
