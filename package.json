@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "babel": "^6.23.0",
-    "bitburner-sync": "^1.1.0",
+    "bitburner-sync": "^1.2.0",
     "fs": "^0.0.1-security"
   },
   "devDependencies": {
@@ -26,6 +26,7 @@
   },
   "config": {
     "bitburnerAuthToken": "f3tCN3d9CK4JovNgZbO7u5vCewuhvKQeD3pO4J8zTQ0IxeUJpWMJKNqGPvI55zz7",
-    "bitburnerScriptRoot": "./src"
+    "bitburnerScriptRoot": "./src",
+    "bitburnerAllowDelete": true
   }
 }

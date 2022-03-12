@@ -43,13 +43,13 @@ export class HYDRA_CONFIG {
         '/hydra/weaken.js',
         '/hydra/grow.js',
         '/hydra/leecher.js',
-        '/hydra/shiva-daemon2.js',
+        '/hydra/shiva-daemon.js',
         '/helpers/helper.js',
         '/config/config.js',
         '/network/server.js'];
     static PAUSE_BETWEEN_BLOCKS = 200; // ms
     static hackRatio = 75 / 100;
-    static SHIVA_DAEMON_FILE = '/hydra/shiva-daemon2.js';
+    static SHIVA_DAEMON_FILE = '/hydra/shiva-daemon.js';
     static LEECHER_FILE = '/hydra/leecher.js';
     static HACK_FILE = '/hydra/hack.js';
     static WEAKEN_FILE = '/hydra/weaken.js';
