@@ -4,9 +4,9 @@ import {Network} from '/network/network.js';
 
 export async function main(ns) {
     initDaemon(ns, config.displayTail);
-    const vulnerableTargetList = ns.args[0];
-    const targetName = ns.args[1];
-    await new Hydra(ns).run(vulnerableTargetList, targetName);
+    const targetName = ns.args[0];
+    const runnerName = ns.args[1];
+    await new Hydra(ns).run(targetName, runnerName);
 }
 
 class Hydra {
@@ -18,13 +18,13 @@ class Hydra {
         this.#hackingFarm = new HackingFarm(ns);
     }
     
-    async run(targetName = null) {
+    async run(targetName = null, runnerName = null) {
         targetName = this.#findNextBestTarget(targetName);
         Log.debug(this.#ns, `HYDRA_DAEMON - No potential target at the moment ${targetName}.`);
         if (targetName.length !== 0) {
-            //targetName = 'ecorp';
-            const runnerName = this.#setupRunnerInfra(targetName);
-            //const runnerName = 'home';
+            if (runnerName === null) {
+                runnerName = this.#setupRunnerInfra(targetName);
+            }
             await this.#deployMalwaresOnRunner(runnerName);
             this.#activateShiva(runnerName, targetName);
         } else {
