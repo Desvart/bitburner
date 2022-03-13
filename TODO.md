@@ -43,4 +43,5 @@ const symbols = ["", "k", "m", "b", "t", "q", "Q", "s", "S", "o", "n", "e33", "e
 Queue : 1 Hydra -- 2 Sherlock -- 3 ICA-47
 
 ## Class diagram
-![Class Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Desvart/bitburner/main/assets/classdiagram.iuml)
+![Class Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Desvart/bitburner/main/doc/class-diagram.puml)
+![Class Diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Desvart/bitburner/main/doc/architecture.puml)
