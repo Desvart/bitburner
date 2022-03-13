@@ -17,7 +17,7 @@
   "parser": "@babel/eslint-parser",
   "eslintConfig": {},
   "parserOptions": {
-    "ecmaVersion": 7,
+    "ecmaVersion": 11,
     "sourceType": "module"
   },
   "scripts": {
