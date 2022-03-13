@@ -1,5 +1,4 @@
 import {Manager} from '/hacknet/manager.js';
-import config from '/hacknet/config.js';
 
 export async function main(ns) {
 
