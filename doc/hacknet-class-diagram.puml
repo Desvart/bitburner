@@ -1,0 +1,38 @@
+@startuml
+
+class Manager {
+}
+
+class Farm {
+}
+
+class Node {
+    +id: int
+    -MAX_LEVEL: int
+    -MAX_RAM: int
+    -MAX_CORES: int
+    --getter--
+    +getLevel()
+    +getRam()
+    +getCores()
+    +getLevelUpgradeCost()
+    +getRamUpgradeCost()
+    +getCoreUpgradeCost()
+    +getProductionRate()
+    +getTotalProduction()
+    --
+
+}
+
+enum Component {
+    NODE
+    LEVEL
+    RAM
+    CORE
+}
+
+Component -> Node
+Node -> Farm
+Farm -> Manager
+
+@enduml
