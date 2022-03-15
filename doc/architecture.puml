@@ -1,69 +1,127 @@
 @startuml
 skinparam componentStyle rectangle
 
-
 rectangle {
     hexagon Jarvis #Business
-    component ApplicationAPI #Application
-    component JarvisHydraAdapter #Implementation
-    component JarvisSherlockAdapter #Implementation
-    component JarvisHacknetAdapter #Implementation
-    component JarvisQueueAdapter #Implementation
+
+    component JarvisApp #Application
+    interface JarvisPort #Application
+
+    interface HydraJarvisPort
+    component HydraAdapter #Implementation
+
+    interface SherlockJarvisPort
+    component SherlockAdapter #Implementation
+
+    interface HacknetJarvisPort
+    component HacknetAdapter #Implementation
+
+    interface NsJarvisPort
     component JarvisNsAdapter #Implementation
 }
 
 rectangle {
+    component HydraApp #Application
+    interface HydraAPI #Application
+
     hexagon Hydra #Business
-    component HydraJarvisAdapter #Implementation
+    interface HydraPort
+
+    interface HydraNsPort
     component HydraNsAdapter #Implementation
+
+    component HydraFactory #Implementation
 }
 
 rectangle {
+    component SherlockApp #Application
+    interface SherlockAPI #Application
+
     hexagon Sherlock #Business
-    component SherlockJarvisAdapter #Implementation
+    interface SherlockPort
+
+    interface SherlockNsPort
     component SherlockNsAdapter #Implementation
+
+    component SherlockFactory #Implementation
 }
 
 rectangle {
+    component HacknetApp #Application
+    interface HacknetAPI #Application
+
     hexagon Hacknet #Business
-    component HacknetJarvisAdapter #Implementation
-    component HacknetQueueAdapter #Implementation
+    interface HacknetPort
+
+    interface HacknetNsPort
     component HacknetNsAdapter #Implementation
+
+    component HacknetFactory #Implementation
 }
 
-interface Queue #Technology
-component NS #Technology
+rectangle {
+    interface NsInterface #Technology
+    component NS #Technology
+}
 
+'Jarvis
+    ' Application
+    JarvisApp -r-> JarvisPort
 
-ApplicationAPI --> Jarvis
-Jarvis --> JarvisHydraAdapter
-Jarvis --> JarvisHacknetAdapter
-Jarvis --> JarvisSherlockAdapter
-Jarvis --> JarvisQueueAdapter
-Jarvis --> JarvisNsAdapter
+    'Adapters
+    JarvisPort -r-> Jarvis
+    Jarvis --> HydraJarvisPort
+    HydraJarvisPort --> HydraAdapter
+    Jarvis --> HacknetJarvisPort
+    HacknetJarvisPort --> HacknetAdapter
+    Jarvis --> SherlockJarvisPort
+    SherlockJarvisPort --> SherlockAdapter
+    Jarvis --> NsJarvisPort
+    NsJarvisPort --> JarvisNsAdapter
 
-HydraJarvisAdapter --> Hydra
-Hydra --> HydraNsAdapter
+' Hydra
+    HydraAPI -l-> HydraApp
+    HydraApp --> HydraFactory
+    HydraApp --> HydraPort
+    HydraPort --> Hydra
+    Hydra -r-> HydraNsPort
+    HydraNsPort --> HydraNsAdapter
+    HydraFactory ..|> HydraNsAdapter
+    HydraFactory ..|> Hydra
 
-SherlockJarvisAdapter --> Sherlock
-Sherlock --> SherlockNsAdapter
+' Sherlock
+    SherlockAPI -l-> SherlockApp
+    SherlockApp --> SherlockFactory
+    SherlockApp --> SherlockPort
+    SherlockPort --> Sherlock
+    Sherlock -r-> SherlockNsPort
+    SherlockNsPort --> SherlockNsAdapter
+    SherlockFactory ..|> SherlockNsAdapter
+    SherlockFactory ..|> Sherlock
 
-HacknetJarvisAdapter --> Hacknet
-Hacknet -r-> HacknetQueueAdapter
-Hacknet --> HacknetNsAdapter
+' Hacknet
+    HacknetAPI -r-> HacknetApp
+    HacknetApp --> HacknetFactory
+    HacknetApp --> HacknetPort
+    HacknetPort --> Hacknet
+    Hacknet -r-> HacknetNsPort
+    HacknetNsPort --> HacknetNsAdapter
+    HacknetFactory ..|> HacknetNsAdapter
+    HacknetFactory ..|> Hacknet
 
-JarvisHydraAdapter --> HydraJarvisAdapter
-JarvisHacknetAdapter --> HacknetJarvisAdapter
-JarvisSherlockAdapter --> SherlockJarvisAdapter
+' NS
+    NsInterface --> NS
 
-HacknetQueueAdapter -u-> Queue : publish
-JarvisQueueAdapter -d-> Queue : read
+' Integration
+    ' Jarvis to modules
+    HacknetAdapter --> HacknetAPI
+    SherlockAdapter --> SherlockAPI
+    HydraAdapter --> HydraAPI
 
-JarvisNsAdapter --> NS
-SherlockNsAdapter --> NS
-HydraNsAdapter --> NS
-HacknetNsAdapter --> NS
-
-
+    ' Modules to NS
+    SherlockNsAdapter --> NsInterface
+    HydraNsAdapter --> NsInterface
+    HacknetNsAdapter --> NsInterface
+    JarvisNsAdapter --> NsInterface
 
 @enduml
