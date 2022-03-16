@@ -1,27 +1,28 @@
-## Hydra-Shiva
-
-* Adapt hydra to match multiple available pServ.
-* Deploy malware as soon as a server has been upgraded
-* Determine targetable servers based on available RAM on pServX
-* Create a kibana-loger per pserv (one server hacked per server)
-* Cleanup code
-  
-## Jarvis
-
+## Hydra
+* Implement a sequential hacking technique for starting game
 * Create a warmup target routine to be able afterward to compute the real max ram of a pServ to hack this server.
-* Implement a log dedicated to the hacking a given server (chrome loggin but with the server name).
-
-* Add hydra activities and upgradable pserv logic
-* Design the daemon to upgrade servers one by one and not the full batch at once.
-* pServ-shivaX auto build
+* Deploy malware as soon as a server has been upgraded
+* Cleanup code
 * => strategy 50% or 5% ?
 
+## Jarvis
+* Integrate hydra
+* Implement logic to adapt hacking based on RAM and availability
+
 ## Sherlock
+* fix bugs
 
+## Misc.
+* ValueObject (mapstruct)
+* Automapper
+* TypeScript
+* Factory to initialize adapters
+* IDE back 
 
+## Doc
+* Hydra (builder Servers) -> Shiva (Compute **previsions**) -> leecher (launch malwares) -> HWGW 
 
 ## Unit testing
-
 * Setup a unit testing framework on JS
 ** Jest + https://www.npmjs.com/package/jest-cucumber
 
@@ -29,11 +30,9 @@
 * NightwatchJS ??
     
 ## Map network in a log window
-
 * Live update network on external pop (with servers internal values)
 
 # Market automation
-
 * Dump price variation on typical stock to analyse price fluctuations
 * Simulate a portfolio and positions... => diversification
 
