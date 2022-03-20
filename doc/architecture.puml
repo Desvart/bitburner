@@ -59,6 +59,8 @@ rectangle {
     component HacknetFactory #Implementation
 }
 
+component LogNsAdapter #Implementation
+
 rectangle {
     interface NsInterface #Technology
     component NS #Technology
@@ -86,6 +88,7 @@ rectangle {
     HydraPort --> Hydra
     Hydra -r-> HydraNsPort
     HydraNsPort --> HydraNsAdapter
+    Hydra ---> LogNsAdapter
     HydraFactory ..|> HydraNsAdapter
     HydraFactory ..|> Hydra
 
@@ -96,6 +99,7 @@ rectangle {
     SherlockPort --> Sherlock
     Sherlock -r-> SherlockNsPort
     SherlockNsPort --> SherlockNsAdapter
+    Sherlock ---> LogNsAdapter
     SherlockFactory ..|> SherlockNsAdapter
     SherlockFactory ..|> Sherlock
 
@@ -106,10 +110,12 @@ rectangle {
     HacknetPort --> Hacknet
     Hacknet -r-> HacknetNsPort
     HacknetNsPort --> HacknetNsAdapter
+    Hacknet ---> LogNsAdapter
     HacknetFactory ..|> HacknetNsAdapter
     HacknetFactory ..|> Hacknet
 
 ' NS
+    LogNsAdapter --> NsInterface
     NsInterface --> NS
 
 ' Integration

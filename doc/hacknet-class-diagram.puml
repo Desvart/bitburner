@@ -1,38 +1,85 @@
 @startuml
 
-class Manager {
+interface HacknetPort
+interface HacknetNsPort
+interface LogNsPort
+
+hexagon Hacknet #Business {
+
+    component HacknetService {
+    }
+
+    class Manager {
+        -farm
+        +kill()
+        +setupInfra()
+        +deploy()
+        +activate()
+        +operate()
+        -identifyCheapestComponentToUpgrade()
+        -waitToHaveEnoughMoney()
+        -upgradeHacknetFarm()
+        -getEtaBeforeNextUpgrade()
+        -waitUntilNextUpgrade()
+    }
+
+    class Farm {
+        +MAX_NODE_COUNT
+        +getNodeCount()
+        +getNewNodeCost()
+        +getNodeList()
+        +getProductionRate()
+        +buyNewNode()
+    }
+
+    class Node {
+        +id: int
+        -MAX_LEVEL: int
+        -MAX_RAM: int
+        -MAX_CORES: int
+        --getter--
+        +getLevel()
+        +getRam()
+        +getCores()
+        +getLevelUpgradeCost()
+        +getRamUpgradeCost()
+        +getCoreUpgradeCost()
+        +getProductionRate()
+        --
+        +getComponentLevel()
+        +getUpgradeCost()
+        +upgrade()
+        -upgradeLevel()
+        -upgradeRam()
+        -upgradeCore()
+    }
+
+    enum Component {
+        Node
+        Level
+        Ram
+        Cores
+    }
 }
 
-class Farm {
-}
+' Driven by
+    HacknetPort --> HacknetService
 
-class Node {
-    +id: int
-    -MAX_LEVEL: int
-    -MAX_RAM: int
-    -MAX_CORES: int
-    --getter--
-    +getLevel()
-    +getRam()
-    +getCores()
-    +getLevelUpgradeCost()
-    +getRamUpgradeCost()
-    +getCoreUpgradeCost()
-    +getProductionRate()
-    +getTotalProduction()
-    --
+' Hexagon
+    HacknetService --> Manager
+    Manager -d-> Farm
+    Manager --> Component
+    Farm --> Node
+    Node -u-> Component
 
-}
-
-enum Component {
-    NODE
-    LEVEL
-    RAM
-    CORE
-}
-
-Component -> Node
-Node -> Farm
-Farm -> Manager
+' Driver
+    HacknetService --> HacknetNsPort
+    HacknetService --> LogNsPort
+    Manager -r-> HacknetNsPort
+    Manager -l-> LogNsPort
+    Farm -u-> HacknetNsPort
+    Farm -u-> LogNsPort
+    Node -u-> HacknetNsPort
+    Node -u-> LogNsPort
 
 @enduml
