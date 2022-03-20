@@ -1,18 +1,15 @@
-import {HacknetDaemon} from '/hacknet/hacknet-daemon.js';
-
+import {Node} from './hacknetTS/node.js';
+import {HacknetNsAdapter} from './hacknetTS/hacknet-ns-adapter.js';
+import {LogNsAdapter} from './resources/helperTS.js';
+import {Component} from './hacknetTS/component.js';
 
 export async function main(ns) {
     ns.tail(); ns.disableLog('ALL'); ns.clearLog();
     
-    const target = 'foodnstuff';
-    ns.rm('/helpers/helper.js', target);
-    ns.rm('/config/config.js', target);
-    ns.rm('/hacknet/hacknet-daemon.js', target);
-    ns.rm('/hacknet/hacknet-farm.js', target);
-    ns.rm('/hacknet/hacknet-node.js', target);
+    let node = new Node(new HacknetNsAdapter(ns), new LogNsAdapter(ns), 5);
     
+    ns.print(node.upgrade(Component.Core, 1));
     
-    await new HacknetDaemon(ns, target).deploy().then(obj => obj.activate());
     
   
     
