@@ -1,49 +1,70 @@
 import {HacknetNsPort} from '/hacknetTS/hacknet-ns-port';
+import {config} from '/hacknetTS/model/config';
 
 export class HacknetNsAdapter implements HacknetNsPort {
-    #ns;
+    private readonly ns;
+    
     constructor(ns: object) {
-        this.#ns = ns;
+        this.ns = ns;
     }
     
     getNodeLevel(nodeId: number): number {
-        return this.#ns.hacknet.getNodeStats(nodeId).level;
+        return this.ns.hacknet.getNodeStats(nodeId).level;
     }
     
     getNodeRam(nodeId: number) {
-        return this.#ns.hacknet.getNodeStats(nodeId).ram;
+        return this.ns.hacknet.getNodeStats(nodeId).ram;
     }
     
     getNodeCore(nodeId: number) {
-        return this.#ns.hacknet.getNodeStats(nodeId).cores;
+        return this.ns.hacknet.getNodeStats(nodeId).cores;
     }
     
     getNodeLevelUpgradeCost(nodeId: number, upgradeQty: number) {
-        return this.#ns.hacknet.getLevelUpgradeCost(nodeId, upgradeQty);
+        return this.ns.hacknet.getLevelUpgradeCost(nodeId, upgradeQty);
     }
     
     getNodeRamUpgradeCost(nodeId: number, upgradeQty: number) {
-        return this.#ns.hacknet.getRamUpgradeCost(nodeId, upgradeQty);
+        return this.ns.hacknet.getRamUpgradeCost(nodeId, upgradeQty);
     }
     
     getNodeCoreUpgradeCost(nodeId: number, upgradeQty: number) {
-        return this.#ns.hacknet.getCoreUpgradeCost(nodeId, upgradeQty);
+        return this.ns.hacknet.getCoreUpgradeCost(nodeId, upgradeQty);
     }
     
     getNodeProductionRate(nodeId: number) {
-        return this.#ns.hacknet.getNodeStats(nodeId).production;
+        return this.ns.hacknet.getNodeStats(nodeId).production;
     }
     
     purchaseNodeLevelUpgrade(nodeId: number, purchaseQty: number): boolean {
-        return this.#ns.hacknet.upgradeLevel(nodeId, purchaseQty);
+        return this.ns.hacknet.upgradeLevel(nodeId, purchaseQty);
     }
     
     purchaseNodeRamUpgrade(nodeId: number, purchaseQty: number): boolean {
-        return this.#ns.hacknet.upgradeRam(nodeId, purchaseQty);
+        return this.ns.hacknet.upgradeRam(nodeId, purchaseQty);
     }
     
     purchaseNodeCoreUpgrade(nodeId: number, purchaseQty: number): boolean {
-        return this.#ns.hacknet.upgradeCore(nodeId, purchaseQty);
+        return this.ns.hacknet.upgradeCore(nodeId, purchaseQty);
     }
-
+    
+    purchaseNewNode(): number {
+        return this.ns.hacknet.purchaseNode();
+    }
+    
+    getMaxNumNodes(): number {
+        return this.ns.hacknet.maxNumNodes();
+    }
+    
+    getNodeCount(): number {
+        return this.ns.hacknet.numNodes();
+    }
+    
+    getNewNodeCost(): number {
+        return this.ns.hacknet.getPurchaseNodeCost();
+    }
+    
+    kill(scriptName: string, hostname: string, param: string): void {
+        this.ns.kill(scriptName, hostname, param);
+    };
 }

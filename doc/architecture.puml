@@ -7,16 +7,9 @@ rectangle {
     component JarvisApp #Application
     interface JarvisPort #Application
 
-    interface HydraJarvisPort
     component HydraAdapter #Implementation
-
-    interface SherlockJarvisPort
     component SherlockAdapter #Implementation
-
-    interface HacknetJarvisPort
     component HacknetAdapter #Implementation
-
-    interface NsJarvisPort
     component JarvisNsAdapter #Implementation
 }
 
@@ -27,7 +20,6 @@ rectangle {
     hexagon Hydra #Business
     interface HydraPort
 
-    interface HydraNsPort
     component HydraNsAdapter #Implementation
 
     component HydraFactory #Implementation
@@ -40,7 +32,6 @@ rectangle {
     hexagon Sherlock #Business
     interface SherlockPort
 
-    interface SherlockNsPort
     component SherlockNsAdapter #Implementation
 
     component SherlockFactory #Implementation
@@ -53,7 +44,6 @@ rectangle {
     hexagon Hacknet #Business
     interface HacknetPort
 
-    interface HacknetNsPort
     component HacknetNsAdapter #Implementation
 
     component HacknetFactory #Implementation
@@ -62,7 +52,12 @@ rectangle {
 component LogNsAdapter #Implementation
 
 rectangle {
-    interface NsInterface #Technology
+    interface JarvisNsPort #Technology
+    interface HacknetNsPort #Technology
+    interface SherlockNsPort #Technology
+    interface HydraNsPort #Technology
+    interface LogNsPort #Technology
+
     component NS #Technology
 }
 
@@ -72,22 +67,17 @@ rectangle {
 
     'Adapters
     JarvisPort -r-> Jarvis
-    Jarvis --> HydraJarvisPort
-    HydraJarvisPort --> HydraAdapter
-    Jarvis --> HacknetJarvisPort
-    HacknetJarvisPort --> HacknetAdapter
-    Jarvis --> SherlockJarvisPort
-    SherlockJarvisPort --> SherlockAdapter
-    Jarvis --> NsJarvisPort
-    NsJarvisPort --> JarvisNsAdapter
+    Jarvis --> HydraAdapter
+    Jarvis --> HacknetAdapter
+    Jarvis --> SherlockAdapter
+    Jarvis --> JarvisNsAdapter
 
 ' Hydra
     HydraAPI -l-> HydraApp
     HydraApp --> HydraFactory
     HydraApp --> HydraPort
     HydraPort --> Hydra
-    Hydra -r-> HydraNsPort
-    HydraNsPort --> HydraNsAdapter
+    Hydra --> HydraNsAdapter
     Hydra ---> LogNsAdapter
     HydraFactory ..|> HydraNsAdapter
     HydraFactory ..|> Hydra
@@ -97,8 +87,7 @@ rectangle {
     SherlockApp --> SherlockFactory
     SherlockApp --> SherlockPort
     SherlockPort --> Sherlock
-    Sherlock -r-> SherlockNsPort
-    SherlockNsPort --> SherlockNsAdapter
+    Sherlock --> SherlockNsAdapter
     Sherlock ---> LogNsAdapter
     SherlockFactory ..|> SherlockNsAdapter
     SherlockFactory ..|> Sherlock
@@ -108,15 +97,18 @@ rectangle {
     HacknetApp --> HacknetFactory
     HacknetApp --> HacknetPort
     HacknetPort --> Hacknet
-    Hacknet -r-> HacknetNsPort
-    HacknetNsPort --> HacknetNsAdapter
+    Hacknet --> HacknetNsAdapter
     Hacknet ---> LogNsAdapter
     HacknetFactory ..|> HacknetNsAdapter
     HacknetFactory ..|> Hacknet
 
 ' NS
-    LogNsAdapter --> NsInterface
-    NsInterface --> NS
+    LogNsAdapter --> LogNsPort
+    JarvisNsPort --> NS
+    SherlockNsPort --> NS
+    HacknetNsPort --> NS
+    HydraNsPort --> NS
+    LogNsPort --> NS
 
 ' Integration
     ' Jarvis to modules
@@ -125,9 +117,9 @@ rectangle {
     HydraAdapter --> HydraAPI
 
     ' Modules to NS
-    SherlockNsAdapter --> NsInterface
-    HydraNsAdapter --> NsInterface
-    HacknetNsAdapter --> NsInterface
-    JarvisNsAdapter --> NsInterface
+    SherlockNsAdapter --> SherlockNsPort
+    HydraNsAdapter --> HydraNsPort
+    HacknetNsAdapter --> HacknetNsPort
+    JarvisNsAdapter --> JarvisNsPort
 
 @enduml

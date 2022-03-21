@@ -1,8 +1,8 @@
 @startuml
 
 interface HacknetPort
-interface HacknetNsPort
-interface LogNsPort
+class HacknetNsAdapter
+class LogNsAdapter
 
 hexagon Hacknet #Business {
 
@@ -73,13 +73,13 @@ hexagon Hacknet #Business {
     Node -u-> Component
 
 ' Driver
-    HacknetService --> HacknetNsPort
-    HacknetService --> LogNsPort
-    Manager -r-> HacknetNsPort
-    Manager -l-> LogNsPort
-    Farm -u-> HacknetNsPort
-    Farm -u-> LogNsPort
-    Node -u-> HacknetNsPort
-    Node -u-> LogNsPort
+    HacknetService --> HacknetNsAdapter
+    HacknetService --> LogNsAdapter
+    Manager -r-> HacknetNsAdapter
+    Manager -l-> LogNsAdapter
+    Farm -u-> HacknetNsAdapter
+    Farm -u-> LogNsAdapter
+    Node -u-> HacknetNsAdapter
+    Node -u-> LogNsAdapter
 
 @enduml

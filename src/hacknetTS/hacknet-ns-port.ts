@@ -12,4 +12,11 @@ export interface HacknetNsPort {
     purchaseNodeLevelUpgrade(nodeId: number, purchaseQty: number): boolean;
     purchaseNodeRamUpgrade(nodeId: number, purchaseQty: number): boolean;
     purchaseNodeCoreUpgrade(nodeId: number, purchaseQty: number): boolean;
+    purchaseNewNode(): number;
+    
+    getMaxNumNodes(): number;
+    getNodeCount(): number;
+    getNewNodeCost(): number;
+    
+    kill(scriptName: string, hostname: string, param: string): void;
 }
