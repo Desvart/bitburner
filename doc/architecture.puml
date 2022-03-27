@@ -1,5 +1,6 @@
 @startuml
 skinparam componentStyle rectangle
+skinparam linetype polyline
 
 rectangle {
     hexagon Jarvis #Business
@@ -26,27 +27,23 @@ rectangle {
 }
 
 rectangle {
-    component SherlockApp #Application
+    component SherlockDaemon #Application
     interface SherlockAPI #Application
 
     hexagon Sherlock #Business
     interface SherlockPort
 
     component SherlockNsAdapter #Implementation
-
-    component SherlockFactory #Implementation
 }
 
 rectangle {
-    component HacknetApp #Application
+    component HacknetDaemon #Application
     interface HacknetAPI #Application
 
     hexagon Hacknet #Business
     interface HacknetPort
 
     component HacknetNsAdapter #Implementation
-
-    component HacknetFactory #Implementation
 }
 
 component LogNsAdapter #Implementation
@@ -83,24 +80,24 @@ rectangle {
     HydraFactory ..|> Hydra
 
 ' Sherlock
-    SherlockAPI -l-> SherlockApp
-    SherlockApp --> SherlockFactory
-    SherlockApp --> SherlockPort
+    SherlockAPI -l-> SherlockDaemon
+    SherlockDaemon --> SherlockPort
     SherlockPort --> Sherlock
     Sherlock --> SherlockNsAdapter
     Sherlock ---> LogNsAdapter
-    SherlockFactory ..|> SherlockNsAdapter
-    SherlockFactory ..|> Sherlock
+    SherlockDaemon ..|> SherlockNsAdapter
+    SherlockDaemon ..|> LogNsAdapter
+    SherlockDaemon ..|> Sherlock
 
 ' Hacknet
-    HacknetAPI -r-> HacknetApp
-    HacknetApp --> HacknetFactory
-    HacknetApp --> HacknetPort
+    HacknetAPI -r-> HacknetDaemon
+    HacknetDaemon --> HacknetPort
     HacknetPort --> Hacknet
     Hacknet --> HacknetNsAdapter
     Hacknet ---> LogNsAdapter
-    HacknetFactory ..|> HacknetNsAdapter
-    HacknetFactory ..|> Hacknet
+    HacknetDaemon ..|> HacknetNsAdapter
+    HacknetDaemon ..|> LogNsAdapter
+    HacknetDaemon ..|> Hacknet
 
 ' NS
     LogNsAdapter --> LogNsPort

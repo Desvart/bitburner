@@ -1,7 +1,8 @@
-import {HacknetNsPort} from '/hacknetTS/hacknet-ns-port';
+import {NsPort} from '/hacknetTS/adapters/ns-port';
 import {config} from '/hacknetTS/model/config';
+import {hasSubscribers} from 'diagnostics_channel';
 
-export class HacknetNsAdapter implements HacknetNsPort {
+export class NsAdapter implements NsPort {
     private readonly ns;
     
     constructor(ns: object) {
@@ -66,5 +67,21 @@ export class HacknetNsAdapter implements HacknetNsPort {
     
     kill(scriptName: string, hostname: string, param: string): void {
         this.ns.kill(scriptName, hostname, param);
-    };
+    }
+    
+    nuke(hostname: string): void {
+        this.ns.nuke(hostname);
+    }
+    
+    scp(file: string[], hostname: string): void {
+        this.ns.scp(file, hostname);
+    }
+    
+    scriptRunning(file: string, hostname: string): boolean {
+        return this.ns.scriptRunning(file, hostname);
+    }
+    
+    exec(file: string, hostname: string, threadCount: number, ...params: any[]): void {
+        this.ns.exec(file, hostname);
+    }
 }

@@ -1,5 +1,5 @@
 import {Component} from '/hacknetTS/model/component.js';
-import {HacknetNsAdapter} from '/hacknetTS/hacknet-ns-adapter.js';
+import {NsAdapter} from '/hacknetTS/adapters/ns-adapter.js';
 import {LogNsAdapter} from '/resources/helperTS.js';
 
 export class Node {
@@ -7,10 +7,10 @@ export class Node {
     private readonly MAX_LEVEL: number = 200;
     private readonly MAX_RAM: number = 64;
     private readonly MAX_CORES: number = 16;
-    private readonly nsA: HacknetNsAdapter;
+    private readonly nsA: NsAdapter;
     private readonly logA: LogNsAdapter;
     
-    constructor(nsA: HacknetNsAdapter, logA: LogNsAdapter, nodeId: number) {
+    constructor(nsA: NsAdapter, logA: LogNsAdapter, nodeId: number) {
         this.nsA = nsA;
         this.logA = logA;
         this.id = nodeId;

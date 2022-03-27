@@ -6,9 +6,6 @@ class LogNsAdapter
 
 hexagon Hacknet #Business {
 
-    component HacknetService {
-    }
-
     class Manager {
         -farm
         +kill()
@@ -63,18 +60,15 @@ hexagon Hacknet #Business {
 }
 
 ' Driven by
-    HacknetPort --> HacknetService
+    HacknetPort --> Manager
 
 ' Hexagon
-    HacknetService --> Manager
     Manager -d-> Farm
     Manager --> Component
     Farm --> Node
     Node -u-> Component
 
 ' Driver
-    HacknetService --> HacknetNsAdapter
-    HacknetService --> LogNsAdapter
     Manager -r-> HacknetNsAdapter
     Manager -l-> LogNsAdapter
     Farm -u-> HacknetNsAdapter
