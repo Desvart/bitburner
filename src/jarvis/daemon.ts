@@ -5,26 +5,34 @@ export async function main(ns) {
 }
 
 class Jarvis {
+    private readonly nsA: NsAdapter;
     private network: Network;
     
     constructor(ns: object) {
-        this.network = new Network(ns);
+        this.nsA = new NsAdapter(ns);
+        this.network = new Network(this.nsA);
     }
     
     runOperations(): void {
-        this.hackAvailableHosts();
-        this.runHacknetOperations();
         
-        while (this.isNetworkOwned() === false) {
+        this.hackAvailableHosts();
+        
+        this.deployHacknetFarm();
+        this.activateHacknetOperations();
+        
+        while (this.network.isNetworkFullyOwned() === false) {
             
             this.hackAvailableHosts();
-            this.deployLocalMalwareOnAvailableHosts();
             
-            if (this.isHydraDeployed() === false) {
-                this.runHydraOperations();
+            const availableHosts: string[] = this.deployWormOnAvailableHosts();
+            this.activateWormOnAvailableHosts(availableHosts);
+            
+            if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
+                this.deployCommandAndControl();
+                this.activateCommandAndControl();
             }
             
-            if (this.isSherlockDeployed() === false) {
+            if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
                 this.runSherlockOperations();
             }
         }
@@ -35,36 +43,77 @@ class Jarvis {
         this.network.nukeNodes(nukableHosts);
     }
     
-    runHacknetOperations(): void {
-        // TODO
-        // Deploy hacknet farm on foodnstuff
-        // Activate hacknet farm
+    deployHacknetFarm(): void {
+        this.nsA.scp(HACKING_CONFIG.FILE_LIST, 'home', HACKING_CONFIG.TARGET);
     }
     
-    isNetworkOwned(): boolean {
+    activateHacknetOperations(): void {
+        this.nsA.exec(HACKING_CONFIG.FILE_LIST[0], HACKING_CONFIG.TARGET, 1);
+    }
+    
+    deployWormOnAvailableHosts(): string[] {
+        const availableHosts: string[] = this.listAvailableHosts();
+        this.deployWorm(availableHosts);
+        return availableHosts;
+    }
+    
+    listAvailableHosts(): string[] {
+        const potentialHosts: Node[] = this.network.nodes.filter(n => n.isPotentialTarget && n.hasAdminRights());
+        let availableHosts: string[] = [];
+        for (const potentialHost of potentialHosts) {
+            if (this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
+                availableHosts.push(potentialHost.hostname);
+            }
+        }
+        return availableHosts;
+    }
+    
+    deployWorm(availableHosts: string[]): void {
+        const fileToCpy: string[] = [
+            '/malwares/local-worm.js',
+            '/malwares/hack.js',
+            '/malwares/weaken.js',
+            '/malwares/grow.js'];
+        
+        for (const target of availableHosts) {
+            this.nsA.scp(fileToCpy, 'home', target);
+        }
+    }
+    
+    activateWormOnAvailableHosts(availableHosts: string[]): void {
+        for (const target of availableHosts) {
+            this.nsA.exec('/malware/worm-daemon.js', target, 1);
+        }
+    }
+    
+    isCommandAndControlDeployed(): boolean {
+        // TODO
+        return false;
+    }
+    isCommandAndControlDeployable(): boolean {
         // TODO
         return false;
     }
     
-    deployLocalMalwareOnAvailableHosts(): void {
-        // TODO
-    }
-    
-    isHydraDeployed(): boolean {
-        // TODO
-        return false;
-    }
-    
-    runHydraOperations(): void {
+    deployCommandAndControl(): void {
         // TODO
         // Deploy hydraManager as soon as we have access to a 32 GB RAM host
-        // Activate hydra operations
+        // Activate malwares operations
         // Determine the RAM cost to // hack n00dles. If it is more than the RAM available on home, buy a server
         // Else run it against home
         // If enough money buy new server and hack next server
     }
     
+    activateCommandAndControl(): void {
+        // TODO
+    }
+    
     isSherlockDeployed(): boolean {
+        // TODO
+        return false;
+    }
+    
+    isSherlockDeployable(): boolean {
         // TODO
         return false;
     }
@@ -80,8 +129,10 @@ class Network {
     
     private readonly nsA: NsAdapter;
     
-    constructor(ns) {
-        this.nsA = new NsAdapter(ns);
+    get nodes(): Node[] { return this.retrieveNetwork(); };
+    
+    constructor(nsA) {
+        this.nsA = nsA;
     }
     
     identifyNukableHosts() {
@@ -121,12 +172,17 @@ class Network {
         return nodes;
     }
     
-    filtersOutNonNukableNodes(network: Node[]): Node[] {
+    private filtersOutNonNukableNodes(network: Node[]): Node[] {
         return network.filter(n => n.isNukable() === true);
     }
     
     nukeNodes(nukableNodes: Node[]): void {
         nukableNodes.forEach(n => n.nuke());
+    }
+    
+    isNetworkFullyOwned(): boolean {
+        const network: Node[] = this.retrieveNetwork();
+        return network.filter(n => n.isPotentialTarget === true).some(n => n.hasAdminRights() === false);
     }
 }
 
@@ -279,6 +335,18 @@ class NsAdapter {
     nuke(hostname: string): void {
         this.ns.nuke(hostname);
     }
+    
+    scp(files: string | string[], source: string, target: string): void {
+        this.ns.scp(files, source, target);
+    }
+    
+    exec(script: string, target: string, threadCount: number, ...args: any[]): void {
+        this.ns.exec(script, target, threadCount, args);
+    }
+    
+    ps(hostname: string): Process[] {
+        return this.ns.ps(hostname);
+    }
 }
 
 type Server = {
@@ -286,6 +354,11 @@ type Server = {
     requiredHackingSkill: number;
     numOpenPortsRequired: number;
     purchasedByPlayer: boolean;
+    hasAdminRights: boolean;
+}
+
+type Process = {
+    filename: string;
 }
 
 const GLOBAL_CONFIG: {
@@ -312,4 +385,12 @@ const NETWORK_CONFIG: {
     BLACK_LIST: string[],
 } = {
     BLACK_LIST: ['home', 'darkweb', 'CSEC', 'The-Cave', 'run4theh111z', 'I.I.I.I', 'avmnite-02h', '.', 'w0r1d_d43m0n'],
+};
+
+const HACKING_CONFIG: {
+    FILE_LIST: string[],
+    TARGET: string,
+} = {
+    FILE_LIST: ['hacknet-daemon.js'],
+    TARGET: 'foodnstuff',
 };
