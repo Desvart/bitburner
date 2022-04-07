@@ -1,6 +1,8 @@
 export async function main(ns) {
-    
-    new Jarvis(ns).runOperations();
+    ns.tail();
+    ns.disableLog('ALL');
+    ns.clearLog();
+    await new Jarvis(ns).runOperations();
     
 }
 
@@ -13,18 +15,18 @@ class Jarvis {
         this.network = new Network(this.nsA);
     }
     
-    runOperations(): void {
-        
+    async runOperations(): Promise<void> {
+        debugger
         this.hackAvailableHosts();
         
-        this.deployHacknetFarm();
+        await this.deployHacknetFarm();
         this.activateHacknetOperations();
         
         while (this.network.isNetworkFullyOwned() === false) {
             
             this.hackAvailableHosts();
             
-            const availableHosts: string[] = this.deployWormOnAvailableHosts();
+            const availableHosts: string[] = await this.deployWormOnAvailableHosts();
             this.activateWormOnAvailableHosts(availableHosts);
             
             if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
@@ -35,6 +37,8 @@ class Jarvis {
             if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
                 this.runSherlockOperations();
             }
+            
+            await this.nsA.sleep(2000);
         }
     }
     
@@ -43,22 +47,23 @@ class Jarvis {
         this.network.nukeNodes(nukableHosts);
     }
     
-    deployHacknetFarm(): void {
-        this.nsA.scp(HACKING_CONFIG.FILE_LIST, 'home', HACKING_CONFIG.TARGET);
+    async deployHacknetFarm(): Promise<void> {
+        await this.nsA.scp(HACKNET_CONFIG.FILE_LIST, 'home', HACKNET_CONFIG.TARGET);
     }
     
     activateHacknetOperations(): void {
-        this.nsA.exec(HACKING_CONFIG.FILE_LIST[0], HACKING_CONFIG.TARGET, 1);
+        this.nsA.exec(HACKNET_CONFIG.FILE_LIST[0], HACKNET_CONFIG.TARGET, 1);
     }
     
-    deployWormOnAvailableHosts(): string[] {
+    async deployWormOnAvailableHosts(): Promise<string[]> {
         const availableHosts: string[] = this.listAvailableHosts();
-        this.deployWorm(availableHosts);
+        await this.deployWorm(availableHosts);
         return availableHosts;
     }
     
     listAvailableHosts(): string[] {
         const potentialHosts: Node[] = this.network.nodes.filter(n => n.isPotentialTarget && n.hasAdminRights());
+        console.debug(this.network.nodes);
         let availableHosts: string[] = [];
         for (const potentialHost of potentialHosts) {
             if (this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
@@ -68,21 +73,21 @@ class Jarvis {
         return availableHosts;
     }
     
-    deployWorm(availableHosts: string[]): void {
+    async deployWorm(availableHosts: string[]): Promise<void> {
         const fileToCpy: string[] = [
-            '/malwares/local-worm.js',
+            '/malwares/worm-daemon.js',
             '/malwares/hack.js',
             '/malwares/weaken.js',
             '/malwares/grow.js'];
         
         for (const target of availableHosts) {
-            this.nsA.scp(fileToCpy, 'home', target);
+            await this.nsA.scp(fileToCpy, 'home', target);
         }
     }
     
     activateWormOnAvailableHosts(availableHosts: string[]): void {
         for (const target of availableHosts) {
-            this.nsA.exec('/malware/worm-daemon.js', target, 1);
+            this.nsA.exec('/malware/worm-hacknet-daemon.js', target, 1);
         }
     }
     
@@ -182,7 +187,7 @@ class Network {
     
     isNetworkFullyOwned(): boolean {
         const network: Node[] = this.retrieveNetwork();
-        return network.filter(n => n.isPotentialTarget === true).some(n => n.hasAdminRights() === false);
+        return !network.filter(n => n.isPotentialTarget === true).some(n => n.hasAdminRights() === false);
     }
 }
 
@@ -231,6 +236,8 @@ class Node {
         for (let blackNode of NETWORK_CONFIG.BLACK_LIST)
             if (this.hostname === blackNode)
                 return false;
+        
+        return true;
     }
     
     getAvailableKeysCount(): number {
@@ -336,16 +343,21 @@ class NsAdapter {
         this.ns.nuke(hostname);
     }
     
-    scp(files: string | string[], source: string, target: string): void {
-        this.ns.scp(files, source, target);
+    async scp(files: string | string[], source: string, target: string): Promise<void> {
+        await this.ns.scp(files, source, target);
     }
     
     exec(script: string, target: string, threadCount: number, ...args: any[]): void {
-        this.ns.exec(script, target, threadCount, args);
+        this.ns.exec(script, target, threadCount, ...args);
     }
     
     ps(hostname: string): Process[] {
         return this.ns.ps(hostname);
+    }
+    
+    async sleep(duration: number): Promise<void> {
+        await this.ns.sleep(duration);
+        
     }
 }
 
@@ -387,10 +399,16 @@ const NETWORK_CONFIG: {
     BLACK_LIST: ['home', 'darkweb', 'CSEC', 'The-Cave', 'run4theh111z', 'I.I.I.I', 'avmnite-02h', '.', 'w0r1d_d43m0n'],
 };
 
-const HACKING_CONFIG: {
+const HACKNET_CONFIG: {
     FILE_LIST: string[],
     TARGET: string,
 } = {
-    FILE_LIST: ['hacknet-daemon.js'],
+    FILE_LIST: ['/hacknetTS/hacknet-daemon.js'],
     TARGET: 'foodnstuff',
+};
+
+const WORM_CONFIG: {
+    FILE_LIST: string[],
+} = {
+    FILE_LIST: ['/malwares/worm-daemon.js', '/malwares/hack.js', '/malwares/weaken.js', '/malwares/grow.js'],
 };
