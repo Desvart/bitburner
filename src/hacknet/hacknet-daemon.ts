@@ -1,8 +1,8 @@
-import {Farm} from '/hacknetTS/model/farm.js';
-import {NsAdapter} from '/hacknetTS/adapters/ns-adapter.js';
-import {LogNsAdapter} from '/resources/helperTS.js';
-import {config as configTech} from '/hacknetTS/config.js';
-import {config} from '/hacknetTS/model/config.js';
+import {Farm} from '/hacknet/farm.js';
+import {NsAdapter} from '/hacknet/ns-adapter.js';
+import {LogNsAdapter} from '/resources/helper.js';
+import {config as configTech} from '/hacknet/config.js';
+import {config} from '/hacknet/config.js';
 import {configGlobal} from '/resources/global-config.js';
 
 
@@ -13,13 +13,13 @@ export async function main(ns) {
         ['operate', false],
     ]);
     
-    const daemon = new Daemon(ns, flags);
+    const daemon = new HacknetDaemon(ns, flags);
     await daemon.setup();
     await daemon.run();
     
 }
 
-export class Daemon {
+export class HacknetDaemon {
     private readonly flags: {'deploy', 'operate'};
     private readonly nsA: NsAdapter;
     private readonly logA: LogNsAdapter;
@@ -74,7 +74,7 @@ export class Daemon {
     private activate(): void {
         if (this.nsA.scriptRunning(configTech.DAEMON_FILE, config.LOCATION) === false) {
             this.nsA.exec(configTech.DAEMON_FILE, config.LOCATION, 1, '--operate');
-            this.logA.info('JARVIS_DAEMON - Hacknet Daemon activated with success.');
+            this.logA.info('JARVIS_DAEMON - Hacknet HacknetDaemon activated with success.');
         } else {
             const msg = `JARVIS_DAEMON - Hacknet Daemon couldn't be activated: the process is already alive.`;
             this.logA.warn(msg);

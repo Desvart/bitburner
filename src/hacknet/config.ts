@@ -9,7 +9,7 @@ export const config: {
     DISPLAY_TAIL: boolean,
 } = {
     QUEUE_ID: 1,
-    DAEMON_FILE: '/hacknet/hacknet-daemon.js',
+    DAEMON_FILE: '/hacknet/hacknet-hacknet-daemon.js',
     MANAGER_FILE: '/hacknet/manager.js',
     FARM_FILE: '/hacknet/farm.js',
     NODE_FILE: '/hacknet/node.js',

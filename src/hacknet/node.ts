@@ -1,75 +1,92 @@
-import { Component } from '/hacknetTS/model/component.js';
+import {Component} from '/hacknet/component.js';
+import {NsAdapter} from '/hacknet/ns-adapter.js';
+import {LogNsAdapter} from '/resources/helper.js';
+
 export class Node {
-    constructor(nsA, logA, nodeId) {
-        this.MAX_LEVEL = 200;
-        this.MAX_RAM = 64;
-        this.MAX_CORES = 16;
+    readonly id: number;
+    private readonly MAX_LEVEL: number = 200;
+    private readonly MAX_RAM: number = 64;
+    private readonly MAX_CORES: number = 16;
+    private readonly nsA: NsAdapter;
+    private readonly logA: LogNsAdapter;
+    
+    constructor(nsA: NsAdapter, logA: LogNsAdapter, nodeId: number) {
         this.nsA = nsA;
         this.logA = logA;
         this.id = nodeId;
     }
-    getComponentLevel(component) {
+    
+    getComponentLevel(component: Component): number {
         switch (component) {
-            case Component.Level: {
+            case Component.Level : {
                 return this.getLevel();
             }
-            case Component.Ram: {
+            case Component.Ram : {
                 return this.getRam();
             }
-            case Component.Core: {
+            case Component.Core : {
                 return this.getCores();
             }
             default:
                 this.logA.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
         }
     }
-    getLevel() {
+    
+    private getLevel(): number {
         return this.nsA.getNodeLevel(this.id);
     }
-    getRam() {
+    
+    private getRam(): number {
         return this.nsA.getNodeRam(this.id);
     }
-    getCores() {
+    
+    private getCores(): number {
         return this.nsA.getNodeCore(this.id);
     }
-    getLevelUpgradeCost() {
+    
+    private getLevelUpgradeCost(): number {
         return this.nsA.getNodeLevelUpgradeCost(this.id, 1);
     }
-    getRamUpgradeCost() {
+    
+    private getRamUpgradeCost(): number {
         return this.nsA.getNodeRamUpgradeCost(this.id, 1);
     }
-    getCoreUpgradeCost() {
+    
+    private getCoreUpgradeCost(): number {
         return this.nsA.getNodeCoreUpgradeCost(this.id, 1);
     }
-    getUpgradeCost(component) {
+    
+    getUpgradeCost(component: Component): number {
         switch (component) {
-            case Component.Level: {
+            case Component.Level : {
                 return this.getLevelUpgradeCost();
             }
-            case Component.Ram: {
+            case Component.Ram : {
                 return this.getRamUpgradeCost();
             }
-            case Component.Core: {
+            case Component.Core : {
                 return this.getCoreUpgradeCost();
             }
             default:
                 this.logA.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
         }
     }
-    getProductionRate() {
+    
+    getProductionRate(): number {
         return this.nsA.getNodeProductionRate(this.id);
     }
-    upgrade(component, qty = 1) {
+    
+    upgrade(component: Component, qty: number = 1): void {
         switch (component) {
-            case Component.Level: {
+            case Component.Level : {
                 this.upgradeLevel(qty);
                 break;
             }
-            case Component.Ram: {
+            case Component.Ram : {
                 this.upgradeRam(qty);
                 break;
             }
-            case Component.Core: {
+            case Component.Core : {
                 this.upgradeCore(qty);
                 break;
             }
@@ -77,20 +94,22 @@ export class Node {
                 this.logA.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
         }
     }
-    upgradeLevel(qty) {
+    
+    private upgradeLevel(qty: number): void {
         if (this.nsA.purchaseNodeLevelUpgrade(this.id, qty)) {
             this.logA.info(`HACKNET_NODE - Node ${this.id} - Level upgraded to ${this.getLevel()}.`);
         }
     }
-    upgradeRam(qty) {
+    
+    private upgradeRam(qty: number): void {
         if (this.nsA.purchaseNodeRamUpgrade(this.id, qty)) {
             this.logA.info(`HACKNET_NODE - Node ${this.id} - RAM upgraded to ${this.getRam()}.`);
         }
     }
-    upgradeCore(qty) {
+    
+    private upgradeCore(qty:number ): void {
         if (this.nsA.purchaseNodeCoreUpgrade(this.id, qty)) {
             this.logA.info(`HACKNET_NODE - Node ${this.id} - Cores upgraded to ${this.getCores()}.`);
         }
     }
 }
-//# sourceMappingURL=node.js.map

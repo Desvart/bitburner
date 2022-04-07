@@ -403,7 +403,7 @@ const HACKNET_CONFIG: {
     FILE_LIST: string[],
     TARGET: string,
 } = {
-    FILE_LIST: ['/hacknetTS/hacknet-daemon.js'],
+    FILE_LIST: ['/hacknet/hacknet-daemon.js'],
     TARGET: 'foodnstuff',
 };
 

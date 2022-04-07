@@ -1,7 +1,7 @@
-import {Node} from '/hacknetTS/model/node.js';
-import {Component} from '/hacknetTS/model/component.js';
-import {NsAdapter} from '/hacknetTS/adapters/ns-adapter.js';
-import {LogNsAdapter} from '/resources/helperTS.js';
+import {Node} from '/hacknet/node.js';
+import {Component} from '/hacknet/component.js';
+import {NsAdapter} from '/hacknet/ns-adapter.js';
+import {LogNsAdapter} from '/resources/helper.js';
 
 export class Farm {
     private readonly MAX_NODE_COUNT: number;

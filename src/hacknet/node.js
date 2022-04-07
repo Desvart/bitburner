@@ -1,115 +1,96 @@
-import Component from '/hacknet/component.js';
-import {Log} from '/resources/helper.js';
-
+import { Component } from '/hacknet/component.js';
 export class Node {
-    id;
-    #MAX_LEVEL = 200;
-    #MAX_RAM = 64;
-    #MAX_CORES = 16;
-    #ns;
-    
-    constructor(ns, nodeId) {
-        this.#ns = ns;
+    constructor(nsA, logA, nodeId) {
+        this.MAX_LEVEL = 200;
+        this.MAX_RAM = 64;
+        this.MAX_CORES = 16;
+        this.nsA = nsA;
+        this.logA = logA;
         this.id = nodeId;
     }
-    
     getComponentLevel(component) {
         switch (component) {
-            case Component.LEVEL : {
+            case Component.Level: {
                 return this.getLevel();
             }
-            case Component.RAM : {
+            case Component.Ram: {
                 return this.getRam();
             }
-            case Component.CORE : {
+            case Component.Core: {
                 return this.getCores();
             }
             default:
-                Log.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
+                this.logA.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
         }
     }
-    
     getLevel() {
-        return this.#ns.hacknet.getNodeStats(this.id).level;
+        return this.nsA.getNodeLevel(this.id);
     }
-    
     getRam() {
-        return this.#ns.hacknet.getNodeStats(this.id).ram;
+        return this.nsA.getNodeRam(this.id);
     }
-    
     getCores() {
-        return this.#ns.hacknet.getNodeStats(this.id).cores;
+        return this.nsA.getNodeCore(this.id);
     }
-    
     getLevelUpgradeCost() {
-        return this.#ns.hacknet.getLevelUpgradeCost(this.id, 1);
+        return this.nsA.getNodeLevelUpgradeCost(this.id, 1);
     }
-    
     getRamUpgradeCost() {
-        return this.#ns.hacknet.getRamUpgradeCost(this.id, 1);
+        return this.nsA.getNodeRamUpgradeCost(this.id, 1);
     }
-    
     getCoreUpgradeCost() {
-        return this.#ns.hacknet.getCoreUpgradeCost(this.id, 1);
+        return this.nsA.getNodeCoreUpgradeCost(this.id, 1);
     }
-    
     getUpgradeCost(component) {
         switch (component) {
-            case Component.LEVEL : {
-                this.getLevelUpgradeCost();
-                break;
+            case Component.Level: {
+                return this.getLevelUpgradeCost();
             }
-            case Component.RAM : {
-                this.getRamUpgradeCost();
-                break;
+            case Component.Ram: {
+                return this.getRamUpgradeCost();
             }
-            case Component.CORE : {
-                this.getCoreUpgradeCost();
-                break;
+            case Component.Core: {
+                return this.getCoreUpgradeCost();
             }
             default:
-                Log.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
+                this.logA.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
         }
     }
-    
     getProductionRate() {
-        return this.#ns.hacknet.getNodeStats(this.id).production;
+        return this.nsA.getNodeProductionRate(this.id);
     }
-    
     upgrade(component, qty = 1) {
         switch (component) {
-            case Component.LEVEL : {
-                this.#upgradeLevel(qty);
+            case Component.Level: {
+                this.upgradeLevel(qty);
                 break;
             }
-            case Component.RAM : {
-                this.#upgradeRam(qty);
+            case Component.Ram: {
+                this.upgradeRam(qty);
                 break;
             }
-            case Component.CORE : {
-                this.#upgradeCore(qty);
+            case Component.Core: {
+                this.upgradeCore(qty);
                 break;
             }
             default:
-                Log.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
+                this.logA.error(`HACKNET_NODE - Component '${component}' doesn't exist in Hacknet nodes.`);
         }
     }
-    
-    #upgradeLevel(qty) {
-        if (this.#ns.hacknet.upgradeLevel(this.id, qty)) {
-            Log.info(this.#ns, `HACKNET_NODE - Node ${this.id} - Level upgraded to ${this.getLevel()}.`);
+    upgradeLevel(qty) {
+        if (this.nsA.purchaseNodeLevelUpgrade(this.id, qty)) {
+            this.logA.info(`HACKNET_NODE - Node ${this.id} - Level upgraded to ${this.getLevel()}.`);
         }
     }
-    
-    #upgradeRam(qty) {
-        if (this.#ns.hacknet.upgradeRam(this.id, qty)) {
-            Log.info(this.#ns, `HACKNET_NODE - Node ${this.id} - RAM upgraded to ${this.getRam()}.`);
+    upgradeRam(qty) {
+        if (this.nsA.purchaseNodeRamUpgrade(this.id, qty)) {
+            this.logA.info(`HACKNET_NODE - Node ${this.id} - RAM upgraded to ${this.getRam()}.`);
         }
     }
-    
-    #upgradeCore(qty) {
-        if (this.#ns.hacknet.upgradeCore(this.id, qty)) {
-            Log.info(this.#ns, `HACKNET_NODE - Node ${this.id} - Cores upgraded to ${this.getCores()}.`);
+    upgradeCore(qty) {
+        if (this.nsA.purchaseNodeCoreUpgrade(this.id, qty)) {
+            this.logA.info(`HACKNET_NODE - Node ${this.id} - Cores upgraded to ${this.getCores()}.`);
         }
     }
 }
+//# sourceMappingURL=node.js.map

@@ -1,8 +1,7 @@
-import {NsPort} from '/hacknetTS/adapters/ns-port';
-import {config} from '/hacknetTS/model/config';
+import {config} from '/hacknet/config';
 import {hasSubscribers} from 'diagnostics_channel';
 
-export class NsAdapter implements NsPort {
+export class NsAdapter {
     private readonly ns;
     
     constructor(ns: object) {
