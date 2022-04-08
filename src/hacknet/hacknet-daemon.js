@@ -8,10 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Farm } from '/hacknet/farm.js';
-import { NsAdapter } from '/hacknet/ns-adapter.js';
-import { LogNsAdapter } from '/resources/helper.js';
-import { config as configTech } from '/hacknet/config.js';
-import { config } from '/hacknet/config.js';
+import { HacknetAdapters } from '/hacknet/hacknet-adapters.js';
+import { LogNsAdapter } from '/resources/helpers.js';
+import { hacknetConfig as configTech } from '/hacknet/hacknet-config.js';
+import { hacknetConfig } from '/hacknet/hacknet-config.js';
 import { configGlobal } from '/resources/global-config.js';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -26,7 +26,7 @@ export function main(ns) {
 }
 export class HacknetDaemon {
     constructor(ns, flags) {
-        this.nsA = new NsAdapter(ns);
+        this.nsA = new HacknetAdapters(ns);
         this.logA = new LogNsAdapter(ns);
         this.farm = new Farm(this.nsA, this.logA);
         this.flags = flags;
@@ -49,14 +49,14 @@ export class HacknetDaemon {
         });
     }
     kill() {
-        this.nsA.kill(configTech.DAEMON_FILE, config.LOCATION, '--operate');
+        this.nsA.kill(configTech.DAEMON_FILE, hacknetConfig.LOCATION, '--operate');
     }
     setupInfra() {
-        this.nsA.nuke(config.LOCATION);
+        this.nsA.nuke(hacknetConfig.LOCATION);
     }
     deploy() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (config.LOCATION !== 'home') {
+            if (hacknetConfig.LOCATION !== 'home') {
                 const filesList = [configGlobal.CONFIG_FILE,
                     configTech.CONFIG_FILE,
                     configTech.DAEMON_FILE,
@@ -66,13 +66,13 @@ export class HacknetDaemon {
                     configTech.COMPONENT_FILE,
                     configGlobal.HELPER_FILE
                 ];
-                yield this.nsA.scp(filesList, config.LOCATION);
+                yield this.nsA.scp(filesList, hacknetConfig.LOCATION);
             }
         });
     }
     activate() {
-        if (this.nsA.scriptRunning(configTech.DAEMON_FILE, config.LOCATION) === false) {
-            this.nsA.exec(configTech.DAEMON_FILE, config.LOCATION, 1, '--operate');
+        if (this.nsA.scriptRunning(configTech.DAEMON_FILE, hacknetConfig.LOCATION) === false) {
+            this.nsA.exec(configTech.DAEMON_FILE, hacknetConfig.LOCATION, 1, '--operate');
             this.logA.info('JARVIS_DAEMON - Hacknet HacknetDaemon activated with success.');
         }
         else {

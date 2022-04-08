@@ -46,4 +46,4 @@ export class LogNsAdapter {
         throw (`${timestamp} ${msg}`);
     }
 }
-//# sourceMappingURL=helper.js.map
+//# sourceMappingURL=helpers.js.map

@@ -1,16 +1,16 @@
 import {Component} from '/hacknet/component.js';
-import {NsAdapter} from '/hacknet/ns-adapter.js';
-import {LogNsAdapter} from '/resources/helper.js';
+import {HacknetAdapters} from '/hacknet/hacknet-adapters.js';
+import {LogNsAdapter} from '/resources/helpers.js';
 
 export class Node {
     readonly id: number;
-    private readonly MAX_LEVEL: number = 200;
-    private readonly MAX_RAM: number = 64;
-    private readonly MAX_CORES: number = 16;
-    private readonly nsA: NsAdapter;
+    //private readonly MAX_LEVEL: number = 200;
+    //private readonly MAX_RAM: number = 64;
+    //private readonly MAX_CORES: number = 16;
+    private readonly nsA: HacknetAdapters;
     private readonly logA: LogNsAdapter;
     
-    constructor(nsA: NsAdapter, logA: LogNsAdapter, nodeId: number) {
+    constructor(nsA: HacknetAdapters, logA: LogNsAdapter, nodeId: number) {
         this.nsA = nsA;
         this.logA = logA;
         this.id = nodeId;

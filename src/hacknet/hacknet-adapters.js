@@ -1,4 +1,4 @@
-export class NsAdapter {
+export class HacknetAdapters {
     constructor(ns) {
         this.ns = ns;
     }
@@ -56,8 +56,8 @@ export class NsAdapter {
     scriptRunning(file, hostname) {
         return this.ns.scriptRunning(file, hostname);
     }
-    exec(file, hostname, threadCount, ...params) {
+    exec(file, hostname) {
         this.ns.exec(file, hostname);
     }
 }
-//# sourceMappingURL=ns-adapter.js.map
+//# sourceMappingURL=hacknet-adapters.js.map

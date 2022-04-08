@@ -1,4 +1,4 @@
-export const config: {
+export const hacknetConfig: {
     QUEUE_ID: number,
     DAEMON_FILE: string,
     MANAGER_FILE: string,
@@ -14,6 +14,14 @@ export const config: {
     FARM_FILE: '/hacknet/farm.js',
     NODE_FILE: '/hacknet/node.js',
     COMPONENT_FILE: '/hacknet/component.js',
-    CONFIG_FILE: '/hacknet/config.js',
+    CONFIG_FILE: '/hacknet/hacknetConfig.js',
     DISPLAY_TAIL: false,
+};
+
+export const HACKNET_CONFIG: {
+    FILE_LIST: string[],
+    TARGET: string,
+} = {
+    FILE_LIST: ['/hacknet/hacknet-daemon.js'],
+    TARGET: 'foodnstuff',
 };

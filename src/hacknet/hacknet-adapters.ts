@@ -1,7 +1,4 @@
-import {config} from '/hacknet/config';
-import {hasSubscribers} from 'diagnostics_channel';
-
-export class NsAdapter {
+export class HacknetAdapters {
     private readonly ns;
     
     constructor(ns: object) {
@@ -80,7 +77,7 @@ export class NsAdapter {
         return this.ns.scriptRunning(file, hostname);
     }
     
-    exec(file: string, hostname: string, threadCount: number, ...params: any[]): void {
+    exec(file: string, hostname: string): void {
         this.ns.exec(file, hostname);
     }
 }

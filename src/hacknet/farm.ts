@@ -1,14 +1,14 @@
 import {Node} from '/hacknet/node.js';
 import {Component} from '/hacknet/component.js';
-import {NsAdapter} from '/hacknet/ns-adapter.js';
-import {LogNsAdapter} from '/resources/helper.js';
+import {HacknetAdapters} from '/hacknet/hacknet-adapters.js';
+import {LogNsAdapter} from '/resources/helpers.js';
 
 export class Farm {
     private readonly MAX_NODE_COUNT: number;
-    private readonly nsA: NsAdapter;
+    private readonly nsA: HacknetAdapters;
     private readonly logA: LogNsAdapter;
     
-    constructor(nsA: NsAdapter, logA: LogNsAdapter) {
+    constructor(nsA: HacknetAdapters, logA: LogNsAdapter) {
         this.nsA = nsA;
         this.logA = logA;
         this.MAX_NODE_COUNT = this.nsA.getMaxNumNodes();
@@ -54,6 +54,7 @@ export class Farm {
     
     async operate(): Promise<void> {
         let [nodeId, componentName, cost] = this.identifyCheapestComponentToUpgrade();
+        // noinspection InfiniteLoopJS
         while (true) {
             await this.waitToHaveEnoughMoney(cost);
             this.upgradeHacknetFarm(nodeId, componentName);
