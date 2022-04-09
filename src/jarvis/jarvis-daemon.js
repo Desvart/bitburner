@@ -11,6 +11,8 @@ import { Network } from '/jarvis/network.js';
 import { JARVIS_CONFIG } from '/jarvis/jarvis-config.js';
 import { HACKNET_CONFIG } from '/hacknet/hacknet-config.js';
 import { JarvisAdapter } from '/jarvis/jarvis-adapters.js';
+import { WORM_CONFIG } from '/malwares/malwares-config.js';
+import { LogNsAdapter } from '/resources/helpers';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.tail();
@@ -22,6 +24,7 @@ export function main(ns) {
 class Jarvis {
     constructor(ns) {
         this.nsA = new JarvisAdapter(ns);
+        this.logA = new LogNsAdapter(ns);
         this.network = new Network(this.nsA);
     }
     runOperations() {
@@ -31,11 +34,10 @@ class Jarvis {
             yield this.deployHacknetFarm();
             this.activateHacknetOperations();
             while (this.network.isNetworkFullyOwned() === false) {
-                /*
                 this.hackAvailableHosts();
-                
-                const availableHosts: string[] = await this.deployWormOnAvailableHosts();
-                this.activateWormOnAvailableHosts(availableHosts);*/
+                const hostsRequiringWormActivation = yield this.deployWormOnAvailableHosts();
+                /*
+                this.activateWormOnAvailableHosts(hostsRequiringWormActivation);*/
                 /*
                 if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
                     this.deployCommandAndControl();
@@ -70,7 +72,6 @@ class Jarvis {
     }
     listAvailableHosts() {
         const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.hasAdminRights());
-        console.debug(this.network.nodes);
         let availableHosts = [];
         for (const potentialHost of potentialHosts) {
             if (this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
@@ -81,14 +82,14 @@ class Jarvis {
     }
     deployWorm(availableHosts) {
         return __awaiter(this, void 0, void 0, function* () {
-            const fileToCpy = [
-                '/malwares/worm-daemon.js',
-                '/malwares/hack.js',
-                '/malwares/weaken.js',
-                '/malwares/grow.js'
-            ];
             for (const target of availableHosts) {
-                yield this.nsA.scp(fileToCpy, 'home', target);
+                const res = yield this.nsA.scp(WORM_CONFIG.PACKAGE, 'home', target);
+                if (res === true) {
+                    this.logA.success(`Worm package successfully deployed on ${target}.`);
+                }
+                else {
+                    this.logA.error(`Worm package couldn't be deployed on ${target}.`);
+                }
             }
         });
     }

@@ -49,8 +49,8 @@ export class JarvisAdapter {
         this.ns.nuke(hostname);
     }
     
-    async scp(files: string | string[], source: string, target: string): Promise<void> {
-        await this.ns.scp(files, source, target);
+    async scp(files: string | string[], source: string, target: string): Promise<boolean> {
+        return await this.ns.scp(files, source, target);
     }
     
     exec(script: string, target: string, threadCount: number, ...args: any[]): void {
