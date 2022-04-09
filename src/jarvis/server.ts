@@ -1,3 +1,6 @@
+import {NETWORK_CONFIG} from '/jarvis/jarvis-config.js';
+import {JarvisAdapter} from '/jarvis/jarvis-adapters.js';
+
 export class Server {
     private readonly KEYS = [
         'BruteSSH.exe',
@@ -11,9 +14,9 @@ export class Server {
     numOpenPortsRequired: number;
     purchasedByPlayer: boolean;
     isPotentialTarget: boolean;
-    private readonly nsA: NsAdapter;
+    private readonly nsA: JarvisAdapter;
     
-    constructor(nsA: NsAdapter, nodeName: string) {
+    constructor(nsA: JarvisAdapter, nodeName: string) {
         this.nsA = nsA;
         
         const node: any = nsA.getNode(nodeName);

@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Network } from '/jarvis/network.js';
 import { HACKNET_CONFIG } from '/hacknet/hacknet-config';
+import { JarvisAdapter } from '/jarvis/jarvis-adapters.js';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.tail();
@@ -19,26 +20,30 @@ export function main(ns) {
 }
 class Jarvis {
     constructor(ns) {
-        this.nsA = new NsAdapter(ns);
+        this.nsA = new JarvisAdapter(ns);
         this.network = new Network(this.nsA);
     }
     runOperations() {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             this.hackAvailableHosts();
+            //debugger
             yield this.deployHacknetFarm();
-            this.activateHacknetOperations();
+            //this.activateHacknetOperations();
             while (this.network.isNetworkFullyOwned() === false) {
+                /*
                 this.hackAvailableHosts();
-                const availableHosts = yield this.deployWormOnAvailableHosts();
-                this.activateWormOnAvailableHosts(availableHosts);
+                
+                const availableHosts: string[] = await this.deployWormOnAvailableHosts();
+                this.activateWormOnAvailableHosts(availableHosts);*/
+                /*
                 if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
                     this.deployCommandAndControl();
                     this.activateCommandAndControl();
-                }
+                }*/
+                /*
                 if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
                     this.runSherlockOperations();
-                }
+                }*/
                 yield this.nsA.sleep(2000);
             }
         });
@@ -49,11 +54,11 @@ class Jarvis {
     }
     deployHacknetFarm() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.nsA.scp(HACKNET_CONFIG.FILE_LIST, 'home', HACKNET_CONFIG.TARGET);
+            yield this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.TARGET);
         });
     }
     activateHacknetOperations() {
-        this.nsA.exec(HACKNET_CONFIG.FILE_LIST[0], HACKNET_CONFIG.TARGET, 1);
+        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.TARGET, 1);
     }
     deployWormOnAvailableHosts() {
         return __awaiter(this, void 0, void 0, function* () {

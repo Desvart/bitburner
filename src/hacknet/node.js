@@ -1,9 +1,6 @@
 import { Component } from '/hacknet/component.js';
 export class Node {
     constructor(nsA, logA, nodeId) {
-        this.MAX_LEVEL = 200;
-        this.MAX_RAM = 64;
-        this.MAX_CORES = 16;
         this.nsA = nsA;
         this.logA = logA;
         this.id = nodeId;

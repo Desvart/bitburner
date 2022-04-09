@@ -1,4 +1,4 @@
-class NsAdapter {
+export class JarvisAdapter {
     private readonly ns;
     
     constructor(ns: object) {

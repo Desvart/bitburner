@@ -9,7 +9,16 @@ export const hacknetConfig = {
     DISPLAY_TAIL: false,
 };
 export const HACKNET_CONFIG = {
-    FILE_LIST: ['/hacknet/hacknet-daemon.js'],
+    PACKAGE: [
+        '/hacknet/hacknet-daemon.js',
+        '/hacknet/hacknet-config.js',
+        '/hacknet/hacknet-adapters.js',
+        '/hacknet/farm.js',
+        '/hacknet/component.js',
+        '/hacknet/node.js',
+        '/resources/global-config.js',
+        '/resources/helpers.js'
+    ],
     TARGET: 'foodnstuff',
 };
 //# sourceMappingURL=hacknet-config.js.map

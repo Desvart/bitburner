@@ -52,6 +52,7 @@ export class Farm {
     operate() {
         return __awaiter(this, void 0, void 0, function* () {
             let [nodeId, componentName, cost] = this.identifyCheapestComponentToUpgrade();
+            // noinspection InfiniteLoopJS
             while (true) {
                 yield this.waitToHaveEnoughMoney(cost);
                 this.upgradeHacknetFarm(nodeId, componentName);

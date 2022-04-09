@@ -18,7 +18,7 @@
 # Release 1.0.0
 
 ### Hacknet module
-* Automatic grow of the Hacknet farm with a yield ratio that can be defined in the module config.
+* Automatic grow of the Hacknet farm with a yield ratio that can be defined in the module hacknetConfig.
 
 ### Spider module
 * Map the full network in an object

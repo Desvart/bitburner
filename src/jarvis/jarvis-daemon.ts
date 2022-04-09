@@ -1,6 +1,7 @@
 import {Network} from '/jarvis/network.js';
 import {Server} from '/jarvis/server';
 import {HACKNET_CONFIG} from '/hacknet/hacknet-config';
+import {JarvisAdapter} from '/jarvis/jarvis-adapters.js';
 
 export async function main(ns) {
     ns.tail();
@@ -10,36 +11,36 @@ export async function main(ns) {
 }
 
 class Jarvis {
-    private readonly nsA: NsAdapter;
+    private readonly nsA: JarvisAdapter;
     private network: Network;
     
     constructor(ns: object) {
-        this.nsA = new NsAdapter(ns);
+        this.nsA = new JarvisAdapter(ns);
         this.network = new Network(this.nsA);
     }
     
     async runOperations(): Promise<void> {
-        debugger
-        this.hackAvailableHosts();
         
+        this.hackAvailableHosts();
+        //debugger
         await this.deployHacknetFarm();
-        this.activateHacknetOperations();
+        //this.activateHacknetOperations();
         
         while (this.network.isNetworkFullyOwned() === false) {
-            
+            /*
             this.hackAvailableHosts();
             
             const availableHosts: string[] = await this.deployWormOnAvailableHosts();
-            this.activateWormOnAvailableHosts(availableHosts);
-            
+            this.activateWormOnAvailableHosts(availableHosts);*/
+            /*
             if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
                 this.deployCommandAndControl();
                 this.activateCommandAndControl();
-            }
-            
+            }*/
+            /*
             if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
                 this.runSherlockOperations();
-            }
+            }*/
             
             await this.nsA.sleep(2000);
         }
@@ -51,11 +52,11 @@ class Jarvis {
     }
     
     async deployHacknetFarm(): Promise<void> {
-        await this.nsA.scp(HACKNET_CONFIG.FILE_LIST, 'home', HACKNET_CONFIG.TARGET);
+        await this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.TARGET);
     }
     
     activateHacknetOperations(): void {
-        this.nsA.exec(HACKNET_CONFIG.FILE_LIST[0], HACKNET_CONFIG.TARGET, 1);
+        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.TARGET, 1);
     }
     
     async deployWormOnAvailableHosts(): Promise<string[]> {
