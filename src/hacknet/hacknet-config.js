@@ -1,14 +1,9 @@
-export const hacknetConfig = {
-    QUEUE_ID: 1,
-    DAEMON_FILE: '/hacknet/hacknet-hacknet-daemon.js',
-    MANAGER_FILE: '/hacknet/manager.js',
-    FARM_FILE: '/hacknet/farm.js',
-    NODE_FILE: '/hacknet/node.js',
-    COMPONENT_FILE: '/hacknet/component.js',
-    CONFIG_FILE: '/hacknet/hacknetConfig.js',
-    DISPLAY_TAIL: false,
-};
 export const HACKNET_CONFIG = {
+    // Functional
+    LOCATION: 'foodnstuff',
+    HARVEST_RATIO: 50 / 100,
+    CYCLE_TIME: 2000,
+    // Technical
     PACKAGE: [
         '/hacknet/hacknet-daemon.js',
         '/hacknet/hacknet-config.js',
@@ -19,6 +14,6 @@ export const HACKNET_CONFIG = {
         '/resources/global-config.js',
         '/resources/helpers.js'
     ],
-    TARGET: 'foodnstuff',
+    DISPLAY_TAIL: false,
 };
 //# sourceMappingURL=hacknet-config.js.map

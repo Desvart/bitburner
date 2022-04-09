@@ -8,7 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Network } from '/jarvis/network.js';
-import { HACKNET_CONFIG } from '/hacknet/hacknet-config';
+import { JARVIS_CONFIG } from '/jarvis/jarvis-config.js';
+import { HACKNET_CONFIG } from '/hacknet/hacknet-config.js';
 import { JarvisAdapter } from '/jarvis/jarvis-adapters.js';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -28,7 +29,7 @@ class Jarvis {
             this.hackAvailableHosts();
             //debugger
             yield this.deployHacknetFarm();
-            //this.activateHacknetOperations();
+            this.activateHacknetOperations();
             while (this.network.isNetworkFullyOwned() === false) {
                 /*
                 this.hackAvailableHosts();
@@ -44,7 +45,7 @@ class Jarvis {
                 if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
                     this.runSherlockOperations();
                 }*/
-                yield this.nsA.sleep(2000);
+                yield this.nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
             }
         });
     }
@@ -54,11 +55,11 @@ class Jarvis {
     }
     deployHacknetFarm() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.TARGET);
+            yield this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.LOCATION);
         });
     }
     activateHacknetOperations() {
-        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.TARGET, 1);
+        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
     }
     deployWormOnAvailableHosts() {
         return __awaiter(this, void 0, void 0, function* () {

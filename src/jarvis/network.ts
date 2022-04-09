@@ -1,9 +1,10 @@
 import {GLOBAL_CONFIG} from '/resources/global-config.js';
 import {Server} from '/jarvis/server.js';
+import {JarvisAdapter} from '/jarvis/jarvis-adapters.js';
 
 export class Network {
     
-    private readonly nsA: NsAdapter;
+    private readonly nsA: JarvisAdapter;
     
     get nodes(): Server[] { return this.retrieveNetwork(); };
     

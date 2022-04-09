@@ -80,4 +80,12 @@ export class HacknetAdapters {
     exec(file: string, hostname: string): void {
         this.ns.exec(file, hostname);
     }
+    
+    getServerMoneyAvailable(hostname: string = 'home'): number {
+        return this.ns.getServerMoneyAvailable(hostname);
+    }
+    
+    async sleep(duration: number) {
+        await this.ns.sleep(duration);
+    }
 }

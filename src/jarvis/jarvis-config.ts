@@ -1,7 +1,7 @@
-const JARVIS_CONFIG: {
+export const JARVIS_CONFIG: {
     CYCLE_TIME: number,
 } = {
-    CYCLE_TIME: 60 * 1000, //ms
+    CYCLE_TIME: 2000, //60 * 1000, //ms
 };
 
 export const NETWORK_CONFIG: {

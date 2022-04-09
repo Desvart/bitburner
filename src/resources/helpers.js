@@ -45,5 +45,8 @@ export class LogNsAdapter {
         console.error(`${timestamp} ${msg}`);
         throw (`${timestamp} ${msg}`);
     }
+    formatMoney(num) {
+        return this.ns.nFormat(num, '0.00 a$');
+    }
 }
 //# sourceMappingURL=helpers.js.map

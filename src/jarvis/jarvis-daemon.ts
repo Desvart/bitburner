@@ -1,6 +1,7 @@
 import {Network} from '/jarvis/network.js';
-import {Server} from '/jarvis/server';
-import {HACKNET_CONFIG} from '/hacknet/hacknet-config';
+import {Server} from '/jarvis/server.js';
+import {JARVIS_CONFIG} from '/jarvis/jarvis-config.js';
+import {HACKNET_CONFIG} from '/hacknet/hacknet-config.js';
 import {JarvisAdapter} from '/jarvis/jarvis-adapters.js';
 
 export async function main(ns) {
@@ -24,7 +25,7 @@ class Jarvis {
         this.hackAvailableHosts();
         //debugger
         await this.deployHacknetFarm();
-        //this.activateHacknetOperations();
+        this.activateHacknetOperations();
         
         while (this.network.isNetworkFullyOwned() === false) {
             /*
@@ -42,7 +43,7 @@ class Jarvis {
                 this.runSherlockOperations();
             }*/
             
-            await this.nsA.sleep(2000);
+            await this.nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
         }
     }
     
@@ -52,11 +53,11 @@ class Jarvis {
     }
     
     async deployHacknetFarm(): Promise<void> {
-        await this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.TARGET);
+        await this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.LOCATION);
     }
     
     activateHacknetOperations(): void {
-        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.TARGET, 1);
+        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
     }
     
     async deployWormOnAvailableHosts(): Promise<string[]> {
