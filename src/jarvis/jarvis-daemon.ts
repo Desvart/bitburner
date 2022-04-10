@@ -1,9 +1,9 @@
-import {Network} from '/jarvis/network.js';
-import {Server} from '/jarvis/server.js';
-import {JARVIS_CONFIG} from '/jarvis/jarvis-config.js';
-import {HACKNET_CONFIG} from '/hacknet/hacknet-config.js';
-import {JarvisAdapter} from '/jarvis/jarvis-adapters.js';
-import {WORM_CONFIG} from '/malwares/malwares-config.js';
+import {Network} from '/jarvis/network';
+import {Server} from '/jarvis/server';
+import {JARVIS_CONFIG} from '/jarvis/jarvis-config';
+import {HACKNET_CONFIG} from '/hacknet/hacknet-config';
+import {JarvisAdapter} from '/jarvis/jarvis-adapters';
+import {WORM_CONFIG} from '/malwares/worm-config';
 import {LogNsAdapter} from '/resources/helpers';
 
 export async function main(ns) {
@@ -27,17 +27,14 @@ class Jarvis {
     async runOperations(): Promise<void> {
         
         this.hackAvailableHosts();
-        //debugger
-        await this.deployHacknetFarm();
-        this.activateHacknetOperations();
+        await this.deployAndActivateHacknetFarm();
+        //this.deployAndActivateKittyHack();
         
         while (this.network.isNetworkFullyOwned() === false) {
             
             this.hackAvailableHosts();
             
-            const hostsRequiringWormActivation: string[] = await this.deployWormOnAvailableHosts();
-            /*
-            this.activateWormOnAvailableHosts(hostsRequiringWormActivation);*/
+            await this.installAndActivateWormOnAvailableHosts();
             /*
             if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
                 this.deployCommandAndControl();
@@ -57,22 +54,19 @@ class Jarvis {
         this.network.nukeNodes(nukableHosts);
     }
     
-    async deployHacknetFarm(): Promise<void> {
+    async deployAndActivateHacknetFarm(): Promise<void> {
         await this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.LOCATION);
-    }
-    
-    activateHacknetOperations(): void {
         this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
     }
     
-    async deployWormOnAvailableHosts(): Promise<string[]> {
+    async installAndActivateWormOnAvailableHosts(): Promise<void> {
         const availableHosts: string[] = this.listAvailableHosts();
-        await this.deployWorm(availableHosts);
-        return availableHosts;
+        await this.installAndActivateWorms(availableHosts);
     }
     
     listAvailableHosts(): string[] {
-        const potentialHosts: Server[] = this.network.nodes.filter(n => n.isPotentialTarget && n.hasAdminRights());
+        const potentialHosts: Server[] = this.network.nodes.filter(n =>
+            n.isPotentialTarget && n.ram > 4 && n.hasAdminRights() === true);
         let availableHosts: string[] = [];
         for (const potentialHost of potentialHosts) {
             if (this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
@@ -82,21 +76,16 @@ class Jarvis {
         return availableHosts;
     }
     
-    async deployWorm(availableHosts: string[]): Promise<void> {
+    async installAndActivateWorms(availableHosts: string[]): Promise<void> {
         for (const target of availableHosts) {
-            const res: boolean = await this.nsA.scp(WORM_CONFIG.PACKAGE, 'home', target);
+            const res: boolean = await this.nsA.scp(WORM_CONFIG.INSTALL_PACKAGE, 'home', target);
             if (res === true) {
                 this.logA.success(`Worm package successfully deployed on ${target}.`);
             } else {
                 this.logA.error(`Worm package couldn't be deployed on ${target}.`);
             }
             
-        }
-    }
-    
-    activateWormOnAvailableHosts(availableHosts: string[]): void {
-        for (const target of availableHosts) {
-            this.nsA.exec('/malware/worm-hacknet-daemon.js', target, 1);
+            this.nsA.exec(WORM_CONFIG.INSTALL_PACKAGE[0], target, 1);
         }
     }
     
@@ -104,6 +93,7 @@ class Jarvis {
         // TODO
         return false;
     }
+    
     isCommandAndControlDeployable(): boolean {
         // TODO
         return false;

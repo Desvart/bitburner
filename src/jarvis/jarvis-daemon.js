@@ -7,11 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Network } from '/jarvis/network.js';
-import { JARVIS_CONFIG } from '/jarvis/jarvis-config.js';
-import { HACKNET_CONFIG } from '/hacknet/hacknet-config.js';
-import { JarvisAdapter } from '/jarvis/jarvis-adapters.js';
-import { WORM_CONFIG } from '/malwares/malwares-config.js';
+import { Network } from '/jarvis/network';
+import { JARVIS_CONFIG } from '/jarvis/jarvis-config';
+import { HACKNET_CONFIG } from '/hacknet/hacknet-config';
+import { JarvisAdapter } from '/jarvis/jarvis-adapters';
+import { WORM_CONFIG } from '/malwares/worm-config';
 import { LogNsAdapter } from '/resources/helpers';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -30,14 +30,11 @@ class Jarvis {
     runOperations() {
         return __awaiter(this, void 0, void 0, function* () {
             this.hackAvailableHosts();
-            //debugger
-            yield this.deployHacknetFarm();
-            this.activateHacknetOperations();
+            yield this.deployAndActivateHacknetFarm();
+            //this.deployAndActivateKittyHack();
             while (this.network.isNetworkFullyOwned() === false) {
                 this.hackAvailableHosts();
-                const hostsRequiringWormActivation = yield this.deployWormOnAvailableHosts();
-                /*
-                this.activateWormOnAvailableHosts(hostsRequiringWormActivation);*/
+                yield this.installAndActivateWormOnAvailableHosts();
                 /*
                 if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
                     this.deployCommandAndControl();
@@ -55,23 +52,20 @@ class Jarvis {
         let nukableHosts = this.network.identifyNukableHosts();
         this.network.nukeNodes(nukableHosts);
     }
-    deployHacknetFarm() {
+    deployAndActivateHacknetFarm() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.LOCATION);
+            this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
         });
     }
-    activateHacknetOperations() {
-        this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
-    }
-    deployWormOnAvailableHosts() {
+    installAndActivateWormOnAvailableHosts() {
         return __awaiter(this, void 0, void 0, function* () {
             const availableHosts = this.listAvailableHosts();
-            yield this.deployWorm(availableHosts);
-            return availableHosts;
+            yield this.installAndActivateWorms(availableHosts);
         });
     }
     listAvailableHosts() {
-        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.hasAdminRights());
+        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram > 4 && n.hasAdminRights() === true);
         let availableHosts = [];
         for (const potentialHost of potentialHosts) {
             if (this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
@@ -80,23 +74,19 @@ class Jarvis {
         }
         return availableHosts;
     }
-    deployWorm(availableHosts) {
+    installAndActivateWorms(availableHosts) {
         return __awaiter(this, void 0, void 0, function* () {
             for (const target of availableHosts) {
-                const res = yield this.nsA.scp(WORM_CONFIG.PACKAGE, 'home', target);
+                const res = yield this.nsA.scp(WORM_CONFIG.INSTALL_PACKAGE, 'home', target);
                 if (res === true) {
                     this.logA.success(`Worm package successfully deployed on ${target}.`);
                 }
                 else {
                     this.logA.error(`Worm package couldn't be deployed on ${target}.`);
                 }
+                this.nsA.exec(WORM_CONFIG.INSTALL_PACKAGE[0], target, 1);
             }
         });
-    }
-    activateWormOnAvailableHosts(availableHosts) {
-        for (const target of availableHosts) {
-            this.nsA.exec('/malware/worm-hacknet-daemon.js', target, 1);
-        }
     }
     isCommandAndControlDeployed() {
         // TODO

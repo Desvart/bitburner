@@ -13,6 +13,7 @@ export class Server {
     requiredHackingSkill: number;
     numOpenPortsRequired: number;
     purchasedByPlayer: boolean;
+    ram: number;
     isPotentialTarget: boolean;
     private readonly nsA: JarvisAdapter;
     
@@ -24,6 +25,7 @@ export class Server {
         this.requiredHackingSkill = node.requiredHackingSkill;
         this.numOpenPortsRequired = node.numOpenPortsRequired;
         this.purchasedByPlayer = node.purchasedByPlayer;
+        this.ram = node.maxRam;
         this.isPotentialTarget = this.checkIfPotentialTarget();
     }
     
