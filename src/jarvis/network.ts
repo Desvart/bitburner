@@ -25,7 +25,7 @@ export class Network {
     private retrieveNodeNames(): string[] {
         let discoveredNodes: string[] = [];
         let nodesToScan: string[] = ['home'];
-        let infiniteLoopProtection: number = GLOBAL_CONFIG.LOOP_SECURITY;
+        let infiniteLoopProtection = 999;
         
         while (nodesToScan.length > 0 && infiniteLoopProtection-- > 0) {
             const nodeName: string = nodesToScan.pop();

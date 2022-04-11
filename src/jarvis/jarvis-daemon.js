@@ -41,10 +41,9 @@ class Jarvis {
                     this.deployCommandAndControl();
                     this.activateCommandAndControl();
                 }*/
-                /*
                 if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
-                    this.runSherlockOperations();
-                }*/
+                    this.deployAndRunSherlockOperations();
+                }
                 yield this.nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
             }
         });
@@ -129,7 +128,7 @@ class Jarvis {
         // TODO
         return false;
     }
-    runSherlockOperations() {
+    deployAndRunSherlockOperations() {
         // TODO
         // Deploy contract farming as soon as we have access to a second 32GB RAM host
         // Activate sherlock operations
