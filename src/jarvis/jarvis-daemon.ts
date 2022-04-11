@@ -5,6 +5,7 @@ import {HACKNET_CONFIG} from '/hacknet/hacknet-config';
 import {JarvisAdapter} from '/jarvis/jarvis-adapters';
 import {WORM_CONFIG} from '/malwares/worm-config';
 import {LogNsAdapter} from '/resources/helpers';
+import {KITTY_HACK_CONFIG} from '/malwares/kitty-hack-config';
 
 export async function main(ns) {
     ns.tail();
@@ -28,7 +29,7 @@ class Jarvis {
         
         this.hackAvailableHosts();
         await this.deployAndActivateHacknetFarm();
-        //this.deployAndActivateKittyHack();
+        await this.deployAndActivateKittyHack();
         
         while (this.network.isNetworkFullyOwned() === false) {
             
@@ -57,6 +58,17 @@ class Jarvis {
     async deployAndActivateHacknetFarm(): Promise<void> {
         await this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.LOCATION);
         this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
+    }
+    
+    async deployAndActivateKittyHack(): Promise<void>{
+        const res: boolean = await this.nsA.scp(KITTY_HACK_CONFIG.INSTALL_PACKAGE, 'home', KITTY_HACK_CONFIG.HOSTNAME);
+        if (res === true) {
+            this.logA.success(`Kitty-Hack package successfully deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+        } else {
+            this.logA.error(`Kitty-Hack package couldn't be deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+        }
+    
+        this.nsA.exec(KITTY_HACK_CONFIG.RUN_PACKAGE[0], KITTY_HACK_CONFIG.HOSTNAME, 1);
     }
     
     async installAndActivateWormOnAvailableHosts(): Promise<void> {
