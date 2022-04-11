@@ -68,7 +68,8 @@ class Jarvis {
         const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram > 4 && n.hasAdminRights() === true);
         let availableHosts = [];
         for (const potentialHost of potentialHosts) {
-            if (this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
+            if (potentialHost.hostname !== 'foodnstuff' &&
+                this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
                 availableHosts.push(potentialHost.hostname);
             }
         }
