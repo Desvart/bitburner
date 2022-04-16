@@ -1,9 +1,9 @@
-import {WORM_CONFIG} from '/malwares/worm-config';
+import {WORM_CONFIG} from '/worm/worm-config';
 
 export async function main(ns) {
     const hostname = ns.getHostname();
     
-    await ns.scp(WORM_CONFIG.RUN_PACKAGE, 'home', hostname);
+    await ns.scp(WORM_CONFIG.INSTALL_PACKAGE, 'home', hostname);
     
     const daemonFile = WORM_CONFIG.RUN_PACKAGE[0];
     const hackFile = WORM_CONFIG.RUN_PACKAGE[1];
