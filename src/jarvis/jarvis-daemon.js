@@ -11,9 +11,10 @@ import { Network } from '/jarvis/network';
 import { JARVIS_CONFIG } from '/jarvis/jarvis-config';
 import { HACKNET_CONFIG } from '/hacknet/hacknet-config';
 import { JarvisAdapter } from '/jarvis/jarvis-adapters';
-import { WORM_CONFIG } from '/malwares/worm-config';
+import { WORM_CONFIG } from '/worm/worm-config';
 import { LogNsAdapter } from '/resources/helpers';
-import { KITTY_HACK_CONFIG } from '/malwares/kitty-hack-config';
+import { KITTY_HACK_CONFIG } from '/kitty-hack/kitty-hack-config';
+import { SHERLOCK_CONFIG } from '/sherlock/sherlock-config';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.tail();
@@ -37,13 +38,17 @@ class Jarvis {
                 this.hackAvailableHosts();
                 yield this.installAndActivateWormOnAvailableHosts();
                 /*
-                if (this.isCommandAndControlDeployed() === false && this.isCommandAndControlDeployable() === true) {
+                if (!this.isCommandAndControlDeployed() && this.isCommandAndControlDeployable()) {
                     this.deployCommandAndControl();
                     this.activateCommandAndControl();
                 }*/
-                if (this.isSherlockDeployed() === false && this.isSherlockDeployable() === true) {
-                    this.deployAndRunSherlockOperations();
+                if (!this.isSherlockDeployed() && this.isSherlockDeployable()) {
+                    yield this.deployAndRunSherlockOperations();
                 }
+                /*
+                if (!this.isWolfstreetDeployed() && this.isWolfstreetDeployable()) {
+                    this.deployAndRunWolfstreetOperations();
+                }*/
                 yield this.nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
             }
         });
@@ -60,12 +65,15 @@ class Jarvis {
     }
     deployAndActivateKittyHack() {
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield this.nsA.scp(KITTY_HACK_CONFIG.INSTALL_PACKAGE, 'home', KITTY_HACK_CONFIG.HOSTNAME);
-            if (res === true) {
-                this.logA.success(`Kitty-Hack package successfully deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
-            }
-            else {
-                this.logA.error(`Kitty-Hack package couldn't be deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+            if (this.nsA.ps(KITTY_HACK_CONFIG.HOSTNAME).filter(p => p.filename.includes('kitty-hack-daemon.js')).length ===
+                0) {
+                const res = yield this.nsA.scp(KITTY_HACK_CONFIG.INSTALL_PACKAGE, 'home', KITTY_HACK_CONFIG.HOSTNAME);
+                if (res === true) {
+                    this.logA.success(`Kitty-Hack package successfully deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+                }
+                else {
+                    this.logA.error(`Kitty-Hack package couldn't be deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+                }
             }
             this.nsA.exec(KITTY_HACK_CONFIG.RUN_PACKAGE[0], KITTY_HACK_CONFIG.HOSTNAME, 1);
         });
@@ -80,8 +88,11 @@ class Jarvis {
         const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram > 4 && n.hasAdminRights() === true);
         let availableHosts = [];
         for (const potentialHost of potentialHosts) {
+            const hostProcesses = this.nsA.ps(potentialHost.hostname);
             if (potentialHost.hostname !== 'foodnstuff' &&
-                this.nsA.ps(potentialHost.hostname).filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
+                hostProcesses.filter(p => p.filename.includes('sherlock-daemon.js')).length === 0 &&
+                hostProcesses.filter(p => p.filename.includes('shiva-daemon.js')).length === 0 &&
+                hostProcesses.filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
                 availableHosts.push(potentialHost.hostname);
             }
         }
@@ -121,17 +132,32 @@ class Jarvis {
         // TODO
     }
     isSherlockDeployed() {
-        // TODO
+        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram > 16 && n.hasAdminRights() === true);
+        for (const potentialHost of potentialHosts) {
+            const hostProcesses = this.nsA.ps(potentialHost.hostname);
+            if (hostProcesses.filter(p => p.filename.includes('sherlock-daemon.js')).length === 1) {
+                return true;
+            }
+        }
         return false;
     }
     isSherlockDeployable() {
-        // TODO
-        return false;
+        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram === 32 && n.hasAdminRights() === true);
+        return (potentialHosts.length > 0);
     }
     deployAndRunSherlockOperations() {
-        // TODO
-        // Deploy contract farming as soon as we have access to a second 32GB RAM host
-        // Activate sherlock operations
+        return __awaiter(this, void 0, void 0, function* () {
+            const hostname = this.network.nodes.filter(n => n.isPotentialTarget && n.ram === 32 && n.hasAdminRights() === true)[0].hostname;
+            const res = yield this.nsA.scp(SHERLOCK_CONFIG.INSTALL_PACKAGE, 'home', hostname);
+            if (res === true) {
+                this.logA.success(`Sherlock package successfully deployed on ${hostname}.`);
+            }
+            else {
+                this.logA.error(`Sherlock package couldn't be deployed on ${hostname}.`);
+            }
+            this.nsA.killall(hostname);
+            this.nsA.exec(SHERLOCK_CONFIG.INSTALL_PACKAGE[0], hostname, 1);
+        });
     }
 }
 //# sourceMappingURL=jarvis-daemon.js.map

@@ -65,4 +65,8 @@ export class JarvisAdapter {
         await this.ns.sleep(duration);
         
     }
+    
+    killall(hostname: string) {
+        this.ns.killall(hostname);
+    }
 }
