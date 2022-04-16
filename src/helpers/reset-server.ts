@@ -12,11 +12,18 @@ export function main(ns: any) {
         if (node.hostname !== 'home') {
             
             let files: string[] = ns.ls(node.hostname);
+
+            if (files.length === 0)
+                continue;
             
             ns.print(`${files.length} files detected:`);
             ns.print(files);
             
             for (let file of files) {
+                
+                if (file.includes('.cct'))
+                    continue;
+                
                 if (ns.rm(file, node.hostname) === true) {
                     ns.print(`SUCCESS - File ${file} deleted.`);
                 } else {
