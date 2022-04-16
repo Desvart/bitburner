@@ -8,13 +8,14 @@ export async function main(ns) {
     
     //FIXME - Sanitize Parentheses in Expression - ()((())()))(()
     //FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
+    //FIXME - Sanitize Parentheses in Expression - ())()a(aa((a
     //FIXME - Array Jumping Game - [5,2,1,1,5,5]
     //FIXME - Array Jumping Game - [4,2,1,1,8]
     //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
     
     const nsA = new SherlockAdapters(ns);
     const logA = new LogNsAdapter(ns);
-    const sherlock = new Sherlock(nsA, logA);
+    const sherlock = new SherlockDaemon(nsA, logA);
     
     //noinspection InfiniteLoopJS
     while (true) {
@@ -31,13 +32,12 @@ export async function main(ns) {
                     Contract ${contract.name} on ${contract.location}) skipped.`;
                 logA.warn(msg);
             }
-            
-            this.nsA.sleep(5 * 60 * 1000);
         }
+        await nsA.sleep(5 * 60 * 1000);
     }
 }
 
-class Sherlock {
+class SherlockDaemon {
     private readonly nsA: SherlockAdapters;
     private readonly logA: LogNsAdapter;
     
@@ -79,7 +79,7 @@ class Sherlock {
         if (contract.reward !== '' || contract.reward === true) {
             const msg = `SHERLOCK_DAEMON - Contract ${contract.name} (${contract.type}) on ${contract.location} solved.
                 Reward: ${contract.reward}`;
-            this.logA.warn(msg);
+            this.logA.success(msg);
             
         } else {
             const errorLog = `${nowStr()}\nContract: ${contract.name}\nLocation: ${contract.location}\n
@@ -143,9 +143,16 @@ class Sherlock {
             case 'Unique Paths in a Grid II':
                 contract.solution = this.solveUniquePathsInAGridII(contract.data);
                 break;
+            case 'HammingCodes: Integer to encoded Binary':
+                contract.solution = this.solveHammingCodesIntegerToEncodedBinary(contract.data);
+                break;
+            case 'Shortest Path in a Grid':
+                contract.solution = this.solveShortestPathinAGrid(contract.data);
+                break;
             default:
                 const msg = `SHERLOCK - We have found a new type of contract: ${contract.type}.\n
                     Please update Sherlock solver accordingly.`;
+                contract.solution = 'Not implemented yet';
                 this.logA.warn(msg);
         }
         return contract;
@@ -733,6 +740,60 @@ class Sherlock {
         return totalPossiblePaths;
     }
     
+    solveHammingCodesIntegerToEncodedBinary(data) {
+        /*HammingCodes: Integer to encoded Binary
+        You are attempting to solve a Coding Contract. You have 10 tries remaining, after which the contract will self-destruct.
+        
+        
+            You are given the following decimal Value:
+            64
+        Convert it into a binary string and encode it as a 'Hamming-Code'. eg:
+        Value 8 will result into binary '1000', which will be encoded with the pattern 'pppdpddd', where p is a paritybit and d a databit,
+            or '10101' (Value 21) will result into (pppdpdddpd) '1111101011'.
+        
+            NOTE: You need an parity Bit on Index 0 as an 'overall'-paritybit.
+            NOTE 2: You should watch the HammingCode-video from 3Blue1Brown, which explains the 'rule' of encoding, including the first Index parity-bit mentioned on the first note.
+        
+            Now the only one rule for this encoding:
+            It's not allowed to add additional leading '0's to the binary value
+        That means, the binary value has to be encoded as it is*/
+        return 'Not implemented yet';
+    }
+    
+    solveShortestPathinAGrid(data) {
+        /*Shortest Path in a Grid
+        You are attempting to solve a Coding Contract. You have 10 tries remaining, after which the contract will self-destruct.
+        
+        
+        You are located in the top-left corner of the following grid:
+        
+          [[0,0,0,1,0,0,0,0,0,0,1],
+           [1,0,0,0,1,1,0,0,1,1,0],
+           [0,0,0,1,0,0,0,0,0,1,0],
+           [0,1,0,0,0,0,0,1,0,0,0],
+           [0,0,1,0,0,0,0,0,0,0,0],
+           [0,1,1,0,0,0,0,1,0,1,0]]
+        
+        You are trying to find the shortest path to the bottom-right corner of the grid, but there are obstacles on the grid that you cannot move onto. These obstacles are denoted by '1', while empty spaces are denoted by 0.
+        
+        Determine the shortest path from start to finish, if one exists. The answer should be given as a string of UDLR characters, indicating the moves along the path
+        
+        NOTE: If there are multiple equally short paths, any of them is accepted as answer. If there is no path, the answer should be an empty string.
+        NOTE: The data returned for this contract is an 2D array of numbers representing the grid.
+        
+        Examples:
+        
+            [[0,1,0,0,0],
+             [0,0,0,1,0]]
+        
+        Answer: 'DRRURRD'
+        
+            [[0,1],
+             [1,0]]
+        
+        Answer: ''*/
+    }
+    
 }
 
 export class Contract {
@@ -784,5 +845,9 @@ class SherlockAdapters {
     
     exit(): void {
         this.ns.exit();
+    }
+    
+    async sleep(duration: number): Promise<void> {
+        await this.ns.sleep(duration);
     }
 }
