@@ -1,0 +1,72 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:Nuke initial servers;
+
+group Launch Hacknet operation
+    :Deploy Hacknet package on foodnstuff;
+    :Activate Hacknet daemon;
+end group
+
+group Activate KittyCat
+    :Deploy KittyCat malware on n00dles;
+    :Activate KittyCat malware;
+end group
+
+repeat
+    repeat
+        :Nuke available servers;
+        backward:Wait 1 minute;
+    repeat while (new 16GB RAM server nuked?) is (no)
+    ->yes;
+
+    group Activate Worm
+        :Deploy Worm malware on 16GB servers;
+        :Activate Worm malware;
+    end group
+repeat while (16GB RAM server all nuked?) is (no)
+    ->yes;
+
+repeat
+    :Nuke available servers;
+    backward:Wait 1 minute;
+repeat while (new 32GB RAM server nuked?) is (no)
+->yes;
+
+group Launch Sherlock operation
+    :Deploy Sherlock package;
+    :Activate Sherlock daemon;
+end group
+
+repeat
+    :Nuke available servers;
+    backward:Wait 1 minute;
+repeat while (new 32GB RAM server nuked?) is (no)
+->yes;
+
+group Activate Shiva
+    :Deploy Shiva package;
+    :Activate Shiva daemon;
+end group
+
+repeat
+    :Nuke available servers;
+    backward:Wait 1 minute;
+repeat while (new 64GB RAM server nuked?) is (no)
+->yes;
+
+group Launch Wolfstreet operation
+    :Buy trading licences;
+    :Deploy Wolfstreet package;
+    :Activate Wolfstreet daemon;
+end group
+
+
+
+
+
+
+stop
+
+@enduml

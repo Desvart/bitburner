@@ -1,0 +1,22 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:Find the better server to hack;
+:Compute the number of RAM needed to hack with Shiva;
+:Compute cost of an equivalent pserv;
+
+repeat
+    backward:Wait 1 minute;
+repeat while (enough money?) is (no)
+->yes;
+
+:Buy a pServ accordingly;
+
+:Deploy Shiva malware on pserv;
+:Deactivate any conflicting script with Shiva;
+:Activate Shiva malware on pserv;
+
+stop
+
+@enduml
