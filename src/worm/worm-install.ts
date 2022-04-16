@@ -1,15 +1,16 @@
 import {WORM_CONFIG} from '/worm/worm-config';
 
 export async function main(ns) {
+    
     const hostname = ns.getHostname();
     
     await ns.scp(WORM_CONFIG.INSTALL_PACKAGE, 'home', hostname);
-    
+   
     const daemonFile = WORM_CONFIG.RUN_PACKAGE[0];
     const hackFile = WORM_CONFIG.RUN_PACKAGE[1];
     const weakenFile = WORM_CONFIG.RUN_PACKAGE[2];
     const growFile = WORM_CONFIG.RUN_PACKAGE[3];
-    const hostConstFile = WORM_CONFIG.INSTALL_PACKAGE[2];
+    const hostConstFile = WORM_CONFIG.INSTALL_PACKAGE[3];
     
     const hostConst = {
         hostname: hostname,

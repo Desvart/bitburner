@@ -8,7 +8,6 @@ export const WORM_CONFIG: {
         root() + 'worm-install.js',
         root() + 'worm-daemon.js',
         root() + 'worm-config.js',
-        root() + 'worm-adapters.js',
         root() + 'host-const.txt',
         '/resources/helpers.js',
         ...MALWARES_CONFIG.INSTALL_PACKAGE,

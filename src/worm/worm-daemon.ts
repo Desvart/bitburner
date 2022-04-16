@@ -4,8 +4,8 @@ import {LogNsAdapter} from '/resources/helpers';
 export async function main(ns) {
     const nsA = new WormAdapter(ns);
     const logA = new LogNsAdapter(ns);
-    const hostConst = JSON.parse(ns.read(WORM_CONFIG.INSTALL_PACKAGE[2]));
-    
+    const hostConst = JSON.parse(ns.read(WORM_CONFIG.INSTALL_PACKAGE[3]));
+    debugger
     //noinspection InfiniteLoopJS
     while (true) {
         const hostState = {
@@ -49,7 +49,7 @@ class WormAdapter {
     }
     
     exec(filePath: string, targetName: string, threadsQty: number) {
-        this.ns.exec(filePath, targetName, threadsQty, targetName, threadsQty, false, 0, 0);
+        this.ns.exec(filePath, targetName, threadsQty, targetName, threadsQty, 0, 0, 0, false);
     }
     
     getHackTime(hostname: string): number {

@@ -13,7 +13,8 @@ export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         const nsA = new WormAdapter(ns);
         const logA = new LogNsAdapter(ns);
-        const hostConst = JSON.parse(ns.read(WORM_CONFIG.INSTALL_PACKAGE[2]));
+        const hostConst = JSON.parse(ns.read(WORM_CONFIG.INSTALL_PACKAGE[3]));
+        debugger;
         //noinspection InfiniteLoopJS
         while (true) {
             const hostState = {
@@ -51,7 +52,7 @@ class WormAdapter {
         this.ns = ns;
     }
     exec(filePath, targetName, threadsQty) {
-        this.ns.exec(filePath, targetName, threadsQty, targetName, threadsQty, false, 0, 0);
+        this.ns.exec(filePath, targetName, threadsQty, targetName, threadsQty, 0, 0, 0, false);
     }
     getHackTime(hostname) {
         return this.ns.getHackTime(hostname);
