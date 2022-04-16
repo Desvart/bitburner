@@ -48,5 +48,11 @@ export class LogNsAdapter {
     formatMoney(num) {
         return this.ns.nFormat(num, '0.00 a$');
     }
+    formatDuration(num) {
+        let sec = Math.trunc(num / 1000) % 60;
+        let min = Math.trunc((num - sec) / 60) % 60;
+        let hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
+        return hour.toString() + ':' + min.toString() + ':' + sec.toString();
+    }
 }
 //# sourceMappingURL=helpers.js.map
