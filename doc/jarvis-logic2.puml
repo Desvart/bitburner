@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+start
+
+:Nuke weak servers;
+:Activate Hacknet;
+:Activate Kittycat;
+repeat
+    backward:Wait 1 minute\nNuke weak servers;
+repeat while (16GB RAM?) is (no)
+:Activate Worm;
+repeat
+    backward:Wait 1 minute\nNuke weak servers;
+repeat while (16GB RAM?) is (no)
+:Activate Sherlock;
+repeat
+    backward:Wait 1 minute\nNuke weak servers;
+repeat while (16GB RAM?) is (no)
+:Activate C&C;
+repeat
+    backward:Wait 1 minute\nNuke weak servers;
+repeat while (32GB/64GB RAM?) is (no)
+:Activate Wolfstreet;
+
+stop
+@enduml

@@ -2,20 +2,39 @@
 'https://plantuml.com/activity-diagram-beta
 
 start
-:Find the better server to hack;
-:Compute the number of RAM needed to hack with Shiva;
-:Compute cost of an equivalent pserv;
 
-repeat
-    backward:Wait 1 minute;
-repeat while (enough money?) is (no)
-->yes;
+group c2 @ C2 server
+    :Find the better server to hack;
+    :Compute the number of RAM needed to hack with Shiva;
+    :Compute cost of an equivalent pserv;
 
-:Buy a pServ accordingly;
+    repeat
+        backward:Wait 1 minute;
+    repeat while (enough money?) is (no)
+    ->yes;
 
-:Deploy Shiva malware on pserv;
-:Deactivate any conflicting script with Shiva;
-:Activate Shiva malware on pserv;
+    :Buy a pServ accordingly;
+
+    :Upload shiva-install on pserv;
+    :Execute shinva-install on pserv;
+end group
+
+group Shiva-install @ runner
+    :Upload Shiva on runner;
+    :Spawn Shiva-setup on runner;
+end group
+
+group Shiva-setup @ runner
+    :Gather Malware static properties;
+    :Persist the static properties;
+    :Kill any previous malware on same target;
+    :Bring target to speed;
+    :Spawn Shiva on runner;
+end group
+
+group Shiva @ runner
+
+end group
 
 stop
 

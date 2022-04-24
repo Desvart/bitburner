@@ -12,47 +12,48 @@ export async function main(ns) {
     ns.tail();
     ns.disableLog('ALL');
     ns.clearLog();
-    await new Jarvis(ns).runOperations();
+    
+    const nsA = new JarvisAdapter(ns);
+    const logA = new LogNsAdapter(ns);
+    
+    const jarvis = new Jarvis(nsA, logA);
+    jarvis.hackAvailableHosts();
+    
+    await jarvis.deployAndActivateHacknetFarm();
+    await jarvis.deployAndActivateKittyHack();
+    
+    while (jarvis.network.isNetworkFullyOwned() === false) {
+    
+        jarvis.hackAvailableHosts();
+        
+        await jarvis.installAndActivateWormOnAvailableHosts();
+        /*
+        if (!jarvis.isCommandAndControlDeployed() && jarvis.isCommandAndControlDeployable()) {
+            jarvis.deployCommandAndControl();
+            jarvis.activateCommandAndControl();
+        }*/
+        
+        if (!jarvis.isSherlockDeployed() && jarvis.isSherlockDeployable()) {
+            await jarvis.deployAndRunSherlockOperations();
+        }
+        /*
+        if (!jarvis.isWolfstreetDeployed() && jarvis.isWolfstreetDeployable()) {
+            jarvis.deployAndRunWolfstreetOperations();
+        }*/
+        
+        await nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
+    }
 }
 
 class Jarvis {
     private readonly nsA: JarvisAdapter;
     private readonly logA: LogNsAdapter;
-    private network: Network;
+    network: Network;
     
-    constructor(ns: object) {
-        this.nsA = new JarvisAdapter(ns);
-        this.logA = new LogNsAdapter(ns);
-        this.network = new Network(this.nsA);
-    }
-    
-    async runOperations(): Promise<void> {
-        
-        this.hackAvailableHosts();
-        await this.deployAndActivateHacknetFarm();
-        await this.deployAndActivateKittyHack();
-        
-        while (this.network.isNetworkFullyOwned() === false) {
-            
-            this.hackAvailableHosts();
-            
-            await this.installAndActivateWormOnAvailableHosts();
-            /*
-            if (!this.isCommandAndControlDeployed() && this.isCommandAndControlDeployable()) {
-                this.deployCommandAndControl();
-                this.activateCommandAndControl();
-            }*/
-            
-            if (!this.isSherlockDeployed() && this.isSherlockDeployable()) {
-                await this.deployAndRunSherlockOperations();
-            }
-            /*
-            if (!this.isWolfstreetDeployed() && this.isWolfstreetDeployable()) {
-                this.deployAndRunWolfstreetOperations();
-            }*/
-            
-            await this.nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
-        }
+    constructor(nsA: JarvisAdapter, logA: LogNsAdapter) {
+        this.nsA = nsA;
+        this.logA = logA;
+        this.network = new Network(nsA);
     }
     
     hackAvailableHosts(): void {
@@ -115,7 +116,7 @@ class Jarvis {
     }
     
     isCommandAndControlDeployed(): boolean {
-        // TODO
+
         return false;
     }
     

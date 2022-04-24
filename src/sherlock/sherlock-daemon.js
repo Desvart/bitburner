@@ -1,67 +1,73 @@
-import {LogNsAdapter, nowStr} from '/resources/helpers';
-import {SHERLOCK_CONFIG} from '/sherlock/sherlock-config';
-
-export async function main(ns) {
-    ns.tail();
-    ns.disableLog('ALL');
-    ns.clearLog();
-    
-    //FIXME - Sanitize Parentheses in Expression - ()((())()))(()
-    //FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
-    //FIXME - Sanitize Parentheses in Expression - ())()a(aa((a
-    //FIXME - Array Jumping Game - [5,2,1,1,5,5]
-    //FIXME - Array Jumping Game - [4,2,1,1,8]
-    //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
-    
-    const nsA = new SherlockAdapters(ns);
-    const logA = new LogNsAdapter(ns);
-    const sherlock = new SherlockDaemon(nsA, logA);
-    
-    //noinspection InfiniteLoopJS
-    while (true) {
-        const contracts = sherlock.retrieveContracts();
-        for (const contract of contracts) {
-            const solvedContract = sherlock.solveContract(contract);
-    
-            if (solvedContract.solution !== 'Not implemented yet') {
-                const submittedContract = sherlock.submitSolution(solvedContract);
-                await sherlock.shareReward(submittedContract);
-        
-            } else {
-                const msg = `SHERLOCK_DAEMON - Solver for contract type "${contract.type}" not yet implemented.\n
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _SherlockDaemon_instances, _SherlockDaemon_factorial, _SherlockDaemon_factorialDivision;
+import { LogNsAdapter, nowStr } from '/resources/helpers';
+import { SHERLOCK_CONFIG } from '/sherlock/sherlock-config';
+export function main(ns) {
+    return __awaiter(this, void 0, void 0, function* () {
+        ns.tail();
+        ns.disableLog('ALL');
+        ns.clearLog();
+        //FIXME - Sanitize Parentheses in Expression - ()((())()))(()
+        //FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
+        //FIXME - Sanitize Parentheses in Expression - ())()a(aa((a
+        //FIXME - Array Jumping Game - [5,2,1,1,5,5]
+        //FIXME - Array Jumping Game - [4,2,1,1,8]
+        //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
+        const nsA = new SherlockAdapters(ns);
+        const logA = new LogNsAdapter(ns);
+        const sherlock = new SherlockDaemon(nsA, logA);
+        //noinspection InfiniteLoopJS
+        while (true) {
+            const contracts = sherlock.retrieveContracts();
+            for (const contract of contracts) {
+                const solvedContract = sherlock.solveContract(contract);
+                if (solvedContract.solution !== 'Not implemented yet') {
+                    const submittedContract = sherlock.submitSolution(solvedContract);
+                    yield sherlock.shareReward(submittedContract);
+                }
+                else {
+                    const msg = `SHERLOCK_DAEMON - Solver for contract type "${contract.type}" not yet implemented.\n
                     Contract ${contract.name} on ${contract.location}) skipped.`;
-                logA.warn(msg);
+                    logA.warn(msg);
+                }
             }
+            yield nsA.sleep(5 * 60 * 1000);
         }
-        await nsA.sleep(5 * 60 * 1000);
-    }
+    });
 }
-
 class SherlockDaemon {
-    private readonly nsA: SherlockAdapters;
-    private readonly logA: LogNsAdapter;
-    
-    constructor(nsA: SherlockAdapters, logA: LogNsAdapter) {
+    constructor(nsA, logA) {
+        _SherlockDaemon_instances.add(this);
         this.nsA = nsA;
         this.logA = logA;
     }
-    
-    retrieveContracts(): Contract[] {
-        let discoveredNodes: string[] = [];
-        let nodesToScan: string[] = ['home'];
-        let infiniteLoopProtection= 999;
-        let contractsList: Contract[] = [];
-        
+    retrieveContracts() {
+        let discoveredNodes = [];
+        let nodesToScan = ['home'];
+        let infiniteLoopProtection = 999;
+        let contractsList = [];
         while (nodesToScan.length > 0 && infiniteLoopProtection-- > 0) {
-            const nodeName: string = nodesToScan.pop();
-            const connectedNodeNames: string[] = this.nsA.scan(nodeName);
+            const nodeName = nodesToScan.pop();
+            const connectedNodeNames = this.nsA.scan(nodeName);
             for (const connectedNodeName of connectedNodeNames) {
                 if (discoveredNodes.includes(connectedNodeName) === false) {
                     nodesToScan.push(connectedNodeName);
                 }
             }
             discoveredNodes.push(nodeName);
-            
             const foundContractFileList = this.nsA.ls(nodeName, SHERLOCK_CONFIG.CONTRACT_EXTENSION);
             for (const contractFile of foundContractFileList) {
                 contractsList.push(new Contract(this.nsA, contractFile, nodeName));
@@ -69,29 +75,27 @@ class SherlockDaemon {
         }
         return contractsList;
     }
-    
-    submitSolution(contract: Contract): Contract {
+    submitSolution(contract) {
         contract.reward = this.nsA.submitSolution(contract);
         return contract;
     }
-    
-    async shareReward(contract) {
-        if (contract.reward !== '' || contract.reward === true) {
-            const msg = `SHERLOCK_DAEMON - Contract ${contract.name} (${contract.type}) on ${contract.location} solved.
+    shareReward(contract) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (contract.reward !== '' || contract.reward === true) {
+                const msg = `SHERLOCK_DAEMON - Contract ${contract.name} (${contract.type}) on ${contract.location} solved.
                 Reward: ${contract.reward}`;
-            this.logA.success(msg);
-            
-        } else {
-            const errorLog = `${nowStr()}\nContract: ${contract.name}\nLocation: ${contract.location}\n
+                this.logA.success(msg);
+            }
+            else {
+                const errorLog = `${nowStr()}\nContract: ${contract.name}\nLocation: ${contract.location}\n
                 Type: ${contract.type}\nData: ${JSON.stringify(contract.data)}\n\n`;
-            await this.nsA.write(SHERLOCK_CONFIG.LOGFILE, errorLog);
-            
-            const msg = `SHERLOCK_DAEMON - Contract resolution failed! - ${contract.name} (${contract.type})
+                yield this.nsA.write(SHERLOCK_CONFIG.LOGFILE, errorLog);
+                const msg = `SHERLOCK_DAEMON - Contract resolution failed! - ${contract.name} (${contract.type})
                 @${contract.location}`;
-            this.logA.warn(msg);
-        }
+                this.logA.warn(msg);
+            }
+        });
     }
-    
     solveContract(contract) {
         switch (contract.type) {
             case 'Algorithmic Stock Trader I':
@@ -163,13 +167,10 @@ class SherlockDaemon {
         }
         return contract;
     }
-    
     solveAlgorithmicStockTrader(data) {
         let i, j, k;
-        
         let maxTrades = data[0];
         let stockPrices = data[1];
-        
         // WHY?
         let tempStr = '[0';
         for (i = 0; i < stockPrices.length; i++) {
@@ -181,25 +182,23 @@ class SherlockDaemon {
             tempArr += ',' + tempStr;
         }
         tempArr += ']';
-        
         let highestProfit = JSON.parse(tempArr);
-        
         for (i = 0; i < maxTrades; i++) {
             for (j = 0; j < stockPrices.length; j++) { // Buy / Start
                 for (k = j; k < stockPrices.length; k++) { // Sell / End
                     if (i > 0 && j > 0 && k > 0) {
-                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i - 1][k],
-                            highestProfit[i][k - 1], highestProfit[i - 1][j - 1] + stockPrices[k] - stockPrices[j]);
-                    } else if (i > 0 && j > 0) {
-                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i - 1][k],
-                            highestProfit[i - 1][j - 1] + stockPrices[k] - stockPrices[j]);
-                    } else if (i > 0 && k > 0) {
-                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i - 1][k],
-                            highestProfit[i][k - 1], stockPrices[k] - stockPrices[j]);
-                    } else if (j > 0 && k > 0) {
-                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i][k - 1],
-                            stockPrices[k] - stockPrices[j]);
-                    } else {
+                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i - 1][k], highestProfit[i][k - 1], highestProfit[i - 1][j - 1] + stockPrices[k] - stockPrices[j]);
+                    }
+                    else if (i > 0 && j > 0) {
+                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i - 1][k], highestProfit[i - 1][j - 1] + stockPrices[k] - stockPrices[j]);
+                    }
+                    else if (i > 0 && k > 0) {
+                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i - 1][k], highestProfit[i][k - 1], stockPrices[k] - stockPrices[j]);
+                    }
+                    else if (j > 0 && k > 0) {
+                        highestProfit[i][k] = Math.max(highestProfit[i][k], highestProfit[i][k - 1], stockPrices[k] - stockPrices[j]);
+                    }
+                    else {
                         highestProfit[i][k] = Math.max(highestProfit[i][k], stockPrices[k] - stockPrices[j]);
                     }
                 }
@@ -207,7 +206,6 @@ class SherlockDaemon {
         }
         return highestProfit[maxTrades - 1][stockPrices.length - 1];
     }
-    
     solveArrayJumpingGame(inputArray) {
         for (let i = inputArray.length - 1; i >= 0; i--) {
             if (inputArray[i] === 0) {
@@ -217,13 +215,11 @@ class SherlockDaemon {
                 inputArray.splice(i, 1);
             }
         }
-        
         if (inputArray[0] !== 0)
             return 1;
         else
             return 0;
     }
-    
     solveArrayJumpingGameII(inputArray) {
         /*Array Jumping Game II
         You are attempting to solve a Coding Contract. You have 3 tries remaining, after which the contract will self-destruct.
@@ -238,33 +234,24 @@ class SherlockDaemon {
             Assuming you are initially positioned at the start of the array, determine the minimum number of jumps to reach the end of the array.
         
             If it's impossible to reach the end, then the answer should be 0.*/
-            return 'Not implemented yet';
+        return 'Not implemented yet';
     }
-    
     solveFindAllValidMathExpressions(arrayData) {
         let i, j;
-        
         let operatorList = ['', '+', '-', '*'];
         let validExpressions = [];
-        
         let tempPermutations = Math.pow(4, (arrayData[0].length - 1));
-        
         for (i = 0; i < tempPermutations; i++) {
-            
             if (!Boolean(i % 100000)) {
                 //await this.#ns.sleep(100);
             }
-            
             let arraySummands = [];
             let candidateExpression = arrayData[0].substring(0, 1);
             arraySummands[0] = parseInt(arrayData[0].substring(0, 1));
-            
             for (j = 1; j < arrayData[0].length; j++) {
-                candidateExpression += operatorList[(i >> ((j - 1) * 2)) % 4] + arrayData[0].substring(j, j+1);
-                
+                candidateExpression += operatorList[(i >> ((j - 1) * 2)) % 4] + arrayData[0].substring(j, j + 1);
                 let rollingOperator = operatorList[(i >> ((j - 1) * 2)) % 4];
-                let rollingOperand = parseInt(arrayData[0].substring(j, j+1));
-                
+                let rollingOperand = parseInt(arrayData[0].substring(j, j + 1));
                 switch (rollingOperator) {
                     case '':
                         rollingOperand = rollingOperand * (arraySummands[arraySummands.length - 1] /
@@ -281,28 +268,23 @@ class SherlockDaemon {
                     case '*':
                         while (j < arrayData[0].length - 1 && ((i >> (j * 2)) % 4) === 0) {
                             j += 1;
-                            candidateExpression += arrayData[0].substring(j, j+1);
-                            rollingOperand = rollingOperand * 10 + parseInt(arrayData[0].substring(j, j+1));
+                            candidateExpression += arrayData[0].substring(j, j + 1);
+                            rollingOperand = rollingOperand * 10 + parseInt(arrayData[0].substring(j, j + 1));
                         }
                         arraySummands[arraySummands.length - 1] = arraySummands[arraySummands.length - 1] *
                             rollingOperand;
                         break;
                 }
             }
-            
-            let rollingTotal = arraySummands.reduce(function(a, b) { return a + b; });
-            
+            let rollingTotal = arraySummands.reduce(function (a, b) { return a + b; });
             //if(arrayData[1] == eval(candidateExpression)){
             if (arrayData[1] === rollingTotal) {
                 validExpressions[validExpressions.length] = candidateExpression;
             }
         }
-        
         return JSON.stringify(validExpressions);
     }
-    
     solveFindLargestPrimeFactor(bigNumber) {
-        
         let primeDecomposition = [];
         let blockSize = 1000000;
         let blockFirstIndex = 2;
@@ -310,7 +292,6 @@ class SherlockDaemon {
         let numberToDecompose = bigNumber;
         let loopSecurity = 9999;
         while (numberToDecompose !== 1 && loopSecurity-- > 0) {
-            
             let loopFirstIndex = blockFirstIndex + (loopIdx * blockSize);
             let loopLastIndex = blockFirstIndex - 1 + ((loopIdx + 1) * blockSize);
             let primeList = segmentedEratosthenesSieve(loopFirstIndex, loopLastIndex);
@@ -328,27 +309,24 @@ class SherlockDaemon {
                 }
             }
         }
-        
         if (loopSecurity === 0) {
             this.logA.error(`Loop security activated in Prime number calculation!`);
             this.nsA.exit();
         }
-        
         function validation(logA, primeList, number) {
             if (recomposePrime(primeList) === number) {
                 return true;
-            } else {
+            }
+            else {
                 logA.error('SHERLOCK - Prime decomposition is incorrect');
             }
         }
-        
         function recomposePrime(decomposedPrime) {
             let recomposedPrime = 1;
             for (let i = 0; i < decomposedPrime.length; i++)
                 recomposedPrime *= decomposedPrime[i];
             return recomposedPrime;
         }
-        
         function eratosthenesSieve(n) {
             let prime = [];
             let mark = Array(n + 1).fill(true);
@@ -361,23 +339,18 @@ class SherlockDaemon {
                 }
             return prime;
         }
-        
         function segmentedEratosthenesSieve(s, e) {
             let primeList = [];
             //if (s < 0 || e < 2)
             //debug(this.#ns, `\n Prime number in range of (${s}, ${e})`);
-            
             // The last possible prime number is below the square root of the number we fixed
             let limit = Math.floor(Math.sqrt(e)) + 1;
-            
             // Starting value
             let low = s;
             let high = limit + s;
             let value = 0;
-            
             // Container which is used to detect (√e) prime element
             let mark = Array(limit + 1).fill(false);
-            
             // Find first (√e) prime number
             let prime = eratosthenesSieve(limit);
             for (let i = 0; i < prime.length; i++)
@@ -385,65 +358,48 @@ class SherlockDaemon {
                     primeList.push(prime[i]);
                     //ns.print("  " + prime[i]);
                 }
-            
             // This loop displays the remaining prime number between (√e .. e)
             while (low < e) {
-                
                 // Set next (√e) prime number is valid
                 for (let i = 0; i <= limit; i++)
                     mark[i] = true;
-                
                 // When next prime pair are greater than e, set high value to e
                 if (high >= e)
                     high = e;
-                
                 for (let i = 0; i < prime.length; i++) {
-                    
                     value = Math.floor(low / prime[i]) * prime[i];
                     if (value < low)
                         value += prime[i]; // Add current prime value
-                    
                     for (let j = value; j < high; j += prime[i])
                         mark[j - low] = false; // Set multiple is non prime
                 }
-                
                 // Store the prime elements
                 for (let i = low; i < high; i++)
                     if (mark[i - low] === true) {
                         primeList.push(i);
                         //ns.print("  " + i);
                     }
-                
                 // Update of all multiple of value is non-prime
                 high += limit;
                 low += limit;
             }
-            
             return primeList;
         }
     }
-    
     solveGenerateIPAddresses(data) {
-        
         let ipList = [];
-        
         for (let i = 1; i <= 3; i++) {
             let tmp1 = data.slice(0, i) + '.' + data.slice(i);
-            
             for (let j = i + 2; j <= i + 4; j++) {
                 let tmp2 = tmp1.slice(0, j) + '.' + tmp1.slice(j);
-                
                 for (let k = j + 2; k <= j + 4; k++) {
                     let ip = tmp2.slice(0, k) + '.' + tmp2.slice(k);
-                    
                     if (isIpValid(ip) === true)
                         ipList.push(ip);
                 }
             }
         }
-        
         return ipList;
-        
         function isIpValid(ip) {
             const blocksList = ip.split('.');
             if (blocksList.length !== 4)
@@ -453,7 +409,6 @@ class SherlockDaemon {
                     return false;
             return true;
         }
-        
         function isBlockValid(block) {
             if (block.length > 1 && block[0] === '0')
                 return false;
@@ -462,7 +417,6 @@ class SherlockDaemon {
             return true;
         }
     }
-    
     solveMergeOverlappingIntervals(input) {
         // Sort the array based on the first element of each array to reduce number of passes
         input = input.sort((a, b) => a[0] - b[0]);
@@ -480,7 +434,6 @@ class SherlockDaemon {
         }
         return input;
     }
-    
     solveMinimumPathSumInATriangle(data) {
         let triangle = data;
         let nextArray;
@@ -499,34 +452,24 @@ class SherlockDaemon {
         }
         return Math.min.apply(null, nextArray);
     }
-    
     solveSanitizeParenthesesInExpression(data) {
-        
         data = trim(data);
         let [n, char] = charToRemove(data);
-        
         if (n === 0 && isValidExpression(data))
             return [data];
-        
         let currSolutions = [data];
         for (let i = 0; i < n; i++) {
-            
             let newSolutions = [];
             for (let solution of currSolutions) {
                 let partialSolution = removeOneParenthesis(solution, char);
                 newSolutions = newSolutions.concat(partialSolution);
                 newSolutions = [...new Set(newSolutions)]; // remove duplicates
             }
-            
             currSolutions = newSolutions;
         }
-        
         let solutions = currSolutions.filter(x => isValidExpression(x));
-        
         return solutions;
-        
         function trim(data) {
-            
             let padStart = '';
             for (let i = 0; i < data.length; i++) {
                 if (data[i] !== '(' && data[i] !== ')')
@@ -536,7 +479,6 @@ class SherlockDaemon {
                     break;
                 }
             }
-            
             let padStop = '';
             for (let i = data.length - 1; i >= 0; i--) {
                 if (data[i] !== '(' && data[i] !== ')')
@@ -546,43 +488,34 @@ class SherlockDaemon {
                     break;
                 }
             }
-            
             for (let i = 0; i < data.length; i++)
                 if (data[i] !== ')') {
                     data = data.slice(i);
                     console.log('1 ' + data);
                     break;
                 }
-            
             for (let i = data.length - 1; i >= 0; i--)
                 if (data[i] !== '(') {
                     data = data.slice(0, i + 1);
                     console.log('2 ' + data);
                     break;
                 }
-            
             if (data.length <= 1) {
                 data = '';
             }
-            
             return padStart + data + padStop;
         }
-        
         function charToRemove(data) {
-            
             let open = data.match(/\(/g || []).length;
             let close = data.match(/\)/g || []).length;
             let removeCount = close - open;
-            
             let char = '';
             if (removeCount > 0)
                 char = ')';
             if (removeCount < 0)
                 char = '(';
-            
             return [Math.abs(removeCount), char];
         }
-        
         function removeOneParenthesis(data, char) {
             let solutions = [];
             let oneSolution = '';
@@ -595,7 +528,6 @@ class SherlockDaemon {
             }
             return solutions;
         }
-        
         function isValidExpression(data) {
             let open = 0;
             for (let i = 0; i < data.length; i++) {
@@ -607,36 +539,28 @@ class SherlockDaemon {
                     else
                         return false;
             }
-            
             if (open === 0)
                 return true;
             else
                 return false;
         }
     }
-    
     solveSpiralizeMatrix(data, accum = []) {
         if (data.length === 0 || data[0].length === 0)
             return accum;
-        
         accum = accum.concat(data.shift());
         if (data.length === 0 || data[0].length === 0)
             return accum;
-        
         accum = accum.concat(column(data, data[0].length - 1));
         if (data.length === 0 || data[0].length === 0)
             return accum;
-        
         accum = accum.concat(data.pop().reverse());
         if (data.length === 0 || data[0].length === 0)
             return accum;
-        
         accum = accum.concat(column(data, 0).reverse());
         if (data.length === 0 || data[0].length === 0)
             return accum;
-        
         return this.solveSpiralizeMatrix(data, accum);
-        
         function column(arr, index) {
             const res = [];
             for (let i = 0; i < arr.length; i++) {
@@ -647,7 +571,6 @@ class SherlockDaemon {
             return res;
         }
     }
-    
     solveSubarrayWithMaximumSum(data) {
         data = regroupValuesOfSameSign(data);
         data = trimDataOfNegativeValues(data);
@@ -666,14 +589,14 @@ class SherlockDaemon {
             }
         }
         return max;
-        
         function regroupValuesOfSameSign(data) {
             let reducedData = [];
             let tmp = data[0];
             for (let i = 1; i < data.length; i++) {
                 if (data[i - 1] * data[i] >= 0) {
                     tmp += data[i];
-                } else {
+                }
+                else {
                     reducedData.push(tmp);
                     tmp = data[i];
                 }
@@ -681,7 +604,6 @@ class SherlockDaemon {
             reducedData.push(tmp);
             return reducedData;
         }
-        
         function trimDataOfNegativeValues(data) {
             if (data[0] <= 0)
                 data.shift();
@@ -690,11 +612,9 @@ class SherlockDaemon {
             return data;
         }
     }
-    
     solveTotalWayToSum(data) {
         let cache = {};
         return twts(data, data, cache) - 1;
-        
         function twts(limit, n, cache) {
             if (n < 1)
                 return 1;
@@ -707,19 +627,15 @@ class SherlockDaemon {
                 if (limit in c)
                     return c[limit];
             }
-            
             let s = 0;
             for (let i = 1; i <= limit; i++)
                 s += twts(i, n - i, cache);
-            
             if (!(n in cache))
                 cache[n] = {};
-            
             cache[n][limit] = s;
             return s;
         }
     }
-    
     solveTotalWayToSumII(data) {
         /*Total Ways to Sum II
         You are attempting to solve a Coding Contract. You have 10 tries remaining, after which the contract will self-destruct.
@@ -732,50 +648,31 @@ class SherlockDaemon {
         You may use each integer in the set zero or more times.*/
         return 'Not implemented yet';
     }
-    
     solveUniquePathsInAGridI(data) {
         const rightMoves = data[0] - 1;
         const downMoves = data[1] - 1;
         const rightPlusDown = rightMoves + downMoves;
-        return Math.round(this.#factorialDivision(rightPlusDown, rightMoves) / (this.#factorial(downMoves)));
+        return Math.round(__classPrivateFieldGet(this, _SherlockDaemon_instances, "m", _SherlockDaemon_factorialDivision).call(this, rightPlusDown, rightMoves) / (__classPrivateFieldGet(this, _SherlockDaemon_instances, "m", _SherlockDaemon_factorial).call(this, downMoves)));
     }
-    
-    #factorial(n) {
-        return this.#factorialDivision(n, 1);
-    }
-    
-    #factorialDivision(n, d) {
-        if (n === 0 || n === 1 || n === d)
-            return 1;
-        return this.#factorialDivision(n - 1, d) * n;
-    }
-    
     solveUniquePathsInAGridII(data, ignoreFirst = false, ignoreLast = false) {
         const rightMoves = data[0].length - 1;
         const downMoves = data.length - 1;
-        
-        let totalPossiblePaths = Math.round(
-            this.#factorialDivision(rightMoves + downMoves, rightMoves) / (this.#factorial(downMoves)));
-        
+        let totalPossiblePaths = Math.round(__classPrivateFieldGet(this, _SherlockDaemon_instances, "m", _SherlockDaemon_factorialDivision).call(this, rightMoves + downMoves, rightMoves) / (__classPrivateFieldGet(this, _SherlockDaemon_instances, "m", _SherlockDaemon_factorial).call(this, downMoves)));
         for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].length; j++) {
-                
                 if (data[i][j] === 1 && (!ignoreFirst || (i !== 0 || j !== 0)) &&
                     (!ignoreLast || (i !== data.length - 1 || j !== data[i].length - 1))) {
                     const newArray = [];
                     for (let k = i; k < data.length; k++)
                         newArray.push(data[k].slice(j, data[i].length));
-                    
                     let removedPaths = this.solveUniquePathsInAGridII(newArray, true, ignoreLast);
                     removedPaths *= this.solveUniquePathsInAGridI([i + 1, j + 1]);
-                    
                     totalPossiblePaths -= removedPaths;
                 }
             }
         }
         return totalPossiblePaths;
     }
-    
     solveHammingCodesIntegerToEncodedBinary(data) {
         /*HammingCodes: Integer to encoded Binary
         You are attempting to solve a Coding Contract. You have 10 tries remaining, after which the contract will self-destruct.
@@ -795,7 +692,6 @@ class SherlockDaemon {
         That means, the binary value has to be encoded as it is*/
         return 'Not implemented yet';
     }
-    
     solveShortestPathinAGrid(data) {
         /*Shortest Path in a Grid
         You are attempting to solve a Coding Contract. You have 10 tries remaining, after which the contract will self-destruct.
@@ -830,17 +726,15 @@ class SherlockDaemon {
         Answer: ''*/
         return 'Not implemented yet';
     }
-    
 }
-
+_SherlockDaemon_instances = new WeakSet(), _SherlockDaemon_factorial = function _SherlockDaemon_factorial(n) {
+    return __classPrivateFieldGet(this, _SherlockDaemon_instances, "m", _SherlockDaemon_factorialDivision).call(this, n, 1);
+}, _SherlockDaemon_factorialDivision = function _SherlockDaemon_factorialDivision(n, d) {
+    if (n === 0 || n === 1 || n === d)
+        return 1;
+    return __classPrivateFieldGet(this, _SherlockDaemon_instances, "m", _SherlockDaemon_factorialDivision).call(this, n - 1, d) * n;
+};
 export class Contract {
-    name;
-    location;
-    type;
-    data;
-    solution;
-    reward;
-    
     constructor(nsA, name, location) {
         this.name = name;
         this.location = location;
@@ -848,43 +742,37 @@ export class Contract {
         this.data = nsA.getContractData(name, location);
     }
 }
-
 class SherlockAdapters {
-    private readonly ns;
-    
     constructor(ns) {
         this.ns = ns;
     }
-    
-    getContractType(name: string, hostname: string): string {
+    getContractType(name, hostname) {
         return this.ns.codingcontract.getContractType(name, hostname);
     }
-    
-    getContractData(name: string, hostname: string): any {
+    getContractData(name, hostname) {
         return this.ns.codingcontract.getData(name, hostname);
     }
-    
-    ls(hostname: string, extension: string): string[] {
+    ls(hostname, extension) {
         return this.ns.ls(hostname, extension);
     }
-    
-    scan(hostname: string): string[] {
+    scan(hostname) {
         return this.ns.scan(hostname);
     }
-    
-    submitSolution(contract: Contract): string {
-    return this.ns.codingcontract.attempt(contract.solution, contract.name, contract.location, {returnReward: true});
+    submitSolution(contract) {
+        return this.ns.codingcontract.attempt(contract.solution, contract.name, contract.location, { returnReward: true });
     }
-    
-    async write(file: string, message: string) {
-        await this.ns.write(file, message, 'a');
+    write(file, message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.ns.write(file, message, 'a');
+        });
     }
-    
-    exit(): void {
+    exit() {
         this.ns.exit();
     }
-    
-    async sleep(duration: number): Promise<void> {
-        await this.ns.sleep(duration);
+    sleep(duration) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.ns.sleep(duration);
+        });
     }
 }
+//# sourceMappingURL=sherlock-daemon.js.map

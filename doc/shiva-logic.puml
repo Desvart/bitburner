@@ -3,8 +3,28 @@
 
 start
 
+package shiva-install {
+    :Install shiva on runner;
+    :Kill previous malware on target;
+    :Rampup target to running speed;
+}
+floating note: Setup runner and\nprepare target
 
+package shiva-daemon {
+    group Determine Shiva's config
+        :Determine threads count for each steps;
+        :Determine relative delays between steps;
 
-stop
+    end group
+
+    repeat
+        :Sleep until next block;
+        :Exec. weaken 1;
+        :Exec. weaken 2;
+        :Exec. grow;
+        :Exec. hack;
+        :Exec. reporter;
+    repeat while
+}
 
 @enduml

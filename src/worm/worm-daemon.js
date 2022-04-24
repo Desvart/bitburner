@@ -14,7 +14,6 @@ export function main(ns) {
         const nsA = new WormAdapter(ns);
         const logA = new LogNsAdapter(ns);
         const hostConst = JSON.parse(ns.read(WORM_CONFIG.INSTALL_PACKAGE[3]));
-        debugger;
         //noinspection InfiniteLoopJS
         while (true) {
             const hostState = {

@@ -1,0 +1,1 @@
+{"version":3,"file":"sherlock-config.js","sourceRoot":"","sources":["sherlock-config.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,eAAe,GAKxB;IACA,eAAe,EAAE;QACb,8BAA8B;QAC9B,8BAA8B;QAC9B,uBAAuB;KAC1B;IACD,WAAW,EAAE;QACT,8BAA8B;KACjC;IACD,kBAAkB,EAAE,KAAK;IACzB,OAAO,EAAE,yBAAyB;CACrC,CAAC"}
