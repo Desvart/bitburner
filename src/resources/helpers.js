@@ -9,7 +9,7 @@ export function timeConverter(timestamp) {
 export function nowStr() {
     return timeConverter(Date.now());
 }
-export class LogNsAdapter {
+export class Log {
     constructor(ns) {
         this.ns = ns;
     }
@@ -33,11 +33,12 @@ export class LogNsAdapter {
             console.debug(`${timestamp} %c${msg}`, style);
         }
     }
-    warn(msg) {
+    warn(msg, toastSwitch = false) {
         const timestamp = nowStr();
         this.ns.print(`${timestamp} WARNING - ${msg}`);
         console.warn(`${timestamp} ${msg}`);
-        this.ns.toast(`${msg}`, 'warning', null);
+        if (toastSwitch)
+            this.ns.toast(`${msg}`, 'warning', null);
     }
     error(msg) {
         const timestamp = nowStr();

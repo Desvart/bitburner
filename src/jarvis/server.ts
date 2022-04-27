@@ -1,5 +1,4 @@
-import {NETWORK_CONFIG} from '/jarvis/jarvis-config.js';
-import {JarvisAdapter} from '/jarvis/jarvis-adapters.js';
+import {INs, INsServer, Log} from '/resources/helpers';
 
 export class Server {
     private readonly KEYS = [
@@ -15,50 +14,43 @@ export class Server {
     purchasedByPlayer: boolean;
     ram: number;
     isPotentialTarget: boolean;
-    private readonly nsA: JarvisAdapter;
+    private readonly ns: INs;
+    private readonly log: Log;
     
-    constructor(nsA: JarvisAdapter, nodeName: string) {
-        this.nsA = nsA;
+    constructor(ns: INs, log: Log, hostname: string) {
+        this.ns = ns;
+        this.log = log;
         
-        const node: any = nsA.getNode(nodeName);
-        this.hostname = node.hostname;
-        this.requiredHackingSkill = node.requiredHackingSkill;
-        this.numOpenPortsRequired = node.numOpenPortsRequired;
-        this.purchasedByPlayer = node.purchasedByPlayer;
-        this.ram = node.maxRam;
-        this.isPotentialTarget = this.checkIfPotentialTarget();
+        const nsServer: INsServer = ns.getServer(hostname);
+        this.hostname = nsServer.hostname;
+        this.requiredHackingSkill = nsServer.requiredHackingSkill;
+        this.numOpenPortsRequired = nsServer.numOpenPortsRequired;
+        this.purchasedByPlayer = nsServer.purchasedByPlayer;
+        this.ram = nsServer.maxRam;
+        this.isPotentialTarget = nsServer.moneyMax > 0;
     }
     
-    hasAdminRights(): boolean {
-        return this.nsA.hasRootAccess(this.hostname);
+    hasRootAccess(): boolean {
+        return this.ns.hasRootAccess(this.hostname);
     }
     
     isNukable(): boolean {
         return (this.isPotentialTarget === true &&
-            this.hasAdminRights() === false &&
-            this.requiredHackingSkill <= this.nsA.getPlayerHackingLevel() &&
+            this.hasRootAccess() === false &&
+            this.requiredHackingSkill <= this.ns.getHackingLevel() &&
             this.numOpenPortsRequired <= this.getAvailableKeysCount());
     }
     
-    private checkIfPotentialTarget(): boolean {
-        
-        if (this.purchasedByPlayer === true)
+    nuke(): boolean {
+        if (this.isNukable()) {
+            this.openPorts();
+            this.getRootAccess();
+            this.log.success(`SERVER - ${this.hostname} successfully nuked.`);
+            return true;
+        } else {
+            this.log.warn(`SERVER - Cannot nuke ${this.hostname}.`, true);
             return false;
-        
-        for (let blackNode of NETWORK_CONFIG.BLACK_LIST)
-            if (this.hostname === blackNode)
-                return false;
-        
-        return true;
-    }
-    
-    getAvailableKeysCount(): number {
-        return this.getAvailableKeys().length;
-    }
-    
-    nuke() {
-        this.openPorts();
-        this.getRootAccess();
+        }
     }
     
     private openPorts(): number {
@@ -67,27 +59,27 @@ export class Server {
         for (let key of availableKeys) {
             switch (key) {
                 case this.KEYS[0]:
-                    this.nsA.brutessh(this.hostname);
+                    this.ns.brutessh(this.hostname);
                     portOpenedCount++;
                     break;
                 
                 case this.KEYS[1]:
-                    this.nsA.ftpcrack(this.hostname);
+                    this.ns.ftpcrack(this.hostname);
                     portOpenedCount++;
                     break;
                 
                 case this.KEYS[2]:
-                    this.nsA.relaysmtp(this.hostname);
+                    this.ns.relaysmtp(this.hostname);
                     portOpenedCount++;
                     break;
                 
                 case this.KEYS[3]:
-                    this.nsA.httpworm(this.hostname);
+                    this.ns.httpworm(this.hostname);
                     portOpenedCount++;
                     break;
                 
                 case this.KEYS[4]:
-                    this.nsA.sqlinject(this.hostname);
+                    this.ns.sqlinject(this.hostname);
                     portOpenedCount++;
                     break;
             }
@@ -95,11 +87,15 @@ export class Server {
         return portOpenedCount;
     }
     
-    private getAvailableKeys() {
-        return this.KEYS.filter(key => this.nsA.fileExists(key, 'home'));
+    private getAvailableKeys(): string[] {
+        return this.KEYS.filter(key => this.ns.fileExists(key, 'home'));
     }
     
-    private getRootAccess() {
-        this.nsA.nuke(this.hostname);
+    private getAvailableKeysCount(): number {
+        return this.getAvailableKeys().length;
+    }
+    
+    private getRootAccess(): void {
+        this.ns.nuke(this.hostname);
     }
 }
