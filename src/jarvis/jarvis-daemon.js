@@ -8,131 +8,127 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Log } from '/resources/helpers';
+import { Server } from '/jarvis/server';
+const CONFIG = {
+    CYCLE_TIME: 12000,
+    HACKNET_HOST: 'foodnstuff',
+    KITTYCAT_HOSTS: ['n00dles', 'foodnstuff'],
+    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'harakiri-sushi'],
+    SHERLOCK_HOST: 'hong-fang-tea',
+    C2_HOST: 'joesguns',
+    WOLFSTREET_HOST: '?',
+};
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.tail();
         ns.disableLog('ALL');
         ns.clearLog();
-        const logA = new Log(ns);
-        const jarvis = new Jarvis(ns, logA);
+        const jarvis = new Jarvis(ns, new Log(ns));
         jarvis.nukeWeakServers();
-        yield jarvis.deployAndActivateHacknetFarm();
-        yield jarvis.deployAndActivateKittyHack();
-        while (jarvis.network.isNetworkFullyOwned() === false) {
-            yield ns.sleep(JARVIS_CONFIG.CYCLE_TIME);
+        if (!jarvis.isDaemonFullyDeployed('hacknet')) {
+            yield jarvis.releaseDaemon('hacknet', CONFIG.HACKNET_HOST);
+        }
+        if (!jarvis.isDaemonFullyDeployed('kittycat')) {
+            yield jarvis.releaseDaemon('kittycat', CONFIG.KITTYCAT_HOSTS);
+        }
+        while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
+            yield jarvis.waitNCycles();
+            if (jarvis.isThereAServersOfGivenSizeToHack(16)) {
+                jarvis.nukeWeakServers();
+                if (!jarvis.isDaemonFullyDeployed('worm')) {
+                    yield jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
+                }
+            }
+        }
+        if (!jarvis.isDaemonFullyDeployed('sherlock')) {
+            yield jarvis.releaseDaemon('sherlock', CONFIG.SHERLOCK_HOST); //TODO split script in two less than 16 GB RAM
+        }
+        if (!jarvis.isDaemonFullyDeployed('c2')) {
+            yield jarvis.releaseDaemon('C2', CONFIG.C2_HOST);
+        }
+        while (!jarvis.areAllServersOfGivenSizeHacked(32)) {
+            yield jarvis.waitNCycles(5);
+            if (jarvis.isThereAServersOfGivenSizeToHack(32)) {
+                jarvis.nukeWeakServers();
+                if (jarvis.isDaemonFullyDeployed('wolfstreet')) {
+                    yield jarvis.releaseDaemon('wolfstreet', CONFIG.WOLFSTREET_HOST);
+                }
+            }
+        }
+        while (!jarvis.isNetworkFullyOwned()) {
+            yield jarvis.waitNCycles();
+            jarvis.nukeWeakServers();
         }
     });
 }
 class Jarvis {
-    constructor(ns, logA) {
+    constructor(ns, log) {
         this.ns = ns;
-        this.logA = logA;
-        this.network = new Network(nsA);
+        this.log = log;
+        this.network = this.retrieveNetwork();
+    }
+    retrieveNetwork() {
+        let discoveredNodes = [];
+        let nodesToScan = ['home'];
+        let loopProtection = 999;
+        while (nodesToScan.length > 0 && loopProtection-- > 0) {
+            const nodeName = nodesToScan.pop();
+            const connectedNodeNames = this.ns.scan(nodeName);
+            for (const connectedNodeName of connectedNodeNames) {
+                if (!discoveredNodes.map(n => n.hostname).includes(connectedNodeName)) {
+                    nodesToScan.push(connectedNodeName);
+                }
+            }
+            discoveredNodes.push(new Server(this.ns, this.log, nodeName));
+        }
+        return discoveredNodes;
     }
     nukeWeakServers() {
-        let nukableHosts = this.network.identifyNukableHosts();
-        this.network.nukeNodes(nukableHosts);
+        this.network.filter(n => n.isNukable()).forEach(n => n.nuke());
     }
-    deployAndActivateHacknetFarm() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.nsA.scp(HACKNET_CONFIG.PACKAGE, 'home', HACKNET_CONFIG.LOCATION);
-            this.nsA.exec(HACKNET_CONFIG.PACKAGE[0], HACKNET_CONFIG.LOCATION, 1);
-        });
+    isDaemonFullyDeployed(daemonName) {
+        let allProcessesName = [];
+        for (const server of this.network) {
+            allProcessesName.push(...this.ns.ps(server.hostname).map(p => p.filename));
+        }
+        return allProcessesName.filter(fileName => fileName.includes(daemonName + '-daemon')).length > 0;
     }
-    deployAndActivateKittyHack() {
+    releaseDaemon(daemonName, hostnames) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.nsA.ps(KITTY_HACK_CONFIG.HOSTNAME).filter(p => p.filename.includes('kitty-hack-daemon.js')).length ===
-                0) {
-                const res = yield this.nsA.scp(KITTY_HACK_CONFIG.INSTALL_PACKAGE, 'home', KITTY_HACK_CONFIG.HOSTNAME);
-                if (res === true) {
-                    this.logA.success(`Kitty-Hack package successfully deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+            const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js'];
+            if (typeof hostnames === 'string')
+                hostnames = [hostnames];
+            let globalStatus = true;
+            for (const hostname of hostnames) {
+                const scpStatus = yield this.ns.scp(files, hostname);
+                const execStatus = this.ns.exec(files[0], hostname, 1);
+                if (scpStatus === true && execStatus > 0) {
+                    this.log.success(`JARVIS - ${daemonName} installer successfully uploaded on ${hostname}`);
+                }
+                else if (scpStatus === false || execStatus === 0) {
+                    this.log.warn(`JARVIS - Couldn't upload ${daemonName} installer on ${hostname}`);
+                    globalStatus = false;
                 }
                 else {
-                    this.logA.error(`Kitty-Hack package couldn't be deployed on ${KITTY_HACK_CONFIG.HOSTNAME}.`);
+                    globalStatus = false;
                 }
             }
-            this.nsA.exec(KITTY_HACK_CONFIG.RUN_PACKAGE[0], KITTY_HACK_CONFIG.HOSTNAME, 1);
+            return globalStatus;
         });
     }
-    installAndActivateWormOnAvailableHosts() {
+    waitNCycles(mult = 1) {
         return __awaiter(this, void 0, void 0, function* () {
-            const availableHosts = this.listAvailableHosts();
-            yield this.installAndActivateWorms(availableHosts);
+            yield this.ns.sleep(CONFIG.CYCLE_TIME * mult);
         });
     }
-    listAvailableHosts() {
-        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram > 4 && n.hasAdminRights() === true);
-        let availableHosts = [];
-        for (const potentialHost of potentialHosts) {
-            const hostProcesses = this.nsA.ps(potentialHost.hostname);
-            if (potentialHost.hostname !== 'foodnstuff' &&
-                hostProcesses.filter(p => p.filename.includes('sherlock-daemon.js')).length === 0 &&
-                hostProcesses.filter(p => p.filename.includes('shiva-daemon.js')).length === 0 &&
-                hostProcesses.filter(p => p.filename.includes('worm-daemon.js')).length === 0) {
-                availableHosts.push(potentialHost.hostname);
-            }
-        }
-        return availableHosts;
+    areAllServersOfGivenSizeHacked(size) {
+        return !this.network.filter(n => n.ram === size).some(n => !n.hasRootAccess());
     }
-    installAndActivateWorms(availableHosts) {
-        return __awaiter(this, void 0, void 0, function* () {
-            for (const target of availableHosts) {
-                const res = yield this.nsA.scp(WORM_CONFIG.INSTALL_PACKAGE, 'home', target);
-                if (res === true) {
-                    this.logA.success(`Worm package successfully deployed on ${target}.`);
-                }
-                else {
-                    this.logA.error(`Worm package couldn't be deployed on ${target}.`);
-                }
-                this.nsA.exec(WORM_CONFIG.INSTALL_PACKAGE[0], target, 1);
-            }
-        });
+    isThereAServersOfGivenSizeToHack(size) {
+        return this.network.filter(n => n.ram === size).some(n => n.isNukable());
     }
-    isCommandAndControlDeployed() {
-        return false;
-    }
-    isCommandAndControlDeployable() {
-        // TODO
-        return false;
-    }
-    deployCommandAndControl() {
-        // TODO
-        // Deploy hydraManager as soon as we have access to a 32 GB RAM host
-        // Activate malwares operations
-        // Determine the RAM cost to // hack n00dles. If it is more than the RAM available on home, buy a server
-        // Else run it against home
-        // If enough money buy new server and hack next server
-    }
-    activateCommandAndControl() {
-        // TODO
-    }
-    isSherlockDeployed() {
-        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram > 16 && n.hasAdminRights() === true);
-        for (const potentialHost of potentialHosts) {
-            const hostProcesses = this.nsA.ps(potentialHost.hostname);
-            if (hostProcesses.filter(p => p.filename.includes('sherlock-daemon.js')).length === 1) {
-                return true;
-            }
-        }
-        return false;
-    }
-    isSherlockDeployable() {
-        const potentialHosts = this.network.nodes.filter(n => n.isPotentialTarget && n.ram === 32 && n.hasAdminRights() === true);
-        return (potentialHosts.length > 0);
-    }
-    deployAndRunSherlockOperations() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const hostname = this.network.nodes.filter(n => n.isPotentialTarget && n.ram === 32 && n.hasAdminRights() === true)[0].hostname;
-            const res = yield this.nsA.scp(SHERLOCK_CONFIG.INSTALL_PACKAGE, 'home', hostname);
-            if (res === true) {
-                this.logA.success(`Sherlock package successfully deployed on ${hostname}.`);
-            }
-            else {
-                this.logA.error(`Sherlock package couldn't be deployed on ${hostname}.`);
-            }
-            this.nsA.killall(hostname);
-            this.nsA.exec(SHERLOCK_CONFIG.INSTALL_PACKAGE[0], hostname, 1);
-        });
+    isNetworkFullyOwned() {
+        return !this.network.filter(n => n.isPotentialTarget).some(n => !n.hasRootAccess());
     }
 }
 //# sourceMappingURL=jarvis-daemon.js.map
