@@ -86,6 +86,8 @@ export interface INs {
     disableLog(logToDisable: string): void;
     clearLog(): void;
     
+    getServerMoneyAvailable(hostname: string): number;
+    
     getServer(hostname: string): INsServer;
     hasRootAccess(hostname: string): boolean;
     nuke(hostname: string): void;
@@ -104,76 +106,19 @@ export interface INs {
     httpworm(hostname: string): void;
     sqlinject(hostname: string): void;
     
-    /*ls() {}
-
-    write(string) {}
-
-
-
-    
-    getServer = {
-        cpuCores: ''
+    hacknet: {
+        maxNumNodes(): number;
+        numNodes(): number;
+        getPurchaseNodeCost(): number;
+        purchaseNode(): number;
+        getNodeStats(nodeId: number): NodeStats;
+        getLevelUpgradeCost(nodeId: number, upgradeQty: number): number;
+        getRamUpgradeCost(nodeId: number, upgradeQty: number): number;
+        getCoreUpgradeCost(nodeId: number, upgradeQty: number): number;
+        upgradeLevel(nodeId: number, upgradeQty: number): void;
+        upgradeRam(nodeId: number, upgradeQty: number): void;
+        upgradeCore(nodeId: number, upgradeQty: number): void;
     }
-    hasRootAccess(hostname) {}
-    getServerMoneyAvailable(hostname) {}
-    getServerSecurityLevel(hostname) {}
-
-    weakenAnalyze(){}
-    hackAnalyzeThreads(){}
-    hackAnalyzeSecurity(){}
-    hackAnalyzeChance(){}
-    hackAnalyze(){}
-    growthAnalyze(){}
-    growthAnalyzeSecurity(){}
-    getHackTime(){}
-    getWeakenTime(){}
-    getGrowTime(){}
-    async hack(target, { threads: threadsCount, stock: marketImpact }) {}
-    async grow(target, { threads: threadsCount, stock: marketImpact }) {}
-    async weaken(target, { threads: threadsCount, stock: marketImpact }) {}
-    deleteServer() {}
-    killall(){}
-    purchaseServer(){}
-    getPurchasedServers(){}
-    getPurchasedServerLimit(){}
-    getPurchasedServerMaxRam(){}
-    hacknet = {
-        getNodeStats () {},
-        getLevelUpgradeCost() {},
-        getRamUpgradeCost() {},
-        getCoreUpgradeCost() {},
-        upgradeLevel(nodeId, qty) {},
-        upgradeRam() {},
-        upgradeCore() {},
-        maxNumNodes() {},
-        numNodes() {},
-        getPurchaseNodeCost() {},
-        purchaseNode() {}
-    }
-    
-    getScriptRam() {}
-    
-    formulas = {
-        hacking: {
-            growPercent() {}
-        }
-    }
-
-    getPurchasedServerCost() {}
-    fileExists(fileName, target) {}
-    clearPort(portId) {}
-    readPort(portId) {}
-    async writePort(portId, data) {}
-    scriptRunning(fileName, hostname) {}
-    getPlayer = {
-        hacking: ''
-    }
-    codingcontract = {
-        getContractType(name, location) {},
-        getData(name, location) {},
-        attempt(solution, contractName, contractLocation, rewardConfig) {}
-    }
-     */
 }
 
 export interface INsServer {
@@ -208,4 +153,17 @@ export interface IProcess {
     filename: string;
     pid: number;
     threads: number;
+}
+
+export interface NodeStats {
+    cache:	number;
+    cores:	number;
+    hashCapacity:	number;
+    level:	number;
+    name:	string;
+    production:	number;
+    ram:	number;
+    ramUsed:	number;
+    timeOnline:	number;
+    totalProduction:	number;
 }
