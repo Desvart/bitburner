@@ -7,51 +7,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Network } from '/jarvis/network';
-import { JARVIS_CONFIG } from '/jarvis/jarvis-config';
-import { HACKNET_CONFIG } from '/hacknet/hacknet-config';
-import { JarvisAdapter } from '/jarvis/jarvis-adapters';
-import { WORM_CONFIG } from '/worm/worm-config';
-import { LogNsAdapter } from '/resources/helpers';
-import { KITTY_HACK_CONFIG } from '/kitty-hack/kitty-hack-config';
-import { SHERLOCK_CONFIG } from '/sherlock/sherlock-config';
+import { Log } from '/resources/helpers';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.tail();
         ns.disableLog('ALL');
         ns.clearLog();
-        const nsA = new JarvisAdapter(ns);
-        const logA = new LogNsAdapter(ns);
-        const jarvis = new Jarvis(nsA, logA);
-        jarvis.hackAvailableHosts();
+        const logA = new Log(ns);
+        const jarvis = new Jarvis(ns, logA);
+        jarvis.nukeWeakServers();
         yield jarvis.deployAndActivateHacknetFarm();
         yield jarvis.deployAndActivateKittyHack();
         while (jarvis.network.isNetworkFullyOwned() === false) {
-            jarvis.hackAvailableHosts();
-            yield jarvis.installAndActivateWormOnAvailableHosts();
-            /*
-            if (!jarvis.isCommandAndControlDeployed() && jarvis.isCommandAndControlDeployable()) {
-                jarvis.deployCommandAndControl();
-                jarvis.activateCommandAndControl();
-            }*/
-            if (!jarvis.isSherlockDeployed() && jarvis.isSherlockDeployable()) {
-                yield jarvis.deployAndRunSherlockOperations();
-            }
-            /*
-            if (!jarvis.isWolfstreetDeployed() && jarvis.isWolfstreetDeployable()) {
-                jarvis.deployAndRunWolfstreetOperations();
-            }*/
-            yield nsA.sleep(JARVIS_CONFIG.CYCLE_TIME);
+            yield ns.sleep(JARVIS_CONFIG.CYCLE_TIME);
         }
     });
 }
 class Jarvis {
-    constructor(nsA, logA) {
-        this.nsA = nsA;
+    constructor(ns, logA) {
+        this.ns = ns;
         this.logA = logA;
         this.network = new Network(nsA);
     }
-    hackAvailableHosts() {
+    nukeWeakServers() {
         let nukableHosts = this.network.identifyNukableHosts();
         this.network.nukeNodes(nukableHosts);
     }

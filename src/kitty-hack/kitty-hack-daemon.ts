@@ -1,12 +1,12 @@
 import {KITTY_HACK_CONFIG} from '/kitty-hack/kitty-hack-config';
-import {LogNsAdapter} from '/resources/helpers';
+import {Log} from '/resources/helpers';
 import {KittyHackAdapter} from '/kitty-hack/kitty-hack-adapters';
 
 export async function main(ns) {
     ns.disableLog('ALL');
     
     const nsA = new KittyHackAdapter(ns);
-    const logA = new LogNsAdapter(ns);
+    const logA = new Log(ns);
     
     //noinspection InfiniteLoopJS
     while (true) {

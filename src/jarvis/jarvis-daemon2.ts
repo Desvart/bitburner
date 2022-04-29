@@ -113,15 +113,15 @@ class Jarvis {
     }
     
     async releaseDaemon(daemonName: string, hostnames: string | string[]): Promise<boolean> {
-        const file = `/${daemonName}/${daemonName}-install.js`;
+        const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js'];
         if (typeof hostnames === 'string')
             hostnames = [hostnames];
         
         let globalStatus = true;
         for (const hostname of hostnames) {
             
-            const scpStatus = await this.ns.scp(file, hostname);
-            const execStatus = this.ns.exec(file, hostname, 1);
+            const scpStatus = await this.ns.scp(files, hostname);
+            const execStatus = this.ns.exec(files[0], hostname, 1);
             
             if (scpStatus === true && execStatus > 0) {
                 this.log.success(`JARVIS - ${daemonName} installer successfully uploaded on ${hostname}`);

@@ -8,13 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { KITTY_HACK_CONFIG } from '/kitty-hack/kitty-hack-config';
-import { LogNsAdapter } from '/resources/helpers';
+import { Log } from '/resources/helpers';
 import { KittyHackAdapter } from '/kitty-hack/kitty-hack-adapters';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.disableLog('ALL');
         const nsA = new KittyHackAdapter(ns);
-        const logA = new LogNsAdapter(ns);
+        const logA = new Log(ns);
         //noinspection InfiniteLoopJS
         while (true) {
             const hostState = {
