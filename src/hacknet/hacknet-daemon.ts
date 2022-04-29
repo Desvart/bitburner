@@ -1,5 +1,9 @@
 import {INs, Log} from '/resources/helpers';
 
+// FIXME: Check why daemon buys new node even it they are more expensive at startup
+// TODO: Add cost in each buy step log
+// TODO: Close install window if everything went well
+
 const CONFIG: {
     HARVEST_RATIO: number,
     CYCLE_TIME: number,
