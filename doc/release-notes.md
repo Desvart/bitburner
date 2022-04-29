@@ -1,3 +1,11 @@
+# Release 3.0.0
+Fully refactor code in TypeScript.
+* Jarvis fully refactored in its logic.
+* Implementation of an "install" logic for packages around Jarvis.
+* All modules are fully independent
+* Hacknet fully refactored to highly reduce messy code
+* All other package are not non functional and need to be refactored, at least to be integrated with the new install logic
+
 # Release 2.2.0
 
 ### Sherlock module
