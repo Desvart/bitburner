@@ -7,9 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { KITTY_HACK_CONFIG } from '/kitty-hack/kitty-hack-config';
+import { KITTY_HACK_CONFIG } from '/kittyhack/kitty-hack-config';
 import { Log } from '/resources/helpers';
-import { KittyHackAdapter } from '/kitty-hack/kitty-hack-adapters';
+import { KittyHackAdapter } from '/kittyhack/kitty-hack-adapters';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         ns.disableLog('ALL');
