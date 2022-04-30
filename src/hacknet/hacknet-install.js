@@ -53,7 +53,14 @@ class Install {
     }
     launchDaemon() {
         const daemonFile = `/${this.packageName}/${this.packageName}-daemon.js`;
+        this.closeTail();
         this.ns.spawn(daemonFile, 1);
+    }
+    closeTail() {
+        const doc = eval('document');
+        const installFile = `/${this.packageName}/${this.packageName}-install.js`;
+        let xpath = `//h6[text()='${installFile} ']/parent::*//button[text()='Close']`;
+        doc.evaluate(xpath, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
     }
 }
 //# sourceMappingURL=hacknet-install.js.map
