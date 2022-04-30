@@ -30,7 +30,7 @@ export function main(ns) {
             hacknet.upgrade(upgrade);
             upgrade = hacknet.identifyCheapestUpgrade();
             if (upgrade.component === Component.Node) {
-                const msg = `HACKNET_DAEMON - Next upgrade: New node ${upgrade.nodeId} in ${upgrade.waitTimeBeforeNextUpgrade} s.`;
+                const msg = `HACKNET_DAEMON - Next upgrade: New node ${upgrade.nodeId} in ${upgrade.waitTimeBeforeNextUpgrade} s for ${log.formatMoney(upgrade.cost)}.`;
                 log.info(msg);
             }
             else {
@@ -46,7 +46,7 @@ export function main(ns) {
                         componentUpgrade = ns.hacknet.getNodeStats(upgrade.nodeId).cores + 1;
                         break;
                 }
-                const msg = `HACKNET_DAEMON - Next upgrade: Node ${upgrade.nodeId} - ${Component[upgrade.component]} -> ${componentUpgrade} in ${upgrade.waitTimeBeforeNextUpgrade} s.`;
+                const msg = `HACKNET_DAEMON - Next upgrade: Node ${upgrade.nodeId} - ${Component[upgrade.component]} -> ${componentUpgrade} in ${upgrade.waitTimeBeforeNextUpgrade} s for ${log.formatMoney(upgrade.cost)}.`;
                 log.info(msg);
             }
             yield waitForNextUpgrade(ns, upgrade.waitTimeBeforeNextUpgrade * 1000);
@@ -81,18 +81,11 @@ class Hacknet {
         const coreUpgradeCostList = nodeList.map(n => ns.hacknet.getCoreUpgradeCost(n, 1));
         const upgradeCostList = [levelUpgradeCostList, ramUpgradeCostList, coreUpgradeCostList];
         const [componentId, nodeId, cost] = indexOfSmallest(upgradeCostList);
-        let comp;
-        if (componentId === 0)
-            comp = Component.Level;
-        if (componentId === 1)
-            comp = Component.Ram;
-        if (componentId === 2)
-            comp = Component.Core;
-        return new Upgrade(nodeId, comp, cost, this.getProductionRate());
+        return new Upgrade(nodeId, componentId + 1, cost, this.getProductionRate());
         function indexOfSmallest(costArray) {
             let lowestC = 0;
             let lowestI = 0;
-            for (let c = 0; c < 2; c++)
+            for (let c = 0; c <= 2; c++)
                 for (let i = 0; i < costArray[0].length; i++)
                     if (costArray[c][i] < costArray[lowestC][lowestI]) {
                         lowestC = c;
