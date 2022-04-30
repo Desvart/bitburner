@@ -1,9 +1,5 @@
 import {INs, Log} from '/resources/helpers';
 
-// FIXME: Check why daemon buys new node even it they are more expensive at startup
-// TODO: Add cost in each buy step log
-// TODO: Close install window if everything went well
-
 const CONFIG: {
     HARVEST_RATIO: number,
     CYCLE_TIME: number,
@@ -32,7 +28,7 @@ export async function main(ns: INs) {
         upgrade = hacknet.identifyCheapestUpgrade();
         
         if (upgrade.component === Component.Node) {
-            const msg = `HACKNET_DAEMON - Next upgrade: New node ${upgrade.nodeId} in ${upgrade.waitTimeBeforeNextUpgrade} s.`;
+            const msg = `HACKNET_DAEMON - Next upgrade: New node ${upgrade.nodeId} in ${upgrade.waitTimeBeforeNextUpgrade} s for ${log.formatMoney(upgrade.cost)}.`;
             log.info(msg);
         } else {
             let componentUpgrade: number = 0;
@@ -47,7 +43,7 @@ export async function main(ns: INs) {
                     componentUpgrade = ns.hacknet.getNodeStats(upgrade.nodeId).cores + 1;
                     break;
             }
-            const msg = `HACKNET_DAEMON - Next upgrade: Node ${upgrade.nodeId} - ${Component[upgrade.component]} -> ${componentUpgrade} in ${upgrade.waitTimeBeforeNextUpgrade} s.`;
+            const msg = `HACKNET_DAEMON - Next upgrade: Node ${upgrade.nodeId} - ${Component[upgrade.component]} -> ${componentUpgrade} in ${upgrade.waitTimeBeforeNextUpgrade} s for ${log.formatMoney(upgrade.cost)}.`;
             log.info(msg);
         }
         
@@ -94,16 +90,12 @@ class Hacknet {
         
         const upgradeCostList: number[][] = [levelUpgradeCostList, ramUpgradeCostList, coreUpgradeCostList];
         const [componentId, nodeId, cost] = indexOfSmallest(upgradeCostList);
-        let comp: Component;
-        if (componentId === 0) comp = Component.Level;
-        if (componentId === 1) comp = Component.Ram;
-        if (componentId === 2) comp = Component.Core;
-        return new Upgrade(nodeId, comp, cost, this.getProductionRate());
+        return new Upgrade(nodeId, componentId + 1, cost, this.getProductionRate());
     
         function indexOfSmallest(costArray: number[][]): number[] {
             let lowestC = 0;
             let lowestI = 0;
-            for (let c = 0; c < 2; c++)
+            for (let c = 0; c <= 2; c++)
                 for (let i = 0; i < costArray[0].length; i++)
                     if (costArray[c][i] < costArray[lowestC][lowestI]) {
                         lowestC = c;
@@ -173,8 +165,7 @@ class Upgrade {
     
     private getWaitTimeBeforeToStartUpgrade(productionRate: number) {
         const timeToRoI = this.cost / productionRate; //s
-        let waitTimeBeforeNextUpgrade = Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); //s
-        return waitTimeBeforeNextUpgrade; // s
+        return Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); // s
     }
 }
 
