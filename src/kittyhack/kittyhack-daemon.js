@@ -7,41 +7,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { KITTY_HACK_CONFIG } from '/kittyhack/kitty-hack-config';
-import { Log } from '/resources/helpers';
-import { KittyHackAdapter } from '/kittyhack/kitty-hack-adapters';
+import { loadInitFile, Log } from '/resources/helpers';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
+        ns.tail();
         ns.disableLog('ALL');
-        const nsA = new KittyHackAdapter(ns);
-        const logA = new Log(ns);
+        ns.clearLog();
+        const staticValues = loadInitFile(ns, ns.args[0]);
+        const log = new Log(ns);
         //noinspection InfiniteLoopJS
         while (true) {
             const hostState = {
-                minSec: nsA.getServerMinSecurityLevel(KITTY_HACK_CONFIG.HOSTNAME),
-                actualSec: nsA.getServerSecurityLevel(KITTY_HACK_CONFIG.HOSTNAME),
-                maxMoney: nsA.getServerMaxMoney(KITTY_HACK_CONFIG.HOSTNAME),
-                availMoney: nsA.getServerMoneyAvailable(KITTY_HACK_CONFIG.HOSTNAME),
+                minSec: staticValues.minSec,
+                actualSec: ns.getServerSecurityLevel(staticValues.hostname),
+                maxMoney: staticValues.maxMoney,
+                availMoney: ns.getServerMoneyAvailable(staticValues.hostname),
             };
-            printHostState(logA, hostState);
+            printHostState(log, hostState);
             if (hostState.actualSec > hostState.minSec) {
-                logA.debug(`KITTY-HACK - Start weaken.`);
-                yield nsA.weaken(KITTY_HACK_CONFIG.HOSTNAME);
+                log.info(`KITTYHACK - Start weaken.`);
+                yield ns.weaken(staticValues.hostname);
             }
             else if (hostState.availMoney < hostState.maxMoney) {
-                logA.debug(`KITTY-HACK - Start grow.`);
-                yield nsA.grow(KITTY_HACK_CONFIG.HOSTNAME);
+                log.info(`KITTYHACK - Start grow.`);
+                yield ns.grow(staticValues.hostname);
             }
             else {
-                logA.debug(`KITTY-HACK - Start hack.`);
-                yield nsA.hack(KITTY_HACK_CONFIG.HOSTNAME);
+                log.info(`KITTYHACK - Start hack.`);
+                yield ns.hack(staticValues.hostname);
             }
         }
     });
 }
-function printHostState(logA, hostState) {
-    const secMsg = `Security: ${hostState.actualSec}/${hostState.minSec}`;
-    const monMsg = `Money: ${logA.formatMoney(hostState.availMoney)}/${logA.formatMoney(hostState.maxMoney)}`;
-    logA.debug(`KITTY-HACK - ${secMsg} - ${monMsg}`);
+function printHostState(log, hostState) {
+    const secMsg = `Security: ${log.formatNumber(hostState.actualSec)}/${hostState.minSec}`;
+    const monMsg = `Money: ${log.formatMoney(hostState.availMoney)}/${log.formatMoney(hostState.maxMoney)}`;
+    log.info(`KITTYHACK - ${secMsg} - ${monMsg}\n`);
 }
-//# sourceMappingURL=kitty-hack-daemon.js.map
+//# sourceMappingURL=kittyhack-daemon.js.map
