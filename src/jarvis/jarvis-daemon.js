@@ -12,7 +12,7 @@ import { Server } from '/jarvis/server';
 const CONFIG = {
     CYCLE_TIME: 12000,
     HACKNET_HOST: 'foodnstuff',
-    KITTYCAT_HOSTS: ['n00dles', 'foodnstuff'],
+    KITTYHACK_HOSTS: ['foodnstuff'],
     WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'harakiri-sushi'],
     SHERLOCK_HOST: 'hong-fang-tea',
     C2_HOST: 'joesguns',
@@ -24,12 +24,13 @@ export function main(ns) {
         ns.disableLog('ALL');
         ns.clearLog();
         const jarvis = new Jarvis(ns, new Log(ns));
+        jarvis.removePreviousFiles();
         jarvis.nukeWeakServers();
         if (!jarvis.isDaemonFullyDeployed('hacknet')) {
             yield jarvis.releaseDaemon('hacknet', CONFIG.HACKNET_HOST);
         }
-        if (!jarvis.isDaemonFullyDeployed('kittycat')) {
-            yield jarvis.releaseDaemon('kittycat', CONFIG.KITTYCAT_HOSTS);
+        if (!jarvis.isDaemonFullyDeployed('kittyhack')) {
+            yield jarvis.releaseDaemon('kittyhack', CONFIG.KITTYHACK_HOSTS);
         }
         while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
             yield jarvis.waitNCycles();
@@ -95,7 +96,7 @@ class Jarvis {
     }
     releaseDaemon(daemonName, hostnames) {
         return __awaiter(this, void 0, void 0, function* () {
-            const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js'];
+            const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js', '/resources/install.js'];
             if (typeof hostnames === 'string')
                 hostnames = [hostnames];
             let globalStatus = true;
@@ -129,6 +130,25 @@ class Jarvis {
     }
     isNetworkFullyOwned() {
         return !this.network.filter(n => n.isPotentialTarget).some(n => !n.hasRootAccess());
+    }
+    removePreviousFiles() {
+        for (const server of this.network) {
+            if (server.hostname === 'home')
+                continue;
+            const files = this.ns.ls(server.hostname);
+            if (files.length > 0)
+                this.log.info(`${server.hostname.toUpperCase()} - ${files.length} files detected:\n${files.join(', ')}`);
+            for (let file of files) {
+                if (file.includes('.js') || file.includes('-init.txt')) {
+                    if (this.ns.rm(file, server.hostname) === true) {
+                        this.log.info(`SUCCESS - File ${file} deleted.`);
+                    }
+                    else {
+                        this.log.info(`ERROR - Couldn't delete file ${file}.`);
+                    }
+                }
+            }
+        }
     }
 }
 //# sourceMappingURL=jarvis-daemon.js.map

@@ -4,7 +4,7 @@ import {Server} from '/jarvis/server';
 const CONFIG: {
     CYCLE_TIME: number,
     HACKNET_HOST: string,
-    KITTYCAT_HOSTS: string[],
+    KITTYHACK_HOSTS: string[],
     WORM_HOSTS: string[],
     SHERLOCK_HOST: string,
     C2_HOST: string,
@@ -12,7 +12,7 @@ const CONFIG: {
 } = {
     CYCLE_TIME: 12000, //60 * 1000, //ms
     HACKNET_HOST: 'foodnstuff',
-    KITTYCAT_HOSTS: ['n00dles', 'foodnstuff'],
+    KITTYHACK_HOSTS: ['foodnstuff'], // & 'n00dles' hidden inside kittyhack-install because of RAM limitation)
     WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'harakiri-sushi'],
     SHERLOCK_HOST: 'hong-fang-tea',
     C2_HOST: 'joesguns',
@@ -26,14 +26,15 @@ export async function main(ns: INs) {
     
     const jarvis = new Jarvis(ns, new Log(ns));
     
+    jarvis.removePreviousFiles();
     jarvis.nukeWeakServers();
     
     if (!jarvis.isDaemonFullyDeployed('hacknet')) {
         await jarvis.releaseDaemon('hacknet', CONFIG.HACKNET_HOST);
     }
     
-    if (!jarvis.isDaemonFullyDeployed('kittycat')) {
-        await jarvis.releaseDaemon('kittycat', CONFIG.KITTYCAT_HOSTS);
+    if (!jarvis.isDaemonFullyDeployed('kittyhack')) {
+        await jarvis.releaseDaemon('kittyhack', CONFIG.KITTYHACK_HOSTS);
     }
     
     while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
@@ -113,7 +114,7 @@ class Jarvis {
     }
     
     async releaseDaemon(daemonName: string, hostnames: string | string[]): Promise<boolean> {
-        const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js'];
+        const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js', '/resources/install.js'];
         if (typeof hostnames === 'string')
             hostnames = [hostnames];
         
@@ -151,5 +152,29 @@ class Jarvis {
     
     isNetworkFullyOwned(): boolean {
         return !this.network.filter(n => n.isPotentialTarget).some(n => !n.hasRootAccess());
+    }
+    
+    removePreviousFiles(): void {
+        
+        for (const server of this.network) {
+            
+            if (server.hostname === 'home')
+                continue;
+            
+            const files: string[] = this.ns.ls(server.hostname);
+            if (files.length > 0)
+                this.log.info(`${server.hostname.toUpperCase()} - ${files.length} files detected:\n${files.join(', ')}`);
+    
+            for (let file of files) {
+        
+                if (file.includes('.js') || file.includes('-init.txt')) {
+                    if (this.ns.rm(file, server.hostname) === true) {
+                        this.log.info(`SUCCESS - File ${file} deleted.`);
+                    } else {
+                        this.log.info(`ERROR - Couldn't delete file ${file}.`);
+                    }
+                }
+            }
+        }
     }
 }
