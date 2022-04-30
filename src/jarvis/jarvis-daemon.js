@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Log } from '/resources/helpers';
 import { Server } from '/jarvis/server';
 const CONFIG = {
-    CYCLE_TIME: 12000,
+    CYCLE_TIME: 2000,
     HACKNET_HOST: 'foodnstuff',
     KITTYHACK_HOSTS: ['foodnstuff'],
-    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'harakiri-sushi'],
-    SHERLOCK_HOST: 'hong-fang-tea',
+    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'hong-fang-tea'],
+    SHERLOCK_HOST: 'harakiri-sushi',
     C2_HOST: 'joesguns',
     WOLFSTREET_HOST: '?',
 };
@@ -23,7 +23,8 @@ export function main(ns) {
         ns.tail();
         ns.disableLog('ALL');
         ns.clearLog();
-        const jarvis = new Jarvis(ns, new Log(ns));
+        const log = new Log(ns);
+        const jarvis = new Jarvis(ns, log);
         jarvis.removePreviousFiles();
         jarvis.nukeWeakServers();
         if (!jarvis.isDaemonFullyDeployed('hacknet')) {
@@ -32,14 +33,15 @@ export function main(ns) {
         if (!jarvis.isDaemonFullyDeployed('kittyhack')) {
             yield jarvis.releaseDaemon('kittyhack', CONFIG.KITTYHACK_HOSTS);
         }
+        debugger;
         while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
             yield jarvis.waitNCycles();
             if (jarvis.isThereAServersOfGivenSizeToHack(16)) {
                 jarvis.nukeWeakServers();
-                if (!jarvis.isDaemonFullyDeployed('worm')) {
-                    yield jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
-                }
             }
+        }
+        if (!jarvis.isDaemonFullyDeployed('worm')) {
+            yield jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
         }
         if (!jarvis.isDaemonFullyDeployed('sherlock')) {
             yield jarvis.releaseDaemon('sherlock', CONFIG.SHERLOCK_HOST); //TODO split script in two less than 16 GB RAM
@@ -123,7 +125,7 @@ class Jarvis {
         });
     }
     areAllServersOfGivenSizeHacked(size) {
-        return !this.network.filter(n => n.ram === size).some(n => !n.hasRootAccess());
+        return !this.network.filter(n => n.ram === size && n.requiredHackingSkill < 50).some(n => !n.hasRootAccess());
     }
     isThereAServersOfGivenSizeToHack(size) {
         return this.network.filter(n => n.ram === size).some(n => n.isNukable());

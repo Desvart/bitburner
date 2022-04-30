@@ -70,6 +70,12 @@ export class Log {
         let hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
         return hour.toString() + ':' + min.toString() + ':' + sec.toString();
     }
+    
+    printHostState(malware, hostname, hostState): void {
+        const secMsg = `Security: ${this.formatNumber(hostState.actualSec)}/${hostState.minSec}`;
+        const monMsg = `Money: ${this.formatMoney(hostState.availMoney)}/${this.formatMoney(hostState.maxMoney)}`;
+        this.info(`${malware} ${hostname} - ${secMsg} - ${monMsg}\n`);
+    }
 }
 
 export function loadInitFile(ns: INs, hostname: string): any {
@@ -109,16 +115,21 @@ export interface INs {
     getServerSecurityLevel(hostname: string): number;
     getServerMaxMoney(hostname: string): number;
     getServerMoneyAvailable(hostname: string): number;
+    getServerMaxRam(hostname: string): number;
     
     hack(host: string, opts?: BasicHGWOptions): Promise<number>;
     weaken(host: string, opts?: BasicHGWOptions): Promise<number>;
     grow(host: string, opts?: BasicHGWOptions): Promise<number>;
+    getHackTime(host: string): number;
+    getWeakenTime(host: string): number;
+    getGrowTime(host: string): number;
     
     getHackingLevel(): number;
     
     ls(hostname: string, grep?: string): string[];
     fileExists(file: string, hostname: string): boolean;
     getScriptName(): string;
+    getScriptRam(file: string, hostname: string): number;
     getHostname(): string;
     
     brutessh(hostname: string): void;

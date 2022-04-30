@@ -58,6 +58,11 @@ export class Log {
         let hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
         return hour.toString() + ':' + min.toString() + ':' + sec.toString();
     }
+    printHostState(malware, hostname, hostState) {
+        const secMsg = `Security: ${this.formatNumber(hostState.actualSec)}/${hostState.minSec}`;
+        const monMsg = `Money: ${this.formatMoney(hostState.availMoney)}/${this.formatMoney(hostState.maxMoney)}`;
+        this.info(`${malware} ${hostname} - ${secMsg} - ${monMsg}\n`);
+    }
 }
 export function loadInitFile(ns, hostname) {
     const file = ns.ls(hostname, '-init.txt')[0];

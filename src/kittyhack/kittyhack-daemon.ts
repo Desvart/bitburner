@@ -16,7 +16,7 @@ export async function main(ns: INs) {
             maxMoney: staticValues.maxMoney,
             availMoney: ns.getServerMoneyAvailable(staticValues.hostname),
         };
-        printHostState(log, hostState);
+        log.printHostState('KITTYHACK', staticValues.hostname, hostState);
         
         if (hostState.actualSec > hostState.minSec) {
             log.info(`KITTYHACK - Start weaken.`);
@@ -31,10 +31,4 @@ export async function main(ns: INs) {
             await ns.hack(staticValues.hostname, { threads:  staticValues.numThreads });
         }
     }
-}
-
-function printHostState(log, hostState) {
-    const secMsg = `Security: ${log.formatNumber(hostState.actualSec)}/${hostState.minSec}`;
-    const monMsg = `Money: ${log.formatMoney(hostState.availMoney)}/${log.formatMoney(hostState.maxMoney)}`;
-    log.info(`KITTYHACK - ${secMsg} - ${monMsg}\n`);
 }

@@ -24,16 +24,26 @@ export class Install {
         return this.ns.ls('home', this.packageName + '-').filter(f => !f.includes('-install'));
     }
     
-    async downloadPackage(hostname: string = this.hostname): Promise<void> {
-        const scpStatus = await this.ns.scp(this.fullPackage, 'home', hostname);
+    protected identifyMalwaresToDownload(): string[] {
+        return this.ns.ls('home', 'malware-');
+    }
+    
+    async downloadPackage(hostname: string = this.hostname, packageName: string = this.packageName): Promise<void> {
         
-        const capPackageName = this.packageName.toUpperCase();
+        let fullPackage = this.fullPackage;
+        if (packageName === 'malwares') {
+            // noinspection JSPotentiallyInvalidUsageOfClassThis
+            fullPackage = this.identifyMalwaresToDownload();
+        }
+        const scpStatus = await this.ns.scp(fullPackage, 'home', hostname);
+        
+        const capPackageName = packageName.toUpperCase();
         if (scpStatus === true) {
-            const msg = `${capPackageName}-INSTALL - ${this.packageName} package successfully uploaded on ${hostname}`;
+            const msg = `${capPackageName}-INSTALL - ${packageName} package successfully uploaded on ${hostname}`;
             this.log.success(msg);
         } else {
             this.log.warn(
-                `${capPackageName}-INSTALL - Couldn't upload ${this.packageName} package on ${hostname}`);
+                `${capPackageName}-INSTALL - Couldn't upload ${packageName} package on ${hostname}`);
         }
     }
     

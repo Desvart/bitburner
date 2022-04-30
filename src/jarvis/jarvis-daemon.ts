@@ -10,11 +10,11 @@ const CONFIG: {
     C2_HOST: string,
     WOLFSTREET_HOST: string,
 } = {
-    CYCLE_TIME: 12000, //60 * 1000, //ms
+    CYCLE_TIME: 2000, //60 * 1000, //ms
     HACKNET_HOST: 'foodnstuff',
     KITTYHACK_HOSTS: ['foodnstuff'], // & 'n00dles' hidden inside kittyhack-install because of RAM limitation)
-    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'harakiri-sushi'],
-    SHERLOCK_HOST: 'hong-fang-tea',
+    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'hong-fang-tea'],
+    SHERLOCK_HOST: 'harakiri-sushi',
     C2_HOST: 'joesguns',
     WOLFSTREET_HOST: '?',
 };
@@ -24,7 +24,8 @@ export async function main(ns: INs) {
     ns.disableLog('ALL');
     ns.clearLog();
     
-    const jarvis = new Jarvis(ns, new Log(ns));
+    const log = new Log(ns);
+    const jarvis = new Jarvis(ns, log);
     
     jarvis.removePreviousFiles();
     jarvis.nukeWeakServers();
@@ -36,15 +37,15 @@ export async function main(ns: INs) {
     if (!jarvis.isDaemonFullyDeployed('kittyhack')) {
         await jarvis.releaseDaemon('kittyhack', CONFIG.KITTYHACK_HOSTS);
     }
-    
+    debugger
     while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
         await jarvis.waitNCycles();
         if (jarvis.isThereAServersOfGivenSizeToHack(16)) {
             jarvis.nukeWeakServers();
-            if (!jarvis.isDaemonFullyDeployed('worm')) {
-                await jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
-            }
         }
+    }
+    if (!jarvis.isDaemonFullyDeployed('worm')) {
+        await jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
     }
     
     if (!jarvis.isDaemonFullyDeployed('sherlock')) {
@@ -143,7 +144,7 @@ class Jarvis {
     }
     
     areAllServersOfGivenSizeHacked(size: number): boolean {
-        return !this.network.filter(n => n.ram === size).some(n => !n.hasRootAccess());
+        return !this.network.filter(n => n.ram === size && n.requiredHackingSkill < 50).some(n => !n.hasRootAccess());
     }
     
     isThereAServersOfGivenSizeToHack(size: number): boolean {
