@@ -23,7 +23,7 @@ export function main(ns) {
         log.info(`HACKNET_DAEMON - Upgrade target: Node ${upgrade.nodeId} - ${Component[upgrade.component]} - Cost: ${log.formatMoney(upgrade.cost)}`);
         // noinspection InfiniteLoopJS
         while (true) {
-            yield waitToHaveEnoughMoney(ns, log, upgrade.cost);
+            yield hacknet.waitToHaveEnoughMoney(upgrade.cost);
             hacknet.upgrade(upgrade);
             upgrade = hacknet.identifyCheapestUpgrade();
             if (upgrade.component === Component.Node) {
@@ -131,6 +131,20 @@ class Hacknet {
         let productionList = this.getNodeIdList(this.ns.hacknet.numNodes()).map(i => this.ns.hacknet.getNodeStats(i).production);
         return productionList.reduce((prev, curr) => prev + curr, 0);
     }
+    waitToHaveEnoughMoney(cost) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const wealth = this.ns.getServerMoneyAvailable('home');
+            while (wealth <= cost) {
+                const wealthF = this.log.formatMoney(wealth);
+                const costF = this.log.formatMoney(cost);
+                // noinspection JSPotentiallyInvalidUsageOfClassThis
+                const timeToWait = (cost - wealth) / this.getProductionRate();
+                const msg = `HACKNET_DAEMON - Not enough money! Cost: ${costF}, available: ${wealthF}. Time to wait: ${this.log.formatDuration(timeToWait)}.`;
+                this.log.warn(msg);
+                yield this.ns.sleep(timeToWait);
+            }
+        });
+    }
 }
 class Upgrade {
     constructor(nodeId, component, cost, productionRate = 0) {
@@ -143,18 +157,6 @@ class Upgrade {
         const timeToRoI = this.cost / productionRate; //s
         return Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); // s
     }
-}
-function waitToHaveEnoughMoney(ns, log, cost) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const wealth = ns.getServerMoneyAvailable('home');
-        while (wealth <= cost) {
-            const wealthF = log.formatMoney(wealth);
-            const costF = log.formatMoney(cost);
-            const msg = `HACKNET_DAEMON - Not enough money! Cost: ${costF}, available: ${wealthF}`;
-            log.warn(msg);
-            yield ns.sleep(CONFIG.CYCLE_TIME);
-        }
-    });
 }
 function waitForNextUpgrade(ns, waitTimeBeforeNextUpgrade) {
     return __awaiter(this, void 0, void 0, function* () {

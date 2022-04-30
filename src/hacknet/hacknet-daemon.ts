@@ -22,7 +22,7 @@ export async function main(ns: INs) {
     
     // noinspection InfiniteLoopJS
     while (true) {
-        await waitToHaveEnoughMoney(ns, log, upgrade.cost);
+        await hacknet.waitToHaveEnoughMoney(upgrade.cost);
         
         hacknet.upgrade(upgrade);
         upgrade = hacknet.identifyCheapestUpgrade();
@@ -148,6 +148,22 @@ class Hacknet {
         let productionList = this.getNodeIdList(this.ns.hacknet.numNodes()).map(i => this.ns.hacknet.getNodeStats(i).production);
         return productionList.reduce((prev, curr) => prev + curr, 0);
     }
+    
+    async waitToHaveEnoughMoney(cost: number) {
+        const wealth: number = this.ns.getServerMoneyAvailable('home');
+        
+        while (wealth <= cost) {
+            const wealthF: string = this.log.formatMoney(wealth);
+            const costF: string = this.log.formatMoney(cost);
+    
+            // noinspection JSPotentiallyInvalidUsageOfClassThis
+            const timeToWait = (cost - wealth) / this.getProductionRate();
+            
+            const msg: string = `HACKNET_DAEMON - Not enough money! Cost: ${costF}, available: ${wealthF}. Time to wait: ${this.log.formatDuration(timeToWait)}.`;
+            this.log.warn(msg);
+            await this.ns.sleep(timeToWait);
+        }
+    }
 }
 
 class Upgrade {
@@ -166,18 +182,6 @@ class Upgrade {
     private getWaitTimeBeforeToStartUpgrade(productionRate: number) {
         const timeToRoI = this.cost / productionRate; //s
         return Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); // s
-    }
-}
-
-async function waitToHaveEnoughMoney(ns: INs, log: Log, cost: number) {
-    const wealth: number = ns.getServerMoneyAvailable('home');
-    
-    while (wealth <= cost) {
-        const wealthF: string = log.formatMoney(wealth);
-        const costF: string = log.formatMoney(cost);
-        const msg: string = `HACKNET_DAEMON - Not enough money! Cost: ${costF}, available: ${wealthF}`;
-        log.warn(msg);
-        await ns.sleep(CONFIG.CYCLE_TIME);
     }
 }
 
