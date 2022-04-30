@@ -46,6 +46,9 @@ export class Log {
         console.error(`${timestamp} ${msg}`);
         throw (`${timestamp} ${msg}`);
     }
+    formatNumber(num) {
+        return this.ns.nFormat(num, '0.00 a');
+    }
     formatMoney(num) {
         return this.ns.nFormat(num, '0.00 a$');
     }
@@ -55,5 +58,9 @@ export class Log {
         let hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
         return hour.toString() + ':' + min.toString() + ':' + sec.toString();
     }
+}
+export function loadInitFile(ns, hostname) {
+    const file = ns.ls(hostname, '-init.txt')[0];
+    return JSON.parse(ns.read(file));
 }
 //# sourceMappingURL=helpers.js.map

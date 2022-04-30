@@ -56,7 +56,11 @@ export class Log {
         throw(`${timestamp} ${msg}`);
     }
     
-    formatMoney(num) {
+    formatNumber(num: number): string {
+        return this.ns.nFormat(num, '0.00 a');
+    }
+    
+    formatMoney(num: number): string {
         return this.ns.nFormat(num, '0.00 a$');
     }
     
@@ -66,6 +70,11 @@ export class Log {
         let hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
         return hour.toString() + ':' + min.toString() + ':' + sec.toString();
     }
+}
+
+export function loadInitFile(ns: INs, hostname: string): any {
+    const file: string = ns.ls(hostname, '-init.txt')[0];
+    return JSON.parse(ns.read(file));
 }
 
 export interface INs {
@@ -78,13 +87,16 @@ export interface INs {
     
     scp(files: string|string[], targetName: string): Promise<boolean>;
     scp(files: string|string[], sourceName: string, targetName: string): Promise<boolean>;
-    exec(script: string, hostname: string, numThread: number, args?: Array<string | number | boolean>): number;
-    spawn(script: string, numThread: number, args?: Array<string|number|boolean>): void;
+    exec(script: string, host: string, numThreads?: number, ...args: Array<string | number | boolean>): number;
+    spawn(script: string, numThreads?: number, ...args: string[]): void;
     ps(hostname: string): IProcess[];
     
     tail(): void;
     disableLog(logToDisable: string): void;
     clearLog(): void;
+    write(file: string, data?: string[] | number | string, mode?: "w" | "a"): Promise<void>;
+    read(file: string): any;
+    rm(name: string, host?: string): boolean;
     
     getServerMoneyAvailable(hostname: string): number;
     
@@ -93,9 +105,18 @@ export interface INs {
     nuke(hostname: string): void;
     scan(hostname: string): string[];
     
+    getServerMinSecurityLevel(hostname: string): number;
+    getServerSecurityLevel(hostname: string): number;
+    getServerMaxMoney(hostname: string): number;
+    getServerMoneyAvailable(hostname: string): number;
+    
+    hack(host: string, opts?: BasicHGWOptions): Promise<number>;
+    weaken(host: string, opts?: BasicHGWOptions): Promise<number>;
+    grow(host: string, opts?: BasicHGWOptions): Promise<number>;
+    
     getHackingLevel(): number;
     
-    ls(hostname: string, grep: string): string[];
+    ls(hostname: string, grep?: string): string[];
     fileExists(file: string, hostname: string): boolean;
     getScriptName(): string;
     getHostname(): string;
@@ -166,4 +187,9 @@ export interface NodeStats {
     ramUsed:	number;
     timeOnline:	number;
     totalProduction:	number;
+}
+
+export interface BasicHGWOptions {
+    stock?:	boolean;
+    threads?:	number;
 }
