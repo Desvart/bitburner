@@ -1,9 +1,5 @@
 import {INs, Log} from '/resources/helpers';
 
-// FIXME: Check why daemon buys new node even it they are more expensive at startup
-// TODO: Add cost in each buy step log
-// TODO: Close install window if everything went well
-
 const CONFIG: {
     HARVEST_RATIO: number,
     CYCLE_TIME: number,
@@ -169,8 +165,7 @@ class Upgrade {
     
     private getWaitTimeBeforeToStartUpgrade(productionRate: number) {
         const timeToRoI = this.cost / productionRate; //s
-        let waitTimeBeforeNextUpgrade = Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); //s
-        return waitTimeBeforeNextUpgrade; // s
+        return Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); // s
     }
 }
 

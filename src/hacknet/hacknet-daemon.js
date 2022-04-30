@@ -8,9 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Log } from '/resources/helpers';
-// FIXME: Check why daemon buys new node even it they are more expensive at startup
-// TODO: Add cost in each buy step log
-// TODO: Close install window if everything went well
 const CONFIG = {
     HARVEST_RATIO: 50 / 100,
     CYCLE_TIME: 2000, //ms
@@ -144,8 +141,7 @@ class Upgrade {
     }
     getWaitTimeBeforeToStartUpgrade(productionRate) {
         const timeToRoI = this.cost / productionRate; //s
-        let waitTimeBeforeNextUpgrade = Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); //s
-        return waitTimeBeforeNextUpgrade; // s
+        return Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); // s
     }
 }
 function waitToHaveEnoughMoney(ns, log, cost) {
