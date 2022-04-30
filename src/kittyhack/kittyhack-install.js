@@ -22,21 +22,22 @@ export function main(ns) {
         yield install.precomputeStaticValues(secondaryTarget);
         install.launchDaemon(secondaryTarget);
         yield install.downloadPackage();
-        yield install.precomputeStaticValues();
-        install.launchDaemon();
+        yield install.precomputeStaticValues(install.hostname, 4);
+        install.launchDaemon(install.hostname, 4);
     });
 }
 class InstallKittyHack extends Install {
     constructor(ns, log) {
         super(ns, log);
     }
-    precomputeStaticValues(hostname = this.hostname) {
+    precomputeStaticValues(hostname = this.hostname, numThreads = 1) {
         return __awaiter(this, void 0, void 0, function* () {
             const staticValues = {
                 packageName: this.packageName,
                 hostname: hostname,
                 minSec: this.ns.getServerMinSecurityLevel(hostname),
                 maxMoney: this.ns.getServerMaxMoney(hostname),
+                numThreads: numThreads,
             };
             const initFile = `/${this.packageName}/${this.packageName}-init.txt`;
             yield this.ns.write(initFile, JSON.stringify(staticValues), 'w');

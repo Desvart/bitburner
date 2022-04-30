@@ -3,7 +3,7 @@ import {INs, Log} from '/resources/helpers';
 export class Install {
     protected readonly ns: INs;
     protected readonly log: Log;
-    protected readonly hostname: string;
+    readonly hostname: string;
     protected readonly packageName: string;
     protected readonly fullPackage: string[];
     
@@ -41,14 +41,14 @@ export class Install {
         return undefined;
     }
     
-    launchDaemon(hostname: string = this.hostname): void {
+    launchDaemon(hostname: string = this.hostname, numThreads: number = 1): void {
         const daemonFile = `/${this.packageName}/${this.packageName}-daemon.js`;
         
         if (hostname === this.hostname) {
             this.closeTail();
-            this.ns.spawn(daemonFile, 1, this.hostname);
+            this.ns.spawn(daemonFile, numThreads, this.hostname);
         } else {
-            this.ns.exec(daemonFile, hostname, 1, hostname);
+            this.ns.exec(daemonFile, hostname, numThreads, hostname);
         }
     }
     

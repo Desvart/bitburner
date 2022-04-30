@@ -20,15 +20,15 @@ export async function main(ns: INs) {
         
         if (hostState.actualSec > hostState.minSec) {
             log.info(`KITTYHACK - Start weaken.`);
-            await ns.weaken(staticValues.hostname);
+            await ns.weaken(staticValues.hostname, { threads:  staticValues.numThreads });
             
         } else if (hostState.availMoney < hostState.maxMoney) {
             log.info(`KITTYHACK - Start grow.`);
-            await ns.grow(staticValues.hostname);
+            await ns.grow(staticValues.hostname, { threads:  staticValues.numThreads });
             
         } else {
             log.info(`KITTYHACK - Start hack.`);
-            await ns.hack(staticValues.hostname);
+            await ns.hack(staticValues.hostname, { threads:  staticValues.numThreads });
         }
     }
 }

@@ -26,15 +26,15 @@ export function main(ns) {
             printHostState(log, hostState);
             if (hostState.actualSec > hostState.minSec) {
                 log.info(`KITTYHACK - Start weaken.`);
-                yield ns.weaken(staticValues.hostname);
+                yield ns.weaken(staticValues.hostname, { threads: staticValues.numThreads });
             }
             else if (hostState.availMoney < hostState.maxMoney) {
                 log.info(`KITTYHACK - Start grow.`);
-                yield ns.grow(staticValues.hostname);
+                yield ns.grow(staticValues.hostname, { threads: staticValues.numThreads });
             }
             else {
                 log.info(`KITTYHACK - Start hack.`);
-                yield ns.hack(staticValues.hostname);
+                yield ns.hack(staticValues.hostname, { threads: staticValues.numThreads });
             }
         }
     });
