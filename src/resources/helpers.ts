@@ -96,6 +96,8 @@ export interface INs {
     exec(script: string, host: string, numThreads?: number, ...args: Array<string | number | boolean>): number;
     spawn(script: string, numThreads?: number, ...args: string[]): void;
     ps(hostname: string): IProcess[];
+    killall(hostname: string): boolean;
+    exit(): void;
     
     tail(): void;
     disableLog(logToDisable: string): void;
@@ -151,6 +153,12 @@ export interface INs {
         upgradeRam(nodeId: number, upgradeQty: number): void;
         upgradeCore(nodeId: number, upgradeQty: number): void;
     }
+    
+    codingcontract: {
+        attempt(answer: string[] | number, filename: string, host?: string, opts?: CodingAttemptOptions): boolean | string;
+        getContractType(filename: string, host?: string): string;
+        getData(filename: string, host?: string): any;
+    }
 }
 
 export interface INsServer {
@@ -203,4 +211,8 @@ export interface NodeStats {
 export interface BasicHGWOptions {
     stock?:	boolean;
     threads?:	number;
+}
+
+export interface CodingAttemptOptions {
+    returnReward: boolean;
 }

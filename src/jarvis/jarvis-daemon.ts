@@ -13,10 +13,10 @@ const CONFIG: {
     CYCLE_TIME: 2000, //60 * 1000, //ms
     HACKNET_HOST: 'foodnstuff',
     KITTYHACK_HOSTS: ['foodnstuff'], // & 'n00dles' hidden inside kittyhack-install because of RAM limitation)
-    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'hong-fang-tea'],
-    SHERLOCK_HOST: 'harakiri-sushi',
-    C2_HOST: 'joesguns',
-    WOLFSTREET_HOST: '?',
+    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'hong-fang-tea', 'joesguns'],
+    SHERLOCK_HOST: 'zer0',
+    C2_HOST: 'harakiri-sushi',
+    WOLFSTREET_HOST: 'iron-gym',
 };
 
 export async function main(ns: INs) {
@@ -27,7 +27,10 @@ export async function main(ns: INs) {
     const log = new Log(ns);
     const jarvis = new Jarvis(ns, log);
     
-    jarvis.removePreviousFiles();
+    if (ns.args[0] === 'reset') {
+        jarvis.killAllScript();
+        jarvis.removePreviousFiles();
+    }
     jarvis.nukeWeakServers();
     
     if (!jarvis.isDaemonFullyDeployed('hacknet')) {
@@ -37,7 +40,7 @@ export async function main(ns: INs) {
     if (!jarvis.isDaemonFullyDeployed('kittyhack')) {
         await jarvis.releaseDaemon('kittyhack', CONFIG.KITTYHACK_HOSTS);
     }
-    debugger
+    
     while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
         await jarvis.waitNCycles();
         if (jarvis.isThereAServersOfGivenSizeToHack(16)) {
@@ -48,29 +51,29 @@ export async function main(ns: INs) {
         await jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
     }
     
+    while (!jarvis.areAllServersOfGivenSizeHacked(32)) {
+        await jarvis.waitNCycles(5);
+        if (jarvis.isThereAServersOfGivenSizeToHack(32)) {
+            jarvis.nukeWeakServers();
+        }
+    }
+    
     if (!jarvis.isDaemonFullyDeployed('sherlock')) {
-        await jarvis.releaseDaemon('sherlock', CONFIG.SHERLOCK_HOST); //TODO split script in two less than 16 GB RAM
+        await jarvis.releaseDaemon('sherlock', CONFIG.SHERLOCK_HOST);
     }
     
     if (!jarvis.isDaemonFullyDeployed('c2')) {
         await jarvis.releaseDaemon('C2', CONFIG.C2_HOST);
     }
     
-    while (!jarvis.areAllServersOfGivenSizeHacked(32)) {
-        await jarvis.waitNCycles(5);
-        if (jarvis.isThereAServersOfGivenSizeToHack(32)) {
-            jarvis.nukeWeakServers();
-            if (jarvis.isDaemonFullyDeployed('wolfstreet')) {
-                await jarvis.releaseDaemon('wolfstreet', CONFIG.WOLFSTREET_HOST);
-            }
-        }
+    if (jarvis.isDaemonFullyDeployed('wolfstreet')) {
+        await jarvis.releaseDaemon('wolfstreet', CONFIG.WOLFSTREET_HOST);
     }
     
     while (!jarvis.isNetworkFullyOwned()) {
         await jarvis.waitNCycles();
         jarvis.nukeWeakServers();
     }
-    
 }
 
 class Jarvis {
@@ -155,8 +158,17 @@ class Jarvis {
         return !this.network.filter(n => n.isPotentialTarget).some(n => !n.hasRootAccess());
     }
     
+    killAllScript() {
+        for (const server of this.network) {
+    
+            if (server.hostname === 'home')
+                continue;
+            
+            this.ns.killall(server.hostname);
+        }
+    }
+    
     removePreviousFiles(): void {
-        
         for (const server of this.network) {
             
             if (server.hostname === 'home')
