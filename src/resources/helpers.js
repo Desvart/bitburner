@@ -24,7 +24,8 @@ export class Log {
         this.ns.print(`${timestamp} SUCCESS - ${msg}`);
         const style = 'color: #00FF08; font-size: 12px; padding: 5px;';
         console.info(`${timestamp} %c${msg}`, style);
-        this.ns.toast(`${msg}`, 'success', duration);
+        if (typeof duration !== 'boolean')
+            this.ns.toast(`${msg}`, 'success', duration);
     }
     debug(msg, toggle = true) {
         if (toggle === true) {
@@ -53,9 +54,10 @@ export class Log {
         return this.ns.nFormat(num, '0.00 a$');
     }
     formatDuration(num) {
-        let sec = Math.trunc(num / 1000) % 60;
-        let min = Math.trunc((num - sec) / 60) % 60;
-        let hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
+        num = num / 1000;
+        const sec = Math.trunc(num) % 60;
+        const min = Math.trunc((num - sec) / 60) % 60;
+        const hour = Math.trunc((num - (min * 60) - sec) / (60 * 2));
         return hour.toString() + ':' + min.toString() + ':' + sec.toString();
     }
     printHostState(malware, hostname, hostState) {
@@ -64,8 +66,14 @@ export class Log {
         this.info(`${malware} ${hostname} - ${secMsg} - ${monMsg}\n`);
     }
 }
-export function loadInitFile(ns, hostname) {
-    const file = ns.ls(hostname, '-init.txt')[0];
+export function loadNetwork(ns, hostname) {
+    const file = ns.ls(hostname, 'network')[0];
+    return JSON.parse(ns.read(file));
+}
+export function loadInitFile(ns, hostname, target = '') {
+    if (target !== '')
+        target = '-' + target;
+    const file = ns.ls(hostname, `-init${target}.txt`)[0];
     return JSON.parse(ns.read(file));
 }
 //# sourceMappingURL=helpers.js.map
