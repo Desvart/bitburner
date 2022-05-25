@@ -1,11 +1,9 @@
 import {INs} from '/resources/helpers';
-import {getService, ServiceName} from '/resources/service';
-import {Deployer} from '/resources/deployer';
 
 export async function main(ns) {
-    ns.tail();
+    /*ns.tail();
     ns.disableLog('ALL');
-    ns.clearLog();
+    ns.clearLog();*/
     
     await new ServiceStatus(ns).start();
 }
@@ -15,7 +13,7 @@ class ServiceStatus {
     private headerHook: any;
     private valueHook: any;
     private running: boolean;
-    private deployer: Deployer;
+    private network: string[];
     
     constructor(private ns: INs) {
         
@@ -24,6 +22,7 @@ class ServiceStatus {
         const doc = eval('document');
         this.headerHook = doc.getElementById('overview-extra-hook-0');
         this.valueHook = doc.getElementById('overview-extra-hook-1');
+        this.network = this.retrieveNetwork();
     }
     
     async start() {
@@ -38,19 +37,14 @@ class ServiceStatus {
             }
             await this.ns.asleep(1000);
         }
-        
         this.tearDown();
     }
     
     async getAllServiceStatus(): Promise<Map<string, string>> {
         let serviceStatusMap = new Map<string, string>();
         for (const serviceFile of this.getServiceList()) {
-            
             const serviceName: string = this.getServiceNameFromServiceFile(serviceFile);
-    
-            this.deployer = await getService<Deployer>(this.ns, ServiceName.Deployer);
-            const serviceStatus: boolean = this.deployer.checkIfScriptRunning(serviceFile);
-            
+            const serviceStatus: boolean = this.checkIfScriptRunning(serviceFile);
             serviceStatusMap.set(serviceName, serviceStatus ? '✅' : '🔴');
         }
         return serviceStatusMap;
@@ -62,8 +56,36 @@ class ServiceStatus {
     
     getServiceNameFromServiceFile(serviceFile): string {
         const regExp = /\/resources\/(.*)-service.js/;
-        const serviceName = regExp.exec(serviceFile)[1];
+        const serviceName = eval('regExp.exec(serviceFile)[1]');
         return serviceName.charAt(0).toUpperCase() + serviceName.slice(1);
+    }
+    
+    checkIfScriptRunning(serviceFile: string): boolean {
+        return this.network
+            .filter(hostname => this.ns.ps(hostname)
+                .filter(process => process.filename === serviceFile)
+                .length > 0)
+            .length > 0;
+    }
+    
+    private retrieveNetwork(): string[] {
+        let discoveredNodes: string[] = [];
+        let nodesToScan: string[] = ['home'];
+        let maxLoop = 999;
+        
+        while (nodesToScan.length > 0 && maxLoop-- > 0) {
+            
+            const nodeName: string = nodesToScan.pop();
+            const connectedNodeNames: string[] = this.ns.scan(nodeName);
+            
+            for (const connectedNodeName of connectedNodeNames)
+                if (!discoveredNodes.includes(connectedNodeName))
+                    nodesToScan.push(connectedNodeName);
+            
+            discoveredNodes.push(nodeName);
+        }
+        
+        return discoveredNodes;
     }
     
     tearDown() {
