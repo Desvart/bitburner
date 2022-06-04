@@ -8,15 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Log } from '/resources/helpers';
-import { Server } from '/jarvis/server';
+import { getService, ServiceName } from '/resources/service';
 const CONFIG = {
-    CYCLE_TIME: 2000,
-    HACKNET_HOST: 'foodnstuff',
-    KITTYHACK_HOSTS: ['foodnstuff'],
-    WORM_HOSTS: ['nectar-net', 'sigma-cosmetics', 'hong-fang-tea', 'joesguns'],
-    SHERLOCK_HOST: 'zer0',
-    C2_HOST: 'harakiri-sushi',
-    WOLFSTREET_HOST: 'iron-gym',
+    CYCLE_TIME: 2000, //60 * 1000, //ms
 };
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -26,43 +20,26 @@ export function main(ns) {
         const log = new Log(ns);
         const jarvis = new Jarvis(ns, log);
         if (ns.args[0] === 'reset') {
+            yield jarvis.startServices();
             jarvis.killAllScript();
             jarvis.removePreviousFiles();
         }
-        jarvis.nukeWeakServers();
-        if (!jarvis.isDaemonFullyDeployed('hacknet')) {
-            yield jarvis.releaseDaemon('hacknet', CONFIG.HACKNET_HOST);
-        }
-        if (!jarvis.isDaemonFullyDeployed('kittyhack')) {
-            yield jarvis.releaseDaemon('kittyhack', CONFIG.KITTYHACK_HOSTS);
-        }
-        while (!jarvis.areAllServersOfGivenSizeHacked(16)) {
-            yield jarvis.waitNCycles();
-            if (jarvis.isThereAServersOfGivenSizeToHack(16)) {
-                jarvis.nukeWeakServers();
+        yield jarvis.startServices();
+        while (!jarvis.areAllDaemonsRunning()) {
+            jarvis.nukeServers();
+            if (!jarvis.isDaemonRunning('hacknet')) {
+                yield jarvis.startDaemon('hacknet');
             }
-        }
-        if (!jarvis.isDaemonFullyDeployed('worm')) {
-            yield jarvis.releaseDaemon('worm', CONFIG.WORM_HOSTS);
-        }
-        while (!jarvis.areAllServersOfGivenSizeHacked(32)) {
-            yield jarvis.waitNCycles(5);
-            if (jarvis.isThereAServersOfGivenSizeToHack(32)) {
-                jarvis.nukeWeakServers();
+            if (!jarvis.isDaemonRunning('shiva')) {
+                yield jarvis.startDaemon('shiva');
             }
-        }
-        if (!jarvis.isDaemonFullyDeployed('sherlock')) {
-            yield jarvis.releaseDaemon('sherlock', CONFIG.SHERLOCK_HOST);
-        }
-        if (!jarvis.isDaemonFullyDeployed('c2')) {
-            yield jarvis.releaseDaemon('C2', CONFIG.C2_HOST);
-        }
-        if (jarvis.isDaemonFullyDeployed('wolfstreet')) {
-            yield jarvis.releaseDaemon('wolfstreet', CONFIG.WOLFSTREET_HOST);
-        }
-        while (!jarvis.isNetworkFullyOwned()) {
+            if (!jarvis.isDaemonRunning('sherlock')) {
+                yield jarvis.startDaemon('sherlock');
+            }
+            if (jarvis.isDaemonRunning('wolfstreet')) {
+                yield jarvis.startDaemon('wolfstreet');
+            }
             yield jarvis.waitNCycles();
-            jarvis.nukeWeakServers();
         }
     });
 }
@@ -70,55 +47,50 @@ class Jarvis {
     constructor(ns, log) {
         this.ns = ns;
         this.log = log;
-        this.network = this.retrieveNetwork();
     }
-    retrieveNetwork() {
-        let discoveredNodes = [];
-        let nodesToScan = ['home'];
-        let loopProtection = 999;
-        while (nodesToScan.length > 0 && loopProtection-- > 0) {
-            const nodeName = nodesToScan.pop();
-            const connectedNodeNames = this.ns.scan(nodeName);
-            for (const connectedNodeName of connectedNodeNames) {
-                if (!discoveredNodes.map(n => n.hostname).includes(connectedNodeName)) {
-                    nodesToScan.push(connectedNodeName);
-                }
-            }
-            discoveredNodes.push(new Server(this.ns, this.log, nodeName));
-        }
-        return discoveredNodes;
+    startServices() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.ns.exec('/resources/serviceStatus-daemon.js', 'home');
+            this.ns.exec('/resources/network-service.js', 'home');
+            yield this.ns.sleep(500);
+            this.ns.exec('/resources/deployer-service.js', 'home');
+            yield this.ns.sleep(500);
+            this.deployer = getService(this.ns, ServiceName.Deployer);
+            this.network = getService(this.ns, ServiceName.Network);
+        });
     }
-    nukeWeakServers() {
-        this.network.filter(n => n.isNukable()).forEach(n => n.nuke());
+    nukeServers() {
+        this.network.servers.filter(n => n.canBeNuked()).forEach(n => n.nuke());
     }
-    isDaemonFullyDeployed(daemonName) {
+    isDaemonRunning(daemonName) {
         let allProcessesName = [];
-        for (const server of this.network) {
+        for (const server of this.network.servers) {
             allProcessesName.push(...this.ns.ps(server.hostname).map(p => p.filename));
         }
         return allProcessesName.filter(fileName => fileName.includes(daemonName + '-daemon')).length > 0;
     }
-    releaseDaemon(daemonName, hostnames) {
+    areAllDaemonsRunning() {
+        const daemonList = ['hacknet', 'shiva', 'sherlock', 'wolfstreet'];
+        return !daemonList.some(d => !this.isDaemonRunning(d));
+    }
+    startDaemon(daemonName) {
         return __awaiter(this, void 0, void 0, function* () {
-            const files = [`/${daemonName}/${daemonName}-install.js`, '/resources/helpers.js', '/resources/install.js'];
-            if (typeof hostnames === 'string')
-                hostnames = [hostnames];
-            let globalStatus = true;
-            for (const hostname of hostnames) {
-                const scpStatus = yield this.ns.scp(files, hostname);
-                const execStatus = this.ns.exec(files[0], hostname, 1);
-                if (scpStatus === true && execStatus > 0) {
-                    this.log.success(`JARVIS - ${daemonName} installer successfully uploaded on ${hostname}`);
-                }
-                else if (scpStatus === false || execStatus === 0) {
-                    this.log.warn(`JARVIS - Couldn't upload ${daemonName} installer on ${hostname}`);
-                    globalStatus = false;
-                }
-                else {
-                    globalStatus = false;
-                }
+            const files = this.ns.ls('home', daemonName);
+            let setupScript = '';
+            let setupRam = 0;
+            if (files.includes('-setup')) {
+                setupScript = `/${daemonName}/${daemonName}-setup.js`;
+                setupRam = this.ns.getScriptRam(setupScript, 'home');
             }
-            return globalStatus;
+            let daemonScript = `/${daemonName}/${daemonName}-daemon.js`;
+            let daemonRam = this.ns.getScriptRam(daemonScript, 'home');
+            let startingScript = setupScript || daemonScript;
+            const daemonJob = {
+                script: startingScript,
+                dependencies: files.filter(f => f !== startingScript),
+                scriptRam: Math.max(setupRam, daemonRam)
+            };
+            return yield this.deployer.deploy(daemonJob);
         });
     }
     waitNCycles(mult = 1) {
@@ -126,24 +98,15 @@ class Jarvis {
             yield this.ns.sleep(CONFIG.CYCLE_TIME * mult);
         });
     }
-    areAllServersOfGivenSizeHacked(size) {
-        return !this.network.filter(n => n.ram === size && n.requiredHackingSkill < 50).some(n => !n.hasRootAccess());
-    }
-    isThereAServersOfGivenSizeToHack(size) {
-        return this.network.filter(n => n.ram === size).some(n => n.isNukable());
-    }
-    isNetworkFullyOwned() {
-        return !this.network.filter(n => n.isPotentialTarget).some(n => !n.hasRootAccess());
-    }
     killAllScript() {
-        for (const server of this.network) {
+        for (const server of this.network.servers) {
             if (server.hostname === 'home')
                 continue;
             this.ns.killall(server.hostname);
         }
     }
     removePreviousFiles() {
-        for (const server of this.network) {
+        for (const server of this.network.servers) {
             if (server.hostname === 'home')
                 continue;
             const files = this.ns.ls(server.hostname);

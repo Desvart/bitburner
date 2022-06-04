@@ -17,12 +17,8 @@ const CONFIG: {
     SLEEP_DURATION: 100, // ms
 };
 
-export async function getService<ResultType>(ns: INs, serviceName: ServiceName): Promise<ResultType> {
+export function getService<ResultType>(ns: INs, serviceName: ServiceName): ResultType {
     const portHandle = ns.getPortHandle(serviceName);
-    let tries = CONFIG.MAX_RETRY;
-    while (portHandle.empty() && tries-- > 0) {
-        await ns.asleep(CONFIG.SLEEP_DURATION);
-    }
     return portHandle.empty() ? null : portHandle.peek();
 }
 
@@ -51,7 +47,7 @@ export class Service {
         this.log.info(`Service ${this.objectName} started on port ${this.portId}`);
     }
     
-    async run() {
+    async start() {
         this.operational = true;
         while (this.operational) {
             await this.ns.asleep(1000);

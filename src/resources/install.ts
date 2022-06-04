@@ -51,14 +51,14 @@ export class Install {
         return undefined;
     }
     
-    launchDaemon(hostname: string = this.hostname, numThreads: number = 1): void {
-        const daemonFile = `/${this.packageName}/${this.packageName}-daemon.js`;
+    launchDaemon(hostname: string = this.hostname, numThreads: number = 1, fileType: string = 'daemon', targetName: string = ''): void {
+        const daemonFile = `/${this.packageName}/${this.packageName}-${fileType}.js`;
         
         if (hostname === this.hostname) {
             this.closeTail();
-            this.ns.spawn(daemonFile, numThreads, this.hostname);
+            this.ns.spawn(daemonFile, numThreads, this.hostname, targetName);
         } else {
-            this.ns.exec(daemonFile, hostname, numThreads, hostname);
+            this.ns.exec(daemonFile, hostname, numThreads, hostname, targetName);
         }
     }
     

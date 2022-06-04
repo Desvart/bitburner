@@ -20,7 +20,8 @@ class InstallKittyHack extends Install {
     }
     
     async precomputeStaticValues(hostname: string = this.hostname): Promise<void> {
-        const [GROW_FILE, HACK_FILE, WEAKEN_FILE] = this.identifyMalwaresToDownload();
+        const [GROW_FILE, HACK_FILE, HACK_FILE2, WEAKEN_FILE] = this.identifyMalwaresToDownload();
+
         const freeRam = this.ns.getServerMaxRam(hostname) - this.ns.getScriptRam(`/${this.packageName}/${this.packageName}-daemon.js`, hostname);
         const hackRam = this.ns.getScriptRam(HACK_FILE, hostname);
         const weakenRam = this.ns.getScriptRam(WEAKEN_FILE, hostname);
@@ -38,7 +39,7 @@ class InstallKittyHack extends Install {
             growThreadQty: growThreadQty,
             minSec: this.ns.getServerMinSecurityLevel(hostname),
             maxMoney: this.ns.getServerMaxMoney(hostname),
-            HACK_FILE: HACK_FILE,
+            HACK_FILE: HACK_FILE2,
             WEAKEN_FILE: WEAKEN_FILE,
             GROW_FILE: GROW_FILE,
         };

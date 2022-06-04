@@ -1,4 +1,4 @@
-import {INs, loadInitFile, Log, nowStr} from '/resources/helpers';
+import {INs, Log, nowStr} from '/resources/helpers';
 import {GIPA} from '/sherlock/sherlock-GIPA';
 import {FLPF} from '/sherlock/sherlock-FLPF';
 import {UPIAGI} from '/sherlock/sherlock-UPIAG';
@@ -13,6 +13,8 @@ import {SherlockTWTS} from '/sherlock/sherlock-TWTS';
 import {SherlockSWMS} from '/sherlock/sherlock-SWMS';
 import {SherlockHCITEB} from '/sherlock/sherlock-HCITEB';
 import {SherlockSPIAG} from '/sherlock/sherlock-SPIAG';
+import {getService, ServiceName} from '/resources/service';
+import {Network} from '/resources/network';
 
 export const CONFIG: {
     CONTRACT_EXTENSION: string,
@@ -34,13 +36,13 @@ export async function main(ns: INs) {
     //FIXME - Array Jumping Game - [4,2,1,1,8]
     //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
     
-    const staticValues = loadInitFile(ns, ns.args[0]);
     const log = new Log(ns);
     const sherlock = new SherlockDaemon(ns, log);
+    const network = getService<Network>(ns, ServiceName.Network);
     
     //noinspection InfiniteLoopJS
     while (true) {
-        const contracts = sherlock.retrieveContracts(staticValues.network);
+        const contracts = sherlock.retrieveContracts(network.servers.map(n => n.hostname));
         for (const contract of contracts) {
             
             const solvedContract = sherlock.solveContract(contract);

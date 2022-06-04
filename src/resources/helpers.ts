@@ -141,6 +141,7 @@ export interface INs {
     getServerMaxMoney(hostname: string): number;
     getServerMoneyAvailable(hostname: string): number;
     getServerMaxRam(hostname: string): number;
+    getServerUsedRam(hostname: string): number;
     
     hackAnalyze(host: string): number;
     weakenAnalyze(threads: number, cores?: number): number;

@@ -46,14 +46,14 @@ export class Install {
     precomputeStaticValues() {
         return undefined;
     }
-    launchDaemon(hostname = this.hostname, numThreads = 1) {
-        const daemonFile = `/${this.packageName}/${this.packageName}-daemon.js`;
+    launchDaemon(hostname = this.hostname, numThreads = 1, fileType = 'daemon', targetName = '') {
+        const daemonFile = `/${this.packageName}/${this.packageName}-${fileType}.js`;
         if (hostname === this.hostname) {
             this.closeTail();
-            this.ns.spawn(daemonFile, numThreads, this.hostname);
+            this.ns.spawn(daemonFile, numThreads, this.hostname, targetName);
         }
         else {
-            this.ns.exec(daemonFile, hostname, numThreads, hostname);
+            this.ns.exec(daemonFile, hostname, numThreads, hostname, targetName);
         }
     }
     closeTail() {

@@ -19,14 +19,8 @@ const CONFIG = {
     SLEEP_DURATION: 100, // ms
 };
 export function getService(ns, serviceName) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const portHandle = ns.getPortHandle(serviceName);
-        let tries = CONFIG.MAX_RETRY;
-        while (portHandle.empty() && tries-- > 0) {
-            yield ns.asleep(CONFIG.SLEEP_DURATION);
-        }
-        return portHandle.empty() ? null : portHandle.peek();
-    });
+    const portHandle = ns.getPortHandle(serviceName);
+    return portHandle.empty() ? null : portHandle.peek();
 }
 export class Service {
     constructor(ns, log, portId = 1, obj) {
@@ -44,7 +38,7 @@ export class Service {
         this.ns.atExit(this.tearDown.bind(this));
         this.log.info(`Service ${this.objectName} started on port ${this.portId}`);
     }
-    run() {
+    start() {
         return __awaiter(this, void 0, void 0, function* () {
             this.operational = true;
             while (this.operational) {

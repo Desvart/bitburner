@@ -55,8 +55,8 @@ export class SherlockSPIE {
         return padStart + data + padStop;
     }
     charToRemove(data) {
-        let open = data.match(/\(/g || []).length;
-        let close = data.match(/\)/g || []).length;
+        let open = (data.match(/\(/g) || []).length;
+        let close = (data.match(/\)/g) || []).length;
         let removeCount = close - open;
         let char = '';
         if (removeCount > 0)

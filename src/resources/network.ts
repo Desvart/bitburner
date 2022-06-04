@@ -8,7 +8,7 @@ export class Network {
         this.servers = this.retrieveNetwork();
     }
     
-    getNode(hostname: string) {
+    getNode(hostname: string): Server {
         return this.servers.filter(n => n.hostname === hostname)[0];
     }
     
@@ -31,9 +31,22 @@ export class Network {
         
         return discoveredNodes;
     }
+    
+    getSmallestServers(threadsNeeded, scriptRam): Server {
+        return this.servers
+            .filter(server => server.getAvailableThreads(scriptRam) >= threadsNeeded)
+            .sort((a, n) => (a.getAvailableThreads(scriptRam) - n.getAvailableThreads(scriptRam)))[0];
+    }
+    
+    isFullyNuked(): boolean {
+        return !this.servers.filter(n => n.isPotentialTarget).some(n => !n.hasAdminAccess());
+    }
 }
 
 export class Server implements IServer {
+    
+    private readonly DEFAULT_SCRIPT_RAM = 1.75;
+    
     private readonly KEYS = [
         'BruteSSH.exe',
         'FTPCrack.exe',
@@ -51,13 +64,8 @@ export class Server implements IServer {
     minSec: number;
     maxMoney: number;
     growthFactor: number;
-    private readonly ns: INs;
-    private readonly log: Log;
     
-    constructor(ns: INs, log: Log, hostname: string) {
-        this.ns = ns;
-        this.log = log;
-        
+    constructor(private readonly ns: INs, private readonly log: Log, hostname: string) {
         const nsServer: INsServer = ns.getServer(hostname);
         this.hostname = nsServer.hostname;
         this.requiredHackingSkill = nsServer.requiredHackingSkill;
@@ -71,7 +79,7 @@ export class Server implements IServer {
         this.growthFactor = nsServer.serverGrowth;
     }
     
-    getAdminAccess(): boolean {
+    hasAdminAccess(): boolean {
         return this.ns.hasRootAccess(this.hostname);
     }
     
@@ -83,15 +91,26 @@ export class Server implements IServer {
         return this.ns.getServerSecurityLevel(this.hostname);
     }
     
-    isNukable(): boolean {
+    private getUsedRam(): number {
+        return this.ns.getServerUsedRam(this.hostname);
+    }
+    
+    canBeNuked(): boolean {
         return (this.isPotentialTarget === true &&
-            this.getAdminAccess() === false &&
+            this.hasAdminAccess() === false &&
             this.requiredHackingSkill <= this.ns.getHackingLevel() &&
             this.numOpenPortsRequired <= this.getAvailableKeysCount());
     }
     
+    canExecScripts(): boolean {
+        return (
+            this.hasAdminAccess() &&
+            this.maxRam > 0
+        );
+    }
+    
     nuke(): boolean {
-        if (this.isNukable()) {
+        if (this.canBeNuked()) {
             this.openPorts();
             this.getRootAccess();
             this.log.success(`SERVER - ${this.hostname} successfully nuked.`);
@@ -146,5 +165,21 @@ export class Server implements IServer {
     
     private getRootAccess(): void {
         this.ns.nuke(this.hostname);
+    }
+    
+    private availableRam(): number {
+        
+        let reservedRam: number = 0;
+        if (this.hostname === 'home')
+            reservedRam = 1024; // non allocatable RAM on home
+        
+        return Math.max(this.maxRam - this.getUsedRam() - reservedRam);
+    }
+    
+    getAvailableThreads(scriptRam: number = this.DEFAULT_SCRIPT_RAM): number {
+        if (!this.canExecScripts())
+            return 0;
+        else
+            return Math.floor(this.availableRam() / scriptRam);
     }
 }

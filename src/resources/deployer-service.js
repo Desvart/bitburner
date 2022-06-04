@@ -12,12 +12,12 @@ import { Log } from '/resources/helpers';
 import { Service, ServiceName } from '/resources/service';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
-        ns.tail();
+        /*ns.tail();
         ns.disableLog('ALL');
-        ns.clearLog();
+        ns.clearLog();*/
         const deployer = new Deployer(ns, new Log(ns));
         const service = new Service(ns, new Log(ns), ServiceName.Deployer, deployer);
-        yield service.run();
+        yield service.start();
         ns.closeTail();
     });
 }

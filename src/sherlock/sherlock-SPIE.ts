@@ -70,8 +70,8 @@ export class SherlockSPIE {
     
     private charToRemove(data) {
         
-        let open = data.match(/\(/g || []).length;
-        let close = data.match(/\)/g || []).length;
+        let open = (data.match(/\(/g) || []).length;
+        let close = (data.match(/\)/g) || []).length;
         let removeCount = close - open;
         
         let char = '';

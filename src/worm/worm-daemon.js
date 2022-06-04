@@ -33,7 +33,13 @@ export function main(ns) {
                 yield ns.sleep(ns.getGrowTime(staticValues.hostname) + 200);
             }
             else {
-                ns.exec(staticValues.HACK_FILE, staticValues.hostname, staticValues.hackThreadQty, staticValues.hostname, staticValues.hackThreadQty);
+                //ns.exec(staticValues.HACK_FILE, staticValues.hostname, staticValues.hackThreadQty, staticValues.hostname, staticValues.hackThreadQty);
+                const param = {
+                    target: staticValues.hostname,
+                    threadCount: staticValues.hackThreadQty,
+                    callRef: 'WORM'
+                };
+                ns.exec(staticValues.HACK_FILE, staticValues.hostname, staticValues.hackThreadQty, JSON.stringify(param));
                 yield ns.sleep(ns.getHackTime(staticValues.hostname) + 200);
             }
         }

@@ -10,7 +10,7 @@ export function main(ns: any) {
     
     for (let file of files) {
         
-        if (file.includes('.js') || file.includes('-const.txt')) {
+        if (file.includes('.js') || file.includes('-init.txt')) {
     
             if (ns.rm(file, 'home') === true) {
                 ns.print(`SUCCESS - File ${file} deleted.`);

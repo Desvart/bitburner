@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { loadInitFile, Log, nowStr } from '/resources/helpers';
+import { Log, nowStr } from '/resources/helpers';
 import { GIPA } from '/sherlock/sherlock-GIPA';
 import { FLPF } from '/sherlock/sherlock-FLPF';
 import { UPIAGI } from '/sherlock/sherlock-UPIAG';
@@ -22,6 +22,7 @@ import { SherlockTWTS } from '/sherlock/sherlock-TWTS';
 import { SherlockSWMS } from '/sherlock/sherlock-SWMS';
 import { SherlockHCITEB } from '/sherlock/sherlock-HCITEB';
 import { SherlockSPIAG } from '/sherlock/sherlock-SPIAG';
+import { getService, ServiceName } from '/resources/service';
 export const CONFIG = {
     CONTRACT_EXTENSION: 'cct',
     LOGFILE: '/sherlock-fails.txt',
@@ -37,12 +38,12 @@ export function main(ns) {
         //FIXME - Array Jumping Game - [5,2,1,1,5,5]
         //FIXME - Array Jumping Game - [4,2,1,1,8]
         //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
-        const staticValues = loadInitFile(ns, ns.args[0]);
         const log = new Log(ns);
         const sherlock = new SherlockDaemon(ns, log);
+        const network = getService(ns, ServiceName.Network);
         //noinspection InfiniteLoopJS
         while (true) {
-            const contracts = sherlock.retrieveContracts(staticValues.network);
+            const contracts = sherlock.retrieveContracts(network.servers.map(n => n.hostname));
             for (const contract of contracts) {
                 const solvedContract = sherlock.solveContract(contract);
                 if (solvedContract.solution !== 'Not implemented yet') {

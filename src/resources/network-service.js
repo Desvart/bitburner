@@ -13,12 +13,12 @@ import { Service, ServiceName } from '/resources/service';
 /** @param {NS} ns **/
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
-        ns.tail();
+        /*ns.tail();
         ns.disableLog('ALL');
-        ns.clearLog();
+        ns.clearLog();*/
         const network = new Network(ns, new Log(ns));
         const service = new Service(ns, new Log(ns), ServiceName.Network, network);
-        yield service.run();
+        yield service.start();
         ns.closeTail();
     });
 }

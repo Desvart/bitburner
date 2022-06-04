@@ -21,9 +21,20 @@ export class Network {
         }
         return discoveredNodes;
     }
+    getSmallestServers(threadsNeeded, scriptRam) {
+        return this.servers
+            .filter(server => server.getAvailableThreads(scriptRam) >= threadsNeeded)
+            .sort((a, n) => (a.getAvailableThreads(scriptRam) - n.getAvailableThreads(scriptRam)))[0];
+    }
+    isFullyNuked() {
+        return !this.servers.filter(n => n.isPotentialTarget).some(n => !n.hasAdminAccess());
+    }
 }
 export class Server {
     constructor(ns, log, hostname) {
+        this.ns = ns;
+        this.log = log;
+        this.DEFAULT_SCRIPT_RAM = 1.75;
         this.KEYS = [
             'BruteSSH.exe',
             'FTPCrack.exe',
@@ -31,8 +42,6 @@ export class Server {
             'HTTPWorm.exe',
             'SQLInject.exe'
         ];
-        this.ns = ns;
-        this.log = log;
         const nsServer = ns.getServer(hostname);
         this.hostname = nsServer.hostname;
         this.requiredHackingSkill = nsServer.requiredHackingSkill;
@@ -45,7 +54,7 @@ export class Server {
         this.maxMoney = nsServer.moneyMax;
         this.growthFactor = nsServer.serverGrowth;
     }
-    getAdminAccess() {
+    hasAdminAccess() {
         return this.ns.hasRootAccess(this.hostname);
     }
     getAvailableMoney() {
@@ -54,14 +63,21 @@ export class Server {
     getSecurityLevel() {
         return this.ns.getServerSecurityLevel(this.hostname);
     }
-    isNukable() {
+    getUsedRam() {
+        return this.ns.getServerUsedRam(this.hostname);
+    }
+    canBeNuked() {
         return (this.isPotentialTarget === true &&
-            this.getAdminAccess() === false &&
+            this.hasAdminAccess() === false &&
             this.requiredHackingSkill <= this.ns.getHackingLevel() &&
             this.numOpenPortsRequired <= this.getAvailableKeysCount());
     }
+    canExecScripts() {
+        return (this.hasAdminAccess() &&
+            this.maxRam > 0);
+    }
     nuke() {
-        if (this.isNukable()) {
+        if (this.canBeNuked()) {
             this.openPorts();
             this.getRootAccess();
             this.log.success(`SERVER - ${this.hostname} successfully nuked.`);
@@ -109,6 +125,18 @@ export class Server {
     }
     getRootAccess() {
         this.ns.nuke(this.hostname);
+    }
+    availableRam() {
+        let reservedRam = 0;
+        if (this.hostname === 'home')
+            reservedRam = 1024; // non allocatable RAM on home
+        return Math.max(this.maxRam - this.getUsedRam() - reservedRam);
+    }
+    getAvailableThreads(scriptRam = this.DEFAULT_SCRIPT_RAM) {
+        if (!this.canExecScripts())
+            return 0;
+        else
+            return Math.floor(this.availableRam() / scriptRam);
     }
 }
 //# sourceMappingURL=network.js.map
