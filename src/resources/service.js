@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 export var ServiceName;
 (function (ServiceName) {
-    ServiceName[ServiceName["Network"] = 10] = "Network";
-    ServiceName[ServiceName["Deployer"] = 11] = "Deployer";
-    ServiceName[ServiceName["ThreadPool"] = 12] = "ThreadPool";
-    ServiceName[ServiceName["ShivaOptimizer"] = 13] = "ShivaOptimizer";
+    ServiceName[ServiceName["Player"] = 10] = "Player";
+    ServiceName[ServiceName["Network"] = 12] = "Network";
+    ServiceName[ServiceName["Deployer"] = 14] = "Deployer";
+    ServiceName[ServiceName["ThreadPool"] = 16] = "ThreadPool";
+    ServiceName[ServiceName["ShivaOptimizer"] = 18] = "ShivaOptimizer";
 })(ServiceName || (ServiceName = {}));
 const CONFIG = {
     MAX_RETRY: 10,

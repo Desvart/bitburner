@@ -1,12 +1,11 @@
 import {INetscriptPort, INs, Log} from '/resources/helpers';
-import {Network} from '/resources/network';
-import {Deployer} from '/resources/deployer';
 
 export enum ServiceName {
-    Network = 10,
-    Deployer = 11,
-    ThreadPool = 12,
-    ShivaOptimizer = 13,
+    Player = 10,
+    Network = 12,
+    Deployer = 14,
+    ThreadPool = 16,
+    ShivaOptimizer = 18
 }
 
 const CONFIG: {
