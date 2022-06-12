@@ -7,16 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Network } from '/resources/network';
 import { Log } from '/resources/helpers';
 import { Service, ServiceName } from '/resources/service';
-/** @param {NS} ns **/
+import { Network2 } from '/resources/server';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         /*ns.tail();
         ns.disableLog('ALL');
         ns.clearLog();*/
-        const network = new Network(ns, new Log(ns));
+        const network = new Network2(ns, new Log(ns));
         const service = new Service(ns, new Log(ns), ServiceName.Network, network);
         yield service.start();
         ns.closeTail();
