@@ -97,7 +97,9 @@ export interface INs {
     args: any[];
     
     print(msg: string): void;
+    tprint(...args: any[]): void;
     toast(msg: string, status: string, duration: number): void;
+    flags(schema: [string, string | number | boolean][]): any;
     
     sleep(millis: number): Promise<true>;
     asleep(millis: number): Promise<true>;
@@ -234,6 +236,27 @@ export interface IServer {
     requiredHackingSkill: number;
     growthFactor: number;
     rate?: number;
+}
+
+interface IServer2 {
+    id: string;
+    ram: {
+        free: number;
+        max: number;
+    }
+    port: {
+        portsCountToHack: number;
+        openPortsCount: number;
+    }
+    security: {
+        level: number;
+        min: number;
+    }
+    money: {
+        available: number;
+        max: number;
+    }
+    
 }
 
 export interface IProcess {
