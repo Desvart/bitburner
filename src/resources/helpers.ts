@@ -111,7 +111,8 @@ export interface INs {
     atExit(f: () => void): void;
     
     ps(hostname: string): IProcess[];
-    killall(hostname: string): boolean;
+    kill(script: string, host: string, ...args: string[]): boolean;
+    killall(host?: string, safetyguard?: boolean): boolean;
     exit(): void;
     
     tail(): void;

@@ -1,185 +1,199 @@
-import {INs, INsServer, IServer, Log} from '/resources/helpers';
+import {INs, Log} from '/resources/helpers';
+import {getService, ServiceName} from '/resources/service';
+import {Player} from '/resources/player';
 
-export class Network {
+const HOME_RAM_BUFFER = 8; //GB
+const DEFAULT_THREAD_RAM = 1.75; //GB
+
+export interface INetwork extends Array<Server>{
+    isFullyNuked: boolean;
+    getSmallestServers(threadsNeeded: number, ramPerScriptNeeded: number): Server;
+}
+
+export interface IServer {
+    readonly id: string;
+    readonly level: number;
+    readonly cores: number;
+    readonly requiredPorts: number;
+    readonly purchased: boolean;
+    readonly isHome: boolean;
+    ram: IRam;
+    security: ISecurity;
+    money: IMoney;
+    canBeNuked: boolean;
+    isRoot: boolean;
+    canExecScripts: boolean;
     
-    public servers: Server[];
+    nuke(): void;
     
-    constructor(private ns: INs, private log: Log) {
-        this.servers = this.retrieveNetwork();
+    getThreadsCount(ramNeeded?: number): number;
+}
+
+interface IRam {
+    readonly max: number;
+    free: number;
+    used: number;
+}
+
+interface ISecurity {
+    readonly min: number;
+    level: number;
+}
+
+interface IMoney {
+    readonly max: number;
+    readonly growth: number;
+    available: number;
+}
+
+export class Network extends Array<Server> implements INetwork {
+    
+    constructor(private readonly ns: INs) {
+        super();
+        this.buildServerNetwork();
     }
     
-    getNode(hostname: string): Server {
-        return this.servers.filter(n => n.hostname === hostname)[0];
+    get isFullyNuked(): boolean {
+        return !this.filter(server => server.ram.max > 0).some(server => !server.isRoot);
     }
     
-    private retrieveNetwork(): Server[] {
-        let discoveredNodes: Server[] = [];
-        let nodesToScan: string[] = ['home'];
-        let maxLoop = 999;
-        
-        while (nodesToScan.length > 0 && maxLoop-- > 0) {
-            
-            const nodeName: string = nodesToScan.pop();
-            const connectedNodeNames: string[] = this.ns.scan(nodeName);
-            
-            for (const connectedNodeName of connectedNodeNames)
-                if (!discoveredNodes.map(n => n.hostname).includes(connectedNodeName))
-                    nodesToScan.push(connectedNodeName);
-            
-            discoveredNodes.push(new Server(this.ns, this.log, nodeName));
-        }
-        
-        return discoveredNodes;
+    getSmallestServers(threadsNeeded: number, ramPerScriptNeeded: number): Server {
+        const sortedServers = this.filter(server => server.getThreadsCount(ramPerScriptNeeded) >= threadsNeeded).
+            sort((curr, next) => curr.getThreadsCount(ramPerScriptNeeded) - next.getThreadsCount(ramPerScriptNeeded));
+        return sortedServers[0];
     }
     
-    getSmallestServers(threadsNeeded, scriptRam): Server {
-        return this.servers
-            .filter(server => server.getAvailableThreads(scriptRam) >= threadsNeeded)
-            .sort((a, n) => (a.getAvailableThreads(scriptRam) - n.getAvailableThreads(scriptRam)))[0];
+    static retrieveHostnames(ns: INs, currentNode: string = 'home', scannedNodes: Set<string> = new Set()): string[] {
+        const nodesToScan = ns.scan(currentNode).filter(node => !scannedNodes.has(node));
+        nodesToScan.forEach(node => {
+            scannedNodes.add(node);
+            Network.retrieveHostnames(ns, node, scannedNodes);
+        });
+        return Array.from(scannedNodes.keys());
     }
     
-    isFullyNuked(): boolean {
-        return !this.servers.filter(n => n.isPotentialTarget).some(n => !n.hasAdminAccess());
+    private buildServerNetwork(): void {
+        Network.retrieveHostnames(this.ns).forEach(id => new Server(this.ns, id));
     }
 }
 
 export class Server implements IServer {
+    readonly level: number;
+    readonly cores: number;
+    readonly requiredPorts: number;
+    readonly purchased: boolean;
+    readonly isHome: boolean;
+    readonly ram: Ram;
+    readonly security: Security;
+    readonly money: Money;
     
-    private readonly DEFAULT_SCRIPT_RAM = 1.75;
-    
-    private readonly KEYS = [
-        'BruteSSH.exe',
-        'FTPCrack.exe',
-        'relaySMTP.exe',
-        'HTTPWorm.exe',
-        'SQLInject.exe'];
-    
-    hostname: string;
-    requiredHackingSkill: number;
-    numOpenPortsRequired: number;
-    purchasedByPlayer: boolean;
-    maxRam: number;
-    isPotentialTarget: boolean;
-    coresCount: number;
-    minSec: number;
-    maxMoney: number;
-    growthFactor: number;
-    
-    constructor(private readonly ns: INs, private readonly log: Log, hostname: string) {
-        const nsServer: INsServer = ns.getServer(hostname);
-        this.hostname = nsServer.hostname;
-        this.requiredHackingSkill = nsServer.requiredHackingSkill;
-        this.numOpenPortsRequired = nsServer.numOpenPortsRequired;
-        this.purchasedByPlayer = nsServer.purchasedByPlayer;
-        this.maxRam = nsServer.maxRam;
-        this.isPotentialTarget = nsServer.moneyMax > 0;
-        this.coresCount = nsServer.cpuCores;
-        this.minSec = nsServer.minDifficulty;
-        this.maxMoney = nsServer.moneyMax;
-        this.growthFactor = nsServer.serverGrowth;
+    constructor(private readonly ns: INs, readonly id: string) {
+        this.ram = new Ram(ns, id);
+        this.security = new Security(ns, id);
+        this.money = new Money(ns, id);
+        this.level = ns.getServer(id).requiredHackingSkill;
+        this.cores = ns.getServer(id).cpuCores;
+        this.requiredPorts = ns.getServer(id).numOpenPortsRequired;
+        this.purchased = ns.getServer(id).purchasedByPlayer;
+        this.isHome = (id === 'home');
     }
     
-    hasAdminAccess(): boolean {
-        return this.ns.hasRootAccess(this.hostname);
+    get isRoot(): boolean {
+        return this.ns.getServer(this.id).hasAdminRights;
     }
     
-    getAvailableMoney(): number {
-        return this.ns.getServerMoneyAvailable(this.hostname);
+    get canBeNuked(): boolean {
+        const player = getService<Player>(this.ns, ServiceName.Player);
+        return (!this.isRoot && player.hacking.level >= this.level && player.portsKeyCount >= this.requiredPorts);
     }
     
-    getSecurityLevel(): number {
-        return this.ns.getServerSecurityLevel(this.hostname);
+    get canExecScripts(): boolean {
+        return (this.isRoot && this.ram.max > 0);
     }
     
-    private getUsedRam(): number {
-        return this.ns.getServerUsedRam(this.hostname);
-    }
-    
-    canBeNuked(): boolean {
-        return (this.isPotentialTarget === true &&
-            this.hasAdminAccess() === false &&
-            this.requiredHackingSkill <= this.ns.getHackingLevel() &&
-            this.numOpenPortsRequired <= this.getAvailableKeysCount());
-    }
-    
-    canExecScripts(): boolean {
-        return (
-            this.hasAdminAccess() &&
-            this.maxRam > 0
-        );
-    }
-    
-    nuke(): boolean {
-        if (this.canBeNuked()) {
+    nuke() {
+        if (this.canBeNuked) {
             this.openPorts();
-            this.getRootAccess();
-            this.log.success(`SERVER - ${this.hostname} successfully nuked.`);
-            return true;
+            this.sudo();
         } else {
-            this.log.warn(`SERVER - Cannot nuke ${this.hostname}.`, true);
-            return false;
+            new Log(this.ns).warn(`SERVER ${this.id} - Cannot perform nuke operation`, true);
         }
     }
     
-    private openPorts(): number {
-        const availableKeys = this.getAvailableKeys();
-        let portOpenedCount: number = 0;
-        for (let key of availableKeys) {
-            switch (key) {
-                case this.KEYS[0]:
-                    this.ns.brutessh(this.hostname);
-                    portOpenedCount++;
-                    break;
-                
-                case this.KEYS[1]:
-                    this.ns.ftpcrack(this.hostname);
-                    portOpenedCount++;
-                    break;
-                
-                case this.KEYS[2]:
-                    this.ns.relaysmtp(this.hostname);
-                    portOpenedCount++;
-                    break;
-                
-                case this.KEYS[3]:
-                    this.ns.httpworm(this.hostname);
-                    portOpenedCount++;
-                    break;
-                
-                case this.KEYS[4]:
-                    this.ns.sqlinject(this.hostname);
-                    portOpenedCount++;
-                    break;
-            }
-        }
-        return portOpenedCount;
-    }
-    
-    private getAvailableKeys(): string[] {
-        return this.KEYS.filter(key => this.ns.fileExists(key, 'home'));
-    }
-    
-    private getAvailableKeysCount(): number {
-        return this.getAvailableKeys().length;
-    }
-    
-    private getRootAccess(): void {
-        this.ns.nuke(this.hostname);
-    }
-    
-    private availableRam(): number {
-        
-        let reservedRam: number = 0;
-        if (this.hostname === 'home')
-            reservedRam = 1024; // non allocatable RAM on home
-        
-        return Math.max(this.maxRam - this.getUsedRam() - reservedRam);
-    }
-    
-    getAvailableThreads(scriptRam: number = this.DEFAULT_SCRIPT_RAM): number {
-        if (!this.canExecScripts())
+    getThreadsCount(ramPerThread: number = DEFAULT_THREAD_RAM): number {
+        if (!this.canExecScripts)
             return 0;
         else
-            return Math.floor(this.availableRam() / scriptRam);
+            return Math.floor(this.ram.free / ramPerThread);
+    }
+    
+    private openPorts(): void {
+        const player = getService<Player>(this.ns, ServiceName.Player);
+        
+        if (player.software.ssh)
+            this.ns.brutessh(this.id);
+        
+        if (player.software.ftp)
+            this.ns.ftpcrack(this.id);
+        
+        if (player.software.smtp)
+            this.ns.relaysmtp(this.id);
+        
+        if (player.software.http)
+            this.ns.httpworm(this.id);
+        
+        if (player.software.sql)
+            this.ns.sqlinject(this.id);
+    }
+    
+    private sudo(): void {
+        this.ns.nuke(this.id);
+        const log: Log = new Log(this.ns);
+        if (this.isRoot)
+            log.success(`SERVER ${this.id} - Nuke operation successful`);
+        else
+            log.warn(`SERVER ${this.id} - Nuke operation failed`, true);
+    }
+}
+
+class Ram implements IRam {
+    readonly max: number;
+    
+    constructor(private readonly ns: INs, private readonly serverId: string) {
+        this.max = ns.getServer(serverId).maxRam;
+    }
+    
+    get used(): number {
+        return this.ns.getServer(this.serverId).ramUsed;
+    }
+    
+    get free(): number {
+        return this.max - this.used - (this.serverId === 'home' ? HOME_RAM_BUFFER : 0);
+    }
+}
+
+class Security implements ISecurity {
+    readonly min: number;
+    
+    constructor(private readonly ns: INs, private readonly serverId: string) {
+        this.min = ns.getServer(serverId).minDifficulty;
+    }
+    
+    get level(): number {
+        return this.ns.getServer(this.serverId).hackDifficulty;
+    }
+}
+
+class Money implements IMoney {
+    readonly max: number;
+    readonly growth: number;
+    
+    constructor(private readonly ns: INs, private readonly serverId: string) {
+        this.max = ns.getServer(serverId).moneyMax;
+        this.growth = ns.getServer(serverId).serverGrowth;
+    }
+    
+    get available(): number {
+        return this.ns.getServer(this.serverId).moneyAvailable;
     }
 }
