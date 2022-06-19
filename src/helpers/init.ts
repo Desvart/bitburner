@@ -31,16 +31,16 @@ class Init {
     async startAllServices(): Promise<void> {
         
         this.ns.exec('/resources/monitor-overview-daemon.js', 'home');
-        await this.ns.asleep(500);
+        await this.ns.sleep(500);
         
         this.ns.exec('/resources/player-service.js', 'home');
-        await this.ns.asleep(500);
+        await this.ns.sleep(500);
         
         this.ns.exec('/resources/network-service.js', 'home');
-        await this.ns.asleep(500);
+        await this.ns.sleep(500);
         
         this.ns.exec('/resources/deployer-service.js', 'home');
-        await this.ns.asleep(500);
+        await this.ns.sleep(500);
         
         this.deployer = getService<Deployer>(this.ns, ServiceName.Deployer);
         this.player = getService<Player>(this.ns, ServiceName.Player);

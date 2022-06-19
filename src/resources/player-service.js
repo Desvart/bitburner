@@ -12,13 +12,9 @@ import { Service, ServiceName } from '/resources/service';
 import { Player } from '/resources/player';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
-        /*ns.tail();
-        ns.disableLog('ALL');
-        ns.clearLog();*/
         const player = new Player(ns);
-        const service = new Service(ns, new Log(ns), ServiceName.Network, player);
+        const service = new Service(ns, new Log(ns), ServiceName.Player, player);
         yield service.start();
-        ns.closeTail();
     });
 }
 //# sourceMappingURL=player-service.js.map

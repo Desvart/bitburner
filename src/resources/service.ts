@@ -28,7 +28,7 @@ export class Service {
     private objectName: string;
     private operational: boolean;
     
-    constructor(private ns: INs, private log: Log, private portId: number = 1, obj: any) {
+    constructor(private readonly ns: INs, private readonly log: Log, private portId: number = 1, obj: any) {
         this.portHandle = this.ns.getPortHandle(portId);
         this.publishObject(obj);
     }

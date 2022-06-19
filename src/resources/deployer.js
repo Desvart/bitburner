@@ -18,13 +18,13 @@ export class Deployer {
         return __awaiter(this, void 0, void 0, function* () {
             const scriptRam = job.scriptRam || this.ns.getScriptRam(job.script, 'home');
             if (job.runnerName) {
-                job.runner = this.network.getNode(job.runnerName);
+                job.runner = this.network.getServer(job.runnerName);
             }
             else {
                 job.runner = this.network.getSmallestServers(job.threads || (job.threads = 1), scriptRam);
             }
             const scriptName = job.script.split('/').pop();
-            yield this.deployDependencies(job.runner.hostname, [job.script, ...job.dependencies], scriptName);
+            yield this.deployDependencies(job.runner.id, [job.script, ...job.dependencies], scriptName);
             return this.execJob(job);
         });
     }
@@ -48,12 +48,12 @@ export class Deployer {
         });
     }
     execJob(job) {
-        job.pid = this.ns.exec(job.script, job.runner.hostname, job.threads, ...job.args || []);
+        job.pid = this.ns.exec(job.script, job.runner.id, job.threads, ...job.args || []);
         return job;
     }
     checkIfScriptRunning(serviceFile) {
-        return this.network.servers
-            .filter(node => this.ns.ps(node.hostname)
+        return this.network
+            .filter(node => this.ns.ps(node.id)
             .filter(process => process.filename === serviceFile)
             .length > 0)
             .length > 0;

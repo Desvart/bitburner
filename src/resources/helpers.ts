@@ -196,6 +196,12 @@ export interface INs {
         hacking: {
             weakenTime(server: INsServer, player: IPlayer): number;
         }
+        hacknetNodes: {
+            hacknetNodeCost(n: number, mult: number): number;
+            levelUpgradeCost(startingLevel: number, extraLevels?: number, costMult?: number): number;
+            ramUpgradeCost(startingRam: number, extraLevels?: number, costMult?: number): number;
+            coreUpgradeCost(startingCore: number, extraCores?: number, costMult?: number): number;
+        }
     };
 }
 

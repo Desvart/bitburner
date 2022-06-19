@@ -8,6 +8,7 @@ const DEFAULT_THREAD_RAM = 1.75; //GB
 export interface INetwork extends Array<Server>{
     isFullyNuked: boolean;
     getSmallestServers(threadsNeeded: number, ramPerScriptNeeded: number): Server;
+    map(mapper: Function): Array<any>;
 }
 
 export interface IServer {
@@ -73,7 +74,18 @@ export class Network extends Array<Server> implements INetwork {
     }
     
     private buildServerNetwork(): void {
-        Network.retrieveHostnames(this.ns).forEach(id => new Server(this.ns, id));
+        Network.retrieveHostnames(this.ns).forEach(id => this.push(new Server(this.ns, id)));
+    }
+    
+    map(mapper: Function): any[] {
+        let mappedNetwork = new Network(this.ns);
+        for(let i = 0; i < this.length; i++)
+            mappedNetwork[i] = mapper(this[i]);
+        return mappedNetwork;
+    }
+    
+    getServer(hostname: string): Server {
+        return this.filter(serv => serv.id === hostname)[0];
     }
 }
 

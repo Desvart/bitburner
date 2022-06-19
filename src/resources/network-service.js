@@ -12,13 +12,9 @@ import { Service, ServiceName } from '/resources/service';
 import { Network } from '/resources/network';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
-        /*ns.tail();
-        ns.disableLog('ALL');
-        ns.clearLog();*/
         const network = new Network(ns);
         const service = new Service(ns, new Log(ns), ServiceName.Network, network);
         yield service.start();
-        ns.closeTail();
     });
 }
 //# sourceMappingURL=network-service.js.map

@@ -5,7 +5,7 @@ import {Network, Server} from '/resources/network';
 export class Deployer {
     private network: Network;
     
-    constructor(private ns: INs, private log: Log) {
+    constructor(private readonly ns: INs, private readonly log: Log) {
         this.network = getService<Network>(this.ns, ServiceName.Network);
     }
     
@@ -13,13 +13,13 @@ export class Deployer {
         const scriptRam = job.scriptRam || this.ns.getScriptRam(job.script, 'home');
         
         if (job.runnerName) {
-            job.runner = this.network.getNode(job.runnerName);
+            job.runner = this.network.getServer(job.runnerName);
         } else {
             job.runner = this.network.getSmallestServers(job.threads ||= 1, scriptRam);
         }
         
         const scriptName = job.script.split('/').pop();
-        await this.deployDependencies(job.runner.hostname, [job.script, ...job.dependencies], scriptName);
+        await this.deployDependencies(job.runner.id, [job.script, ...job.dependencies], scriptName);
         return this.execJob(job);
     }
     
@@ -42,13 +42,13 @@ export class Deployer {
     }
     
     private execJob(job: Job): Job {
-        job.pid = this.ns.exec(job.script, job.runner.hostname, job.threads, ...job.args || []);
+        job.pid = this.ns.exec(job.script, job.runner.id, job.threads, ...job.args || []);
         return job;
     }
     
     checkIfScriptRunning(serviceFile: string): boolean {
-        return this.network.servers
-            .filter(node =>this.ns.ps(node.hostname)
+        return this.network
+            .filter(node =>this.ns.ps(node.id)
                 .filter(process => process.filename === serviceFile)
                 .length > 0)
             .length > 0;

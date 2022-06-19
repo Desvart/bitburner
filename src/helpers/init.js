@@ -33,13 +33,13 @@ class Init {
     startAllServices() {
         return __awaiter(this, void 0, void 0, function* () {
             this.ns.exec('/resources/monitor-overview-daemon.js', 'home');
-            yield this.ns.asleep(500);
+            yield this.ns.sleep(500);
             this.ns.exec('/resources/player-service.js', 'home');
-            yield this.ns.asleep(500);
+            yield this.ns.sleep(500);
             this.ns.exec('/resources/network-service.js', 'home');
-            yield this.ns.asleep(500);
+            yield this.ns.sleep(500);
             this.ns.exec('/resources/deployer-service.js', 'home');
-            yield this.ns.asleep(500);
+            yield this.ns.sleep(500);
             this.deployer = getService(this.ns, ServiceName.Deployer);
             this.player = getService(this.ns, ServiceName.Player);
             this.network = getService(this.ns, ServiceName.Network);

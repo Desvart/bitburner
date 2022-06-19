@@ -25,7 +25,16 @@ export class Network extends Array {
         return Array.from(scannedNodes.keys());
     }
     buildServerNetwork() {
-        Network.retrieveHostnames(this.ns).forEach(id => new Server(this.ns, id));
+        Network.retrieveHostnames(this.ns).forEach(id => this.push(new Server(this.ns, id)));
+    }
+    map(mapper) {
+        let mappedNetwork = new Network(this.ns);
+        for (let i = 0; i < this.length; i++)
+            mappedNetwork[i] = mapper(this[i]);
+        return mappedNetwork;
+    }
+    getServer(hostname) {
+        return this.filter(serv => serv.id === hostname)[0];
     }
 }
 export class Server {
