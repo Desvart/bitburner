@@ -1,4 +1,6 @@
 import {INs} from '/resources/helpers';
+import {getService, ServiceName} from '/resources/service';
+import {Player} from '/resources/player';
 
 interface IHacknet2 extends Array<HServer> {
     productionRate: number;
@@ -9,7 +11,7 @@ interface IHacknet2 extends Array<HServer> {
     buyNewServer();
 }
 
-export class Hacknet2 extends Array<HServer> implements IHacknet2 {
+export class Hacknet extends Array<HServer> implements IHacknet2 {
     maxServerCount: number;
     
     constructor(private readonly ns: INs) {
@@ -22,6 +24,10 @@ export class Hacknet2 extends Array<HServer> implements IHacknet2 {
         return this.reduce((acc, obj) => acc + obj.productionRate, 0);
     }
     
+    get totalProduction(): number {
+        return this.reduce((acc, obj) => acc + obj.totalProduction, 0);
+    }
+    
     get serverCount(): number {
         return this.ns.hacknet.numNodes();
     }
@@ -32,6 +38,10 @@ export class Hacknet2 extends Array<HServer> implements IHacknet2 {
     
     get newServerGain(): number {
         return new HServer(this.ns, 0).simulateProductionRate(1, 0, 0);
+    }
+    
+    get cost() {
+        return this.reduce((acc, obj) => acc + obj.cost, 0);
     }
     
     retrieveExistingHacknet() {
@@ -49,6 +59,7 @@ export class Hacknet2 extends Array<HServer> implements IHacknet2 {
 interface IHServer {
     id: number;
     productionRate: number;
+    totalProduction: number;
     level: Level;
     ram: Ram;
     cores: Cores;
@@ -68,11 +79,36 @@ class HServer implements IHServer {
     }
     
     simulateProductionRate(level: number, ram: number, cores: number): number {
-        return (level * 1.5) * Math.pow(1.035, ram - 1) * ((cores + 5) / 6) * this.ns.getPlayer().hacking_money_mult;
+        const player: Player = getService(this.ns, ServiceName.Player);
+        return (level * 1.5) * Math.pow(1.035, ram - 1) * ((cores + 5) / 6) * player.hacknet.multipliers.production;
     }
     
     get productionRate() {
         return this.simulateProductionRate(this.level.actual, this.ram.actual, this.cores.actual);
+    }
+    
+    get totalProduction(): number {
+        return this.ns.hacknet.getNodeStats(this.id).totalProduction;
+    }
+    
+    get cost(): number {
+        
+        let nodeCost = 0;
+        let levelCost = 0;
+        let ramCost = 0;
+        let coresCost = 0;
+        const player: Player = getService<Player>(this.ns, ServiceName.Player);
+        
+        if (player.software.formulas) {
+            const costMult: number = player.hacknet.multipliers.purchaseCost;
+            const hFormulas = this.ns.formulas.hacknetNodes;
+            nodeCost = hFormulas.hacknetNodeCost(this.id, costMult);
+            levelCost = hFormulas.levelUpgradeCost(1, this.level.actual - 1, costMult);
+            ramCost = hFormulas.ramUpgradeCost(1, this.ram.actual - 1, costMult);
+            coresCost = hFormulas.coreUpgradeCost(1, this.cores.actual - 1, costMult);
+        }
+        
+        return nodeCost + levelCost + ramCost + coresCost;
     }
 }
 
@@ -102,7 +138,8 @@ class Level implements IComponent {
     
     get upgradeGain(): number {
         const server: HServer = new HServer(this.ns, this.serverId);
-        const upgradedGain = server.simulateProductionRate(server.level.actual + 1, server.ram.actual, server.cores.actual);
+        const upgradedGain = server.simulateProductionRate(server.level.actual + 1, server.ram.actual,
+            server.cores.actual);
         return upgradedGain - server.productionRate;
     }
     
@@ -128,7 +165,8 @@ class Ram implements IComponent {
     
     get upgradeGain(): number {
         const server: HServer = new HServer(this.ns, this.serverId);
-        const upgradedGain = server.simulateProductionRate(server.level.actual, server.ram.actual * 2, server.cores.actual);
+        const upgradedGain = server.simulateProductionRate(server.level.actual, server.ram.actual * 2,
+            server.cores.actual);
         return upgradedGain - server.productionRate;
     }
     
@@ -154,7 +192,8 @@ class Cores implements IComponent {
     
     get upgradeGain(): number {
         const server: HServer = new HServer(this.ns, this.serverId);
-        const upgradedGain = server.simulateProductionRate(server.level.actual, server.ram.actual, server.cores.actual + 1);
+        const upgradedGain = server.simulateProductionRate(server.level.actual, server.ram.actual,
+            server.cores.actual + 1);
         return upgradedGain - server.productionRate;
     }
     

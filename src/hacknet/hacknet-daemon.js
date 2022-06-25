@@ -8,159 +8,93 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Log } from '/resources/helpers';
-const CONFIG = {
-    HARVEST_RATIO: 50 / 100,
-    CYCLE_TIME: 2000, //ms
-};
+import { Hacknet } from '/hacknet/hacknet';
+import { Player } from '/resources/player';
+const FLAGS = [
+    ['harnestRatio', 1 / 4],
+    ['cycleTime', 200],
+];
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
+        const flags = ns.flags(FLAGS);
         ns.tail();
         ns.disableLog('ALL');
         ns.clearLog();
-        const log = new Log(ns);
-        const hacknet = new Hacknet(ns, log);
-        let upgrade = hacknet.identifyCheapestUpgrade();
-        log.info(`HACKNET_DAEMON - Upgrade target: Node ${upgrade.nodeId} - ${Component[upgrade.component]} - Cost: ${log.formatMoney(upgrade.cost)}`);
+        const hDaemon = new HacknetDaemon(ns);
         // noinspection InfiniteLoopJS
         while (true) {
-            yield hacknet.waitToHaveEnoughMoney(upgrade.cost);
-            hacknet.upgrade(upgrade);
-            upgrade = hacknet.identifyCheapestUpgrade();
-            if (upgrade.component === Component.Node) {
-                const msg = `HACKNET_DAEMON - Next upgrade: New node ${upgrade.nodeId} in ${upgrade.waitTimeBeforeNextUpgrade} s for ${log.formatMoney(upgrade.cost)}.`;
-                log.info(msg);
-            }
-            else {
-                let componentUpgrade = 0;
-                switch (upgrade.component) {
-                    case Component.Level:
-                        componentUpgrade = ns.hacknet.getNodeStats(upgrade.nodeId).level + 1;
-                        break;
-                    case Component.Ram:
-                        componentUpgrade = ns.hacknet.getNodeStats(upgrade.nodeId).ram * 2;
-                        break;
-                    case Component.Core:
-                        componentUpgrade = ns.hacknet.getNodeStats(upgrade.nodeId).cores + 1;
-                        break;
-                }
-                const msg = `HACKNET_DAEMON - Next upgrade: Node ${upgrade.nodeId} - ${Component[upgrade.component]} -> ${componentUpgrade} in ${upgrade.waitTimeBeforeNextUpgrade} s for ${log.formatMoney(upgrade.cost)}.`;
-                log.info(msg);
-            }
-            yield waitForNextUpgrade(ns, upgrade.waitTimeBeforeNextUpgrade * 1000);
+            const bestUpgrade = hDaemon.identifyBestUpgrade();
+            yield hDaemon.waitToHaveEnoughFunds(bestUpgrade, flags.harnestRatio);
+            hDaemon.upgrade(bestUpgrade);
+            yield ns.sleep(flags.cycleTime);
         }
     });
 }
-export var Component;
-(function (Component) {
-    Component[Component["Node"] = 0] = "Node";
-    Component[Component["Level"] = 1] = "Level";
-    Component[Component["Ram"] = 2] = "Ram";
-    Component[Component["Core"] = 3] = "Core";
-})(Component || (Component = {}));
-class Hacknet {
-    constructor(ns, log) {
+class HacknetDaemon {
+    constructor(ns, log = new Log(ns), hacknet = new Hacknet(ns), player = new Player(ns)) {
         this.ns = ns;
         this.log = log;
+        this.hacknet = hacknet;
+        this.player = player;
     }
-    identifyCheapestUpgrade() {
-        let cheapestUpgrade = new Upgrade(0, 0, Infinity);
-        const nodeCount = this.ns.hacknet.numNodes();
-        if (nodeCount !== 0)
-            cheapestUpgrade = this.identifyCheapestComponentUpgrade(this.ns, this.getNodeIdList(nodeCount));
-        const newNodeCost = this.ns.hacknet.getPurchaseNodeCost();
-        if (newNodeCost < cheapestUpgrade.cost)
-            cheapestUpgrade = new Upgrade(nodeCount, Component.Node, Math.ceil(newNodeCost), this.getProductionRate());
-        return cheapestUpgrade;
+    identifyBestUpgrade() {
+        let upgrades = [];
+        upgrades.push(new Upgrade(this.hacknet.newServerGain, this.hacknet.costNewServer, 'server'));
+        this.hacknet.forEach(server => {
+            upgrades.push(new Upgrade(server.level.upgradeGain, server.level.upgradeCost, 'level', server.id));
+            upgrades.push(new Upgrade(server.ram.upgradeGain, server.ram.upgradeCost, 'ram', server.id));
+            upgrades.push(new Upgrade(server.cores.upgradeGain, server.cores.upgradeCost, 'cores', server.id));
+        });
+        const bestUpgrade = upgrades.sort((a, b) => b.ratio - a.ratio)[0];
+        const msgRatio = `${this.log.formatMoney(bestUpgrade.gain)}/s / ${this.log.formatMoney(bestUpgrade.cost)} => ratio = ${this.log.formatNumber(bestUpgrade.ratio)}`;
+        const msg = `HACKNET_DAEMON - Best upgrade: node${bestUpgrade.serverId}.${bestUpgrade.type} - ${msgRatio}`;
+        this.log.info(msg);
+        return bestUpgrade;
     }
-    identifyCheapestComponentUpgrade(ns, nodeList) {
-        const levelUpgradeCostList = nodeList.map(n => ns.hacknet.getLevelUpgradeCost(n, 1));
-        const ramUpgradeCostList = nodeList.map(n => ns.hacknet.getRamUpgradeCost(n, 1));
-        const coreUpgradeCostList = nodeList.map(n => ns.hacknet.getCoreUpgradeCost(n, 1));
-        const upgradeCostList = [levelUpgradeCostList, ramUpgradeCostList, coreUpgradeCostList];
-        const [componentId, nodeId, cost] = indexOfSmallest(upgradeCostList);
-        return new Upgrade(nodeId, componentId + 1, cost, this.getProductionRate());
-        function indexOfSmallest(costArray) {
-            let lowestC = 0;
-            let lowestI = 0;
-            for (let c = 0; c <= 2; c++)
-                for (let i = 0; i < costArray[0].length; i++)
-                    if (costArray[c][i] < costArray[lowestC][lowestI]) {
-                        lowestC = c;
-                        lowestI = i;
-                    }
-            return [lowestC, lowestI, costArray[lowestC][lowestI]];
-        }
-    }
-    getNodeIdList(nodeCount) {
-        return [...Array(nodeCount).keys()];
-    }
-    buyNewNode() {
-        const MAX_NUM_NODES = this.ns.hacknet.maxNumNodes();
-        if (this.ns.hacknet.numNodes() < MAX_NUM_NODES) {
-            const nodeId = this.ns.hacknet.purchaseNode();
-            this.log.success(`HACKNET_DAEMON - New node ${nodeId} bought.`);
-        }
-        else {
-            this.log.info(`HACKNET_DAEMON - Max number of nodes (${MAX_NUM_NODES}) already bought.`);
-        }
-    }
-    upgrade(upgrade) {
-        if (upgrade.component === Component.Node)
-            this.buyNewNode();
-        else {
-            switch (upgrade.component) {
-                case Component.Level: {
-                    this.ns.hacknet.upgradeLevel(upgrade.nodeId, 1);
-                    this.log.info(`HACKNET_NODE - Node ${upgrade.nodeId} - Level upgraded to ${this.ns.hacknet.getNodeStats(upgrade.nodeId).level}.\n`);
-                    break;
-                }
-                case Component.Ram: {
-                    this.ns.hacknet.upgradeRam(upgrade.nodeId, 1);
-                    this.log.info(`HACKNET_NODE - Node ${upgrade.nodeId} - RAM upgraded to ${this.ns.hacknet.getNodeStats(upgrade.nodeId).ram}.\n`);
-                    break;
-                }
-                case Component.Core: {
-                    this.ns.hacknet.upgradeCore(upgrade.nodeId, 1);
-                    this.log.info(`HACKNET_NODE - Node ${upgrade.nodeId} - Cores upgraded to ${this.ns.hacknet.getNodeStats(upgrade.nodeId).cores}.\n`);
-                    break;
-                }
-            }
-        }
-    }
-    getProductionRate() {
-        let productionList = this.getNodeIdList(this.ns.hacknet.numNodes()).map(i => this.ns.hacknet.getNodeStats(i).production);
-        return productionList.reduce((prev, curr) => prev + curr, 0);
-    }
-    waitToHaveEnoughMoney(cost) {
+    waitToHaveEnoughFunds(bestUpgrade, harnestRatio) {
         return __awaiter(this, void 0, void 0, function* () {
-            const wealth = this.ns.getServerMoneyAvailable('home');
-            while (wealth <= cost) {
-                const wealthF = this.log.formatMoney(wealth);
-                const costF = this.log.formatMoney(cost);
-                // noinspection JSPotentiallyInvalidUsageOfClassThis
-                const timeToWait = (cost - wealth) / this.getProductionRate();
-                const msg = `HACKNET_DAEMON - Not enough money! Cost: ${costF}, available: ${wealthF}. Time to wait: ${this.log.formatDuration(timeToWait)}.`;
-                this.log.warn(msg);
-                yield this.ns.sleep(timeToWait);
+            let availableMoney = 0;
+            while (bestUpgrade.cost >= availableMoney) {
+                const hacknetProfit = this.hacknet.totalProduction - this.hacknet.cost;
+                const reinvestAmount = hacknetProfit * (Math.sign(hacknetProfit) > 0 ? harnestRatio : 1 / harnestRatio);
+                availableMoney = (this.player.money - reinvestAmount) >= 0 ? reinvestAmount : 0;
+                if (bestUpgrade.cost >= availableMoney) {
+                    const missingMoney = bestUpgrade.cost - availableMoney;
+                    const timeToWait = missingMoney / (this.hacknet.productionRate * harnestRatio) * 1000;
+                    this.log.info(`HACKNET_DAEMON - Waiting time to next upgrade (node${bestUpgrade.serverId}.${bestUpgrade.type}): ${this.log.formatDuration(timeToWait)}`);
+                    yield this.ns.sleep(timeToWait);
+                }
             }
         });
     }
+    upgrade(bestUpgrade) {
+        switch (bestUpgrade.type) {
+            case 'server':
+                this.hacknet.buyNewServer();
+                break;
+            case 'level':
+                this.hacknet[bestUpgrade.serverId].level.upgrade();
+                break;
+            case 'ram':
+                this.hacknet[bestUpgrade.serverId].ram.upgrade();
+                break;
+            case 'cores':
+                this.hacknet[bestUpgrade.serverId].cores.upgrade();
+                break;
+        }
+        if (bestUpgrade.type === 'node')
+            this.log.info(`HACKNET_DAEMON - New server ${bestUpgrade.serverId} bought`);
+        else
+            this.log.info(`HACKNET_DAEMON - ${bestUpgrade.type} upgraded on server ${bestUpgrade.serverId}.\n`);
+    }
 }
 class Upgrade {
-    constructor(nodeId, component, cost, productionRate = 0) {
-        this.nodeId = nodeId;
-        this.component = component;
+    constructor(gain, cost, type, serverId = 0) {
+        this.gain = gain;
         this.cost = cost;
-        this.waitTimeBeforeNextUpgrade = this.getWaitTimeBeforeToStartUpgrade(productionRate);
+        this.type = type;
+        this.serverId = serverId;
+        this.ratio = gain / cost;
     }
-    getWaitTimeBeforeToStartUpgrade(productionRate) {
-        const timeToRoI = this.cost / productionRate; //s
-        return Math.ceil(timeToRoI / CONFIG.HARVEST_RATIO); // s
-    }
-}
-function waitForNextUpgrade(ns, waitTimeBeforeNextUpgrade) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield ns.sleep(waitTimeBeforeNextUpgrade);
-    });
 }
 //# sourceMappingURL=hacknet-daemon.js.map
