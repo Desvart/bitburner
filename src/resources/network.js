@@ -11,6 +11,9 @@ export class Network extends Array {
     get isFullyNuked() {
         return !this.filter(server => server.ram.max > 0).some(server => !server.isRoot);
     }
+    get hostnames() {
+        return this.map(server => server.id);
+    }
     getSmallestServers(threadsNeeded, ramPerScriptNeeded) {
         const sortedServers = this.filter(server => server.getThreadsCount(ramPerScriptNeeded) >= threadsNeeded).
             sort((curr, next) => curr.getThreadsCount(ramPerScriptNeeded) - next.getThreadsCount(ramPerScriptNeeded));
