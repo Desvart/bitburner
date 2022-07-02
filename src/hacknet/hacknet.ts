@@ -1,6 +1,6 @@
-import {INs} from '/resources/helpers';
-import {getService, ServiceName} from '/resources/service';
-import {Player} from '/resources/player';
+import {INs} from '/helpers';
+import {getService, ServiceName} from '/services/service';
+import {Player} from '/services/player';
 
 interface IHacknet2 extends Array<HServer> {
     productionRate: number;

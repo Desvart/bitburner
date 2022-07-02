@@ -7,9 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Log } from '/resources/helpers';
+import { Log } from '/helpers';
 import { Hacknet } from '/hacknet/hacknet';
-import { Player } from '/resources/player';
+import { Player } from '/services/player';
 const FLAGS = [
     ['harnestRatio', 1 / 4],
     ['cycleTime', 200],
@@ -61,7 +61,8 @@ class HacknetDaemon {
                 if (bestUpgrade.cost >= availableMoney) {
                     const missingMoney = bestUpgrade.cost - availableMoney;
                     const timeToWait = missingMoney / (this.hacknet.productionRate * harnestRatio) * 1000;
-                    this.log.info(`HACKNET_DAEMON - Waiting time to next upgrade (node${bestUpgrade.serverId}.${bestUpgrade.type}): ${this.log.formatDuration(timeToWait)}`);
+                    const timeToWaitStr = this.ns.tFormat(timeToWait);
+                    this.log.info(`HACKNET_DAEMON - Waiting time to next upgrade2 (node${bestUpgrade.serverId}.${bestUpgrade.type}): ${timeToWaitStr}`);
                     yield this.ns.sleep(timeToWait);
                 }
             }

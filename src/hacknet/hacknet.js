@@ -1,4 +1,4 @@
-import { getService, ServiceName } from '/resources/service';
+import { getService, ServiceName } from '/services/service';
 export class Hacknet extends Array {
     constructor(ns) {
         super();

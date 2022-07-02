@@ -1,6 +1,6 @@
-import {INs, Log} from '/resources/helpers';
+import {INs, Log} from '/helpers';
 import {Hacknet} from '/hacknet/hacknet';
-import {Player} from '/resources/player';
+import {Player} from '/services/player';
 
 const FLAGS: [string, number][] = [
     ['harnestRatio', 1/4],
@@ -59,9 +59,9 @@ class HacknetDaemon {
             if (bestUpgrade.cost >= availableMoney) {
                 const missingMoney: number = bestUpgrade.cost - availableMoney;
                 const timeToWait: number = missingMoney / (this.hacknet.productionRate * harnestRatio) * 1000;
+                const timeToWaitStr = this.ns.tFormat(timeToWait);
                 this.log.info(
-                    `HACKNET_DAEMON - Waiting time to next upgrade (node${bestUpgrade.serverId}.${bestUpgrade.type}): ${this.log.formatDuration(
-                        timeToWait)}`);
+                    `HACKNET_DAEMON - Waiting time to next upgrade2 (node${bestUpgrade.serverId}.${bestUpgrade.type}): ${timeToWaitStr}`);
                 await this.ns.sleep(timeToWait);
             }
         }
