@@ -18,18 +18,9 @@ export function main(ns) {
         ns.tail();
         ns.disableLog('ALL');
         ns.clearLog();
-        //FIXME - Sanitize Parentheses in Expression - ()((())()))(()
-        //FIXME - Sanitize Parentheses in Expression - (a(())(a)))(((()
-        //FIXME - Sanitize Parentheses in Expression - ())()a(aa((a
-        //FIXME - Array Jumping Game - [5,2,1,1,5,5]
-        //FIXME - Array Jumping Game - [4,2,1,1,8]
-        //FIXME - Array Jumping Game - [1,3,2,6,3,1,5,2]
         const log = new Log(ns);
         const sherlock = new SherlockDaemon(ns, log);
-        //noinspection InfiniteLoopJS
-        // while (true) {
         for (const contract of sherlock.retrieveContracts()) {
-            // if (contract.type === 'Proper 2-Coloring of a Graph') {
             const solvedContract = sherlock.solveContract(contract);
             if (solvedContract.solution !== 'Not implemented yet') {
                 const submittedContract = sherlock.submitSolution(solvedContract);
@@ -40,10 +31,7 @@ export function main(ns) {
                     Contract ${contract.name} on ${contract.location}) skipped.`;
                 log.warn(msg);
             }
-            // }
         }
-        // await ns.sleep(5 * 60 * 1000);
-        // }
     });
 }
 class SherlockDaemon {
@@ -54,10 +42,10 @@ class SherlockDaemon {
     retrieveContracts() {
         const network = getService(this.ns, ServiceName.Network);
         let contractsList = [];
-        for (const hostname of network.hostnames) {
-            const foundContractFileList = this.ns.ls(hostname, CONFIG.CONTRACT_EXTENSION);
+        for (const server of network) {
+            const foundContractFileList = this.ns.ls(server.id, CONFIG.CONTRACT_EXTENSION);
             for (const contractFile of foundContractFileList) {
-                contractsList.push(new Contract(this.ns, contractFile, hostname));
+                contractsList.push(new Contract(this.ns, contractFile, server.id));
             }
         }
         return contractsList;
