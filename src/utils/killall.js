@@ -43,6 +43,7 @@ export function main(ns) {
                     }
                 }
             }
+            ns.run('/utils/init.js');
         }
         if (!flags.scripts && !flags.services && !flags.all) {
             const processes = ns.ps(ns.getHostname());

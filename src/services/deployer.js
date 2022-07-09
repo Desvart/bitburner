@@ -18,7 +18,7 @@ export class Deployer {
         return __awaiter(this, void 0, void 0, function* () {
             const scriptRam = job.scriptRam || this.ns.getScriptRam(job.script, 'home');
             if (job.runnerName) {
-                job.runner = this.network.getServer(job.runnerName);
+                job.runner = this.network.getNode(job.runnerName);
             }
             else {
                 job.runner = this.network.getSmallestServers(job.threads || (job.threads = 1), scriptRam);

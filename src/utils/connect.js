@@ -21,7 +21,6 @@ export function main(ns) {
         const flags = ns.flags(FLAGS);
         let path = [];
         let targetServer = flags._[0];
-        debugger;
         buildPathToServer(ns, '', 'home', targetServer, path);
         const command = path.join('; connect ') + '; backdoor;';
         if (!flags.print) {

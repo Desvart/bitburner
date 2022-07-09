@@ -39,6 +39,7 @@ export async function main(ns: INs) {
                 }
             }
         }
+        ns.run('/utils/init.js');
     }
     
     if (!flags.scripts && !flags.services && !flags.all) {

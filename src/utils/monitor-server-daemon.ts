@@ -23,7 +23,8 @@ export async function main(ns: INs) {
     ns.disableLog('ALL');
     
     const network: Network = getService<Network>(ns, ServiceName.Network);
-    const server: Server = network.filter(server => server.id === flags._[0])[0];
+    const server: Server = network.getNode(flags._[0]);
+    const home: Server = network.getNode('home');
     
     const maxMoney: number = server.money.max;
     const maxMoneyStr: string = ns.nFormat(maxMoney, "$0.000a");
@@ -47,10 +48,13 @@ export async function main(ns: INs) {
         
         const growTimeStr: string = server.gw.durationStr;
         const growThreadsStr: string = server.gw.getThreadsAmount(money, maxMoney).toFixed();
+        const growThreadsHomeStr: string = server.gw.getThreadsAmount(money, maxMoney, home.cores).toFixed();
         
         const weakenTimeStr: string = server.wk.durationStr;
         const weakenThreadsStr: string = server.wk.getThreadsAmount(sec - minSec).toFixed();
-        
+        const weakenThreadsHomeStr: string = server.wk.getThreadsAmount(sec - minSec, home.cores).toFixed();
+    
+        const ramRatioStr: string = (server.ram.free / server.ram.max * 100).toFixed(2) + '%';
         const hackChance: string = (server.hk.chance * 100).toFixed(2) + '%';
         
         ns.clearLog();
@@ -58,9 +62,9 @@ export async function main(ns: INs) {
         ns.print(` money      : ${moneyStr} / ${maxMoneyStr} (${moneyRatioStr})`);
         ns.print(` sec.       : ${secStr} / ${minSecStr} (+${secDeltaStr})`);
         ns.print(` hack       : ${hackTimeStr} (threads = ${hackThreadsStr})`);
-        ns.print(` grow       : ${growTimeStr} (threads = ${growThreadsStr})`);
-        ns.print(` weaken     : ${weakenTimeStr} (threads = ${weakenThreadsStr})`);
-        ns.print(` RAM (free) : ${server.ram.free}GB / ${server.ram.max}GB`);
+        ns.print(` grow       : ${growTimeStr} (threads = ${growThreadsStr} or ${growThreadsHomeStr})`);
+        ns.print(` weaken     : ${weakenTimeStr} (threads = ${weakenThreadsStr} or ${weakenThreadsHomeStr})`);
+        ns.print(` RAM (free) : ${server.ram.free}GB / ${server.ram.max}GB (${ramRatioStr})`);
         ns.print(` hackChance : ${hackChance}`);
         
         await ns.sleep(flags.refreshrate);

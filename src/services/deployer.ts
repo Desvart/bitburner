@@ -13,7 +13,7 @@ export class Deployer {
         const scriptRam = job.scriptRam || this.ns.getScriptRam(job.script, 'home');
         
         if (job.runnerName) {
-            job.runner = this.network.getServer(job.runnerName);
+            job.runner = this.network.getNode(job.runnerName);
         } else {
             job.runner = this.network.getSmallestServers(job.threads ||= 1, scriptRam);
         }

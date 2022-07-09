@@ -15,7 +15,7 @@ export async function main(ns: INs): Promise<void> {
     const flags = ns.flags(FLAGS);
     let path: string[] = [];
     let targetServer: string = flags._[0];
-    debugger
+
     buildPathToServer(ns, '', 'home', targetServer, path);
     
     const command: string = path.join('; connect ') + '; backdoor;';
