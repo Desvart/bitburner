@@ -80,7 +80,7 @@ class Monitor {
         });
     }
     getServiceList() {
-        return this.ns.ls('home', '-service.js');
+        return this.ns.ls('home', '-service.js').reverse();
     }
     getServiceNameFromServiceFile(serviceFile) {
         const regExp = /\/services\/(.*)-service.js/;

@@ -1,4 +1,4 @@
-import {INs} from '/helpers';
+import {INs} from '/pkg.helpers';
 
 /**
  * This script identifies the path to go from home to a target server. By default, the script automatically tries to

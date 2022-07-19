@@ -1,4 +1,4 @@
-import {INs} from '/helpers';
+import {INs} from '/pkg.helpers';
 
 export class Player {
     

@@ -8,15 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Deployer } from '/services/deployer';
-import { Log } from '/helpers';
 import { Service, ServiceName } from '/services/service';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
-        /*ns.tail();
-        ns.disableLog('ALL');
-        ns.clearLog();*/
-        const deployer = new Deployer(ns, new Log(ns));
-        const service = new Service(ns, new Log(ns), ServiceName.Deployer, deployer);
+        const deployer = new Deployer(ns);
+        const service = new Service(ns, ServiceName.Deployer, deployer);
         yield service.start();
         ns.closeTail();
     });

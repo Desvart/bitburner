@@ -1,14 +1,15 @@
-import {INs, Log} from '/helpers';
-import {getService, ServiceName} from '/services/service';
-import {Deployer} from '/services/deployer';
-import {Player} from '/services/player';
+import {INs, Log} from '/pkg.helpers';
 import {Network} from '/services/network';
+import {ServiceName, ServiceProvider} from '/services/service';
+import {Player} from '/services/player';
+import {Deployer} from '/services/deployer';
 
 const FLAGS: [string, boolean][] = [
     ['killall', false],
 ];
 
 export async function main(ns: INs) {
+    
     const flags = ns.flags(FLAGS);
     const init = new Init(ns, new Log(ns));
     
@@ -22,29 +23,31 @@ export async function main(ns: INs) {
 }
 
 class Init {
-    private deployer: Deployer;
-    private player: Player;
-    private network: Network;
-    
     constructor(private readonly ns: INs, private readonly log: Log) {}
     
     async startAllServices(): Promise<void> {
-        
         this.ns.exec('/utils/monitor-overview-daemon.js', 'home');
         await this.ns.sleep(500);
-        
-        this.ns.exec('/services/player-service.js', 'home');
-        await this.ns.sleep(500);
-        
-        this.ns.exec('/services/network-service.js', 'home');
-        await this.ns.sleep(500);
-        
-        this.ns.exec('/services/deployer-service.js', 'home');
-        await this.ns.sleep(500);
-        
-        this.deployer = getService<Deployer>(this.ns, ServiceName.Deployer);
-        this.player = getService<Player>(this.ns, ServiceName.Player);
-        this.network = getService<Network>(this.ns, ServiceName.Network);
+        await this.getService<Player>(ServiceName.Player);
+        await this.getService<Network>(ServiceName.Network);
+        await this.getService<Deployer>(ServiceName.Deployer);
+    }
+    
+    retrieveService<ResultType>(serviceName: ServiceName): ResultType {
+        const portHandle = this.ns.getPortHandle(serviceName);
+        return portHandle.empty() ? null : portHandle.peek();
+    }
+    
+    async getService<ResultType>(serviceName: ServiceName): Promise<ResultType> {
+        let obj = this.retrieveService<ResultType>(serviceName);
+        if (!obj) {
+            this.ns.exec(`/services/${ServiceName[serviceName].toLowerCase()}-service.js`, 'home');
+            do {
+                await this.ns.sleep(500);
+                obj = this.retrieveService<ResultType>(serviceName);
+            } while (!obj)
+        }
+        return obj;
     }
     
     globalKillAll(hostnames: string[]): void {

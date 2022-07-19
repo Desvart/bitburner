@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { Log } from '/pkg.helpers';
 export var ServiceName;
 (function (ServiceName) {
     ServiceName[ServiceName["Player"] = 10] = "Player";
@@ -19,15 +20,25 @@ const CONFIG = {
     MAX_RETRY: 10,
     SLEEP_DURATION: 100, // ms
 };
-export function getService(ns, serviceName) {
-    const portHandle = ns.getPortHandle(serviceName);
-    return portHandle.empty() ? null : portHandle.peek();
+export class ServiceProvider {
+    static getNetwork(ns) {
+        const portHandle = ns.getPortHandle(ServiceName.Network);
+        return portHandle.empty() ? null : portHandle.peek();
+    }
+    static getPlayers(ns) {
+        const portHandle = ns.getPortHandle(ServiceName.Player);
+        return portHandle.empty() ? null : portHandle.peek();
+    }
+    static getDeployer(ns) {
+        const portHandle = ns.getPortHandle(ServiceName.Deployer);
+        return portHandle.empty() ? null : portHandle.peek();
+    }
 }
 export class Service {
-    constructor(ns, log, portId = 1, obj) {
+    constructor(ns, portId = 1, obj) {
         this.ns = ns;
-        this.log = log;
         this.portId = portId;
+        this.log = new Log(ns);
         this.portHandle = this.ns.getPortHandle(portId);
         this.publishObject(obj);
     }

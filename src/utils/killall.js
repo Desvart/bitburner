@@ -43,6 +43,7 @@ export function main(ns) {
                     }
                 }
             }
+            yield ns.sleep(500);
             ns.run('/utils/init.js');
         }
         if (!flags.scripts && !flags.services && !flags.all) {

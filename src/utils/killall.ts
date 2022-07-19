@@ -1,4 +1,4 @@
-import {INs, IProcess} from '/helpers';
+import {INs, IProcess} from '/pkg.helpers';
 
 /**
  * This script enhances the possibility of the killall command.
@@ -39,6 +39,7 @@ export async function main(ns: INs) {
                 }
             }
         }
+        await ns.sleep(500);
         ns.run('/utils/init.js');
     }
     

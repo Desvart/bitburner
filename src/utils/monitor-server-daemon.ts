@@ -1,6 +1,6 @@
-import {getService, ServiceName} from '/services/service';
+import {ServiceProvider} from '/services/service';
 import {Network, Server} from '/services/network';
-import {formatDuration, INs} from '/helpers';
+import {INs} from '/pkg.helpers';
 
 // noinspection JSCommentMatchesSignature
 /**
@@ -22,7 +22,7 @@ export async function main(ns: INs) {
     ns.tail();
     ns.disableLog('ALL');
     
-    const network: Network = getService<Network>(ns, ServiceName.Network);
+    const network: Network = ServiceProvider.getNetwork(ns);
     const server: Server = network.getNode(flags._[0]);
     const home: Server = network.getNode('home');
     

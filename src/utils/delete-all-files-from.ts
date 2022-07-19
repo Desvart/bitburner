@@ -1,4 +1,4 @@
-import {INs} from '/helpers';
+import {INs} from '/pkg.helpers';
 import {Network} from '/services/network';
 import {getService, ServiceName} from '/services/service';
 

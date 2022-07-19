@@ -1,5 +1,5 @@
 // noinspection DuplicatedCode
-import {INs} from '/helpers';
+import {INs} from '/pkg.helpers';
 import {Player} from '/services/player';
 
 /**
@@ -85,7 +85,7 @@ class Monitor {
     }
     
     getServiceList(): string[] {
-        return this.ns.ls('home', '-service.js');
+        return this.ns.ls('home', '-service.js').reverse();
     }
     
     getServiceNameFromServiceFile(serviceFile): string {

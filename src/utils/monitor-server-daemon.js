@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getService, ServiceName } from '/services/service';
+import { ServiceProvider } from '/services/service';
 // noinspection JSCommentMatchesSignature
 /**
  * This script continuously monitors a specific server on multiple parameters. Useful for creating hacking scripts.
@@ -26,7 +26,7 @@ export function main(ns) {
         ]);
         ns.tail();
         ns.disableLog('ALL');
-        const network = getService(ns, ServiceName.Network);
+        const network = ServiceProvider.getNetwork(ns);
         const server = network.getNode(flags._[0]);
         const home = network.getNode('home');
         const maxMoney = server.money.max;

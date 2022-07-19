@@ -7,9 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Log } from '/helpers';
-import { getService, ServiceName } from '/services/service';
+import { Log } from '/pkg.helpers';
 import { Network } from '/services/network';
+import { ServiceName } from '/services/service';
 const FLAGS = [
     ['killall', false],
 ];
@@ -34,15 +34,26 @@ class Init {
         return __awaiter(this, void 0, void 0, function* () {
             this.ns.exec('/utils/monitor-overview-daemon.js', 'home');
             yield this.ns.sleep(500);
-            this.ns.exec('/services/player-service.js', 'home');
-            yield this.ns.sleep(500);
-            this.ns.exec('/services/network-service.js', 'home');
-            yield this.ns.sleep(500);
-            this.ns.exec('/services/deployer-service.js', 'home');
-            yield this.ns.sleep(500);
-            this.deployer = getService(this.ns, ServiceName.Deployer);
-            this.player = getService(this.ns, ServiceName.Player);
-            this.network = getService(this.ns, ServiceName.Network);
+            yield this.getService(ServiceName.Player);
+            yield this.getService(ServiceName.Network);
+            yield this.getService(ServiceName.Deployer);
+        });
+    }
+    retrieveService(serviceName) {
+        const portHandle = this.ns.getPortHandle(serviceName);
+        return portHandle.empty() ? null : portHandle.peek();
+    }
+    getService(serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let obj = this.retrieveService(serviceName);
+            if (!obj) {
+                this.ns.exec(`/services/${ServiceName[serviceName].toLowerCase()}-service.js`, 'home');
+                do {
+                    yield this.ns.sleep(500);
+                    obj = this.retrieveService(serviceName);
+                } while (!obj);
+            }
+            return obj;
         });
     }
     globalKillAll(hostnames) {

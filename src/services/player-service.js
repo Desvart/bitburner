@@ -7,13 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Log } from '/helpers';
 import { Service, ServiceName } from '/services/service';
 import { Player } from '/services/player';
 export function main(ns) {
     return __awaiter(this, void 0, void 0, function* () {
         const player = new Player(ns);
-        const service = new Service(ns, new Log(ns), ServiceName.Player, player);
+        const service = new Service(ns, ServiceName.Player, player);
         yield service.start();
     });
 }
