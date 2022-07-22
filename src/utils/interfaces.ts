@@ -104,6 +104,7 @@ export interface IBaseProcess {
     filename: string;
     pid: number;
     threads: number;
+    runnerId?: string;
 }
 
 export interface IBaseNodeStats {

@@ -1,8 +1,10 @@
-import {INs, Log} from '/pkg.helpers';
+import {Log} from '/pkg.helpers';
 import {Network} from '/services/network';
-import {ServiceName, ServiceProvider} from '/services/service';
+import {ServiceName} from '/services/service';
 import {Player} from '/services/player';
 import {Deployer} from '/services/deployer';
+import {ProcessMngr} from '/services/processmngr';
+import {INs} from '/utils/interfaces';
 
 const FLAGS: [string, boolean][] = [
     ['killall', false],
@@ -31,6 +33,7 @@ class Init {
         await this.getService<Player>(ServiceName.Player);
         await this.getService<Network>(ServiceName.Network);
         await this.getService<Deployer>(ServiceName.Deployer);
+        await this.getService<ProcessMngr>(ServiceName.ProcessMngr);
     }
     
     retrieveService<ResultType>(serviceName: ServiceName): ResultType {

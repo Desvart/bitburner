@@ -1,14 +1,16 @@
 import {Deployer} from './deployer';
 import {Player} from './player';
-import {INetscriptPort, INs, Log} from '/pkg.helpers';
+import {Log} from '/pkg.helpers';
 import {Network} from '/services/network';
+import {INetscriptPort, INs} from '/utils/interfaces';
 
 export enum ServiceName {
     Player = 10,
     Network = 12,
     Deployer = 14,
-    ThreadPool = 16,
-    ShivaOptimizer = 18
+    ProcessMngr = 16,
+    ThreadPool = 18,
+    ShivaOptimizer = 20
 }
 
 const CONFIG: {

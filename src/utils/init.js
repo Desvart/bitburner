@@ -37,6 +37,7 @@ class Init {
             yield this.getService(ServiceName.Player);
             yield this.getService(ServiceName.Network);
             yield this.getService(ServiceName.Deployer);
+            yield this.getService(ServiceName.ProcessMngr);
         });
     }
     retrieveService(serviceName) {
